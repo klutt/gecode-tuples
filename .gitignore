@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+
+# TexStudio temps
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/*.synctex.gz
+doc/*.toc

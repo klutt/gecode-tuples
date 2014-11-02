@@ -1,0 +1,105 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{rotating}
+\usepackage{tikz} \usetikzlibrary{trees}
+\usepackage{pbox}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\newcommand{\AnyCond}[1]{\text{Any}(#1)}
+\newcommand{\BoundedCond}[1]{\text{Bounded}(#1)}
+\newcommand{\Constraint}[1]{\textsc{#1}}
+\newcommand{\DepProps}{\textit{DepProps}}
+\newcommand{\Distinct}{\Constraint{Distinct}}
+\newcommand{\Failed}{\text{Failed}}
+\newcommand{\FailedCond}[1]{\text{Failed}(#1)}
+\newcommand{\FixedCond}[1]{\text{Fixed}(#1)}
+\newcommand{\Fixpoint}{\text{AtFixpt}}
+\newcommand{\NoneCond}[1]{\text{None}(#1)}
+\newcommand{\Gecode}{\textit{Gecode}}
+\newcommand{\GIST}{\textit{GIST}}
+\newcommand{\Propagate}{\text{Propagate}}
+\newcommand{\PropConds}[1]{\text{PropConds}(#1)}
+\newcommand{\Sequence}[1]{\left[#1\right]}
+\newcommand{\Set}[1]{\left\{#1\right\}}
+\newcommand{\Subsumed}{\text{Subsumed}}
+\newcommand{\Tuple}[1]{\left\langle#1\right\rangle}
+\newcommand{\Unknown}{\text{Unknown}}
+
+\pagestyle{empty}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+
+\title{\textbf{Implementing Tuple Variables in Gecode \\
+	Bachelor thesis \\
+    Uppsala University -- Autumn 2014 \\
+  }
+}
+
+\author{Patrik Broman}
+
+\date{\today}
+
+
+\begin{document}
+
+\begin{abstract}
+This is the abstract
+\end{abstract}
+
+\tableofcontents
+\section{Acknowledgements}
+
+\section{Introduction}
+\subsection{Constraint Programming}
+
+Constraint programming (CP) is a method to solve problems by first modeling the problem with different types of variables and then adding constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. A very typical problem suitable for constraint programming is sudoku. The most intuitive model is a 9x9 matrix of integer variables. The general constraints for all standard sudokus is that every cell has a domain of 1..9, and that all cells in a row, column and box must be different. For a specific sudoku constraints are added to require specific cells to have specific values.
+
+\subsection{Gecode}
+Gecode is an open source CP solver blablabla.
+
+\section{Background}
+\subsection{The need for tuple variables}
+When using a CP solver, one wants to avoid the brute force searching. This is done by intelligently choosing model and constraints. By doing this the variable domains can be pruned to smaller sizes. For example, if two variables $x$ and $y$ have domains $x=\{1,2,3\}$ $y=\{2,3,4\}$ and the constraint $y<x$ is added we can prune the domains to $x=\{3\}$ and $y=\{2\}$. If we instead have the same variables but add the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. In this example the problem was modeled with two integer variables, but if the problem instead would be modeled with one tuple variable pruning would be possible. Then we would have a tuple variable $t$ with domain $t=\{<1,2>,<1,3>,<1,4>,<2,2>,<2,3>,<2,4>,<3,2>,<3,3>,<3,4>\}$ and pruning with the distinct condition would yield $t=\{<1,2>,<1,3>,<1,4>,<2,3>,<2,4>,<3,2>,<3,4>\}$. This shrinks the size of the search tree from 9 to 7. 
+
+If we instead look at the case where $x,y=\{1..1000\}$ and the constraint $x=y$ the benefits is more obvious. Using integer variables pruning can not remove anything. If tuple variables were used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful.
+
+\section{Body}
+
+\subsection{Implementation}
+
+\subsection{Performance test}
+
+\section{Related work}
+\subsection{Implementation of bit-vector variables in a CP solver}
+\subsection{A propagator design framework for constraints over sequences}
+
+\section{Conclusions and future work}
+
+\subsection{Write the implementation in such a way that it may be accepted in a new Gecode release}
+\subsection{Test different implementations with different domain representations}
+\subsection{Extend the tuples to arbitrary dimensions and not just pairs}
+\subsection{Reach better performance for a specific problem with an array of pair variables than with two arrays of integer variables}
+
+\section{Git repository}
+\url{http://github.com/patwotrik}
+
+\section{Legal}
+This document is licensed under GPL v3 and may be redistributed as GPL v3 or later. 
+
+\begin{thebibliography}{99}
+\bibitem{Calculus}
+	Calculus, 
+	Adams
+	
+\bibitem{os}
+	Operating systems and its concepts,
+	Galvin
+	
+\end{thebibliography}
+
+\end{document}
