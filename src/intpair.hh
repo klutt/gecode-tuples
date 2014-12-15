@@ -25,11 +25,19 @@
  *
  */
 
-#ifndef __MPG_INT_HH__
-#define __MPG_INT_HH__
+/* Authors:
+   Patrik Broman
+
+   Copyright:
+   Patrik Broman
+*/
+
+#ifndef __MPG_INTPAIR_HH__
+#define __MPG_INTPAIR_HH__
 #include <iostream>
 #include <sstream>
 #include <climits>
+#include <vector>
 
 #include <gecode/kernel.hh>
 
@@ -84,9 +92,12 @@ using Gecode::TieBreak;
 using Gecode::function_cast;
 using Gecode::BrancherHandle;
 
+using namespace MPG::Int;
 
+/*
 // exceptions
-namespace MPG { namespace Int {
+namespace MPG { namespace IntPair {
+    
   class OutOfLimits : public Exception {
   public:
     OutOfLimits(const char* l)
@@ -103,12 +114,15 @@ namespace MPG { namespace Int {
       : Exception(l,"Unknown branching (variable or value)") {}
   };
 }}
+*/ 
 
 // variable implementation
+
 namespace MPG { namespace Int {
 
+    /*
   // limits
-  namespace Limits {
+  namespace Limit {
     const int max = (INT_MAX / 2) - 1;
     const int min = -max;
   }
@@ -124,25 +138,32 @@ namespace MPG { namespace Int {
     int max(void) const {
       return u;
     }
-  };
-  
-  class IntVarImp : public IntVarImpBase {
-  protected:
-    int l, u;
+    }; */
+
+
+    class IntPairVarImp : public IntPairVarImpBase {
+    protected:
+      struct Pair {
+	int x, y;
+	Pair(int x, int y) : x(x), y(y) {};
+      };
+
+    std::vector<Pair> domain;
+
   public:
-    IntVarImp(Space& home, int min, int max)
-      : IntVarImpBase(home), l(min), u(max) {}
+    IntPairVarImp(Space& home, int x_min, int y_min, int x_max, int y_max)
+      : IntPairVarImpBase(home) {
+      for(int x=x_min; x<=x_max; x++)
+	for(int y=y_min; y<=y_max; y++)
+	  domain.push_back(Pair(x,y));
+    }
     // access operations
-    int min(void) const {
-      return l;
-    }
-    int max(void) const {
-      return u;
-    }
+
     // assignment test
     bool assigned(void) const {
-      return l == u;
+      return domain.size()==1;
     }
+    /*
     // modification operations
     ModEvent lq(Space& home, int n) {
       if (n >= u) return ME_INT_NONE;
@@ -156,7 +177,9 @@ namespace MPG { namespace Int {
       IntDelta d(l,n-1); l = n;
       return notify(home, assigned() ? ME_INT_VAL : ME_INT_MIN, d);
     }
+    */
     // subscriptions
+    /*
     void subscribe(Space& home, Propagator& p, PropCond pc, 
                    bool schedule=true) {
       IntVarImpBase::subscribe(home,p,pc,assigned(),schedule);
@@ -169,47 +192,49 @@ namespace MPG { namespace Int {
     }
     void cancel(Space& home, Advisor& a) {
       IntVarImpBase::cancel(home,a,assigned());
-    }
+      } */
     // copying
-    IntVarImp(Space& home, bool share, IntVarImp& y)
-      : IntVarImpBase(home,share,y), l(y.l), u(y.u) {}
-    IntVarImp* copy(Space& home, bool share) {
+    IntPairVarImp(Space& home, bool share, IntPairVarImp& y)
+      : IntPairVarImpBase(home,share,y), domain(y.domain) {}
+    IntPairVarImp* copy(Space& home, bool share) {
       if (copied()) 
-        return static_cast<IntVarImp*>(forward());
+        return static_cast<IntPairVarImp*>(forward());
       else
-        return new (home) IntVarImp(home,share,*this);
+        return new (home) IntPairVarImp(home,share,*this);
     }
     // delta information
+    /*
     static int min(const Delta& d) {
       return static_cast<const IntDelta&>(d).min();
     }
     static int max(const Delta& d) {
       return static_cast<const IntDelta&>(d).max();
-    }
+      }*/
   };
 
 }}
 
+/*
 // variable
 namespace MPG {
 
-  class IntVar : public VarImpVar<Int::IntVarImp> {
+  class IntPairVar : public VarImpVar<IntPair::IntPairVarImp> {
   protected:
-    using VarImpVar<Int::IntVarImp>::x;
+    using VarImpVar<IntPair::IntPairVarImp>::x;
   public:
-    IntVar(void) {}
-    IntVar(const IntVar& y)
-      : VarImpVar<Int::IntVarImp>(y.varimp()) {}
-    IntVar(Int::IntVarImp* y)
-      : VarImpVar<Int::IntVarImp>(y) {}
+    IntPairVar(void) {}
+    IntPairVar(const IntPairVar& y)
+      : VarImpVar<IntPair::IntPairVarImp>(y.varimp()) {}
+    IntPairVar(IntPair::IntPairVarImp* y)
+      : VarImpVar<IntPair::IntPairVarImp>(y) {}
     // variable creation
-    IntVar(Space& home, int min, int max)
-      : VarImpVar<Int::IntVarImp>
-          (new (home) Int::IntVarImp(home,min,max)) {
-      if ((min < Int::Limits::min) || (max > Int::Limits::max))
+    IntPairVar(Space& home, int xmin,int ymin, int xmax, int ymax)
+      : VarImpVar<IntPair::IntPairVarImp>
+	(new (home) Int::IntPairVarImp(home,xmin, ymin, xmax, ymax)) {
+            if ((min < Int::Limits::min) || (max > Int::Limits::max))
         throw Int::OutOfLimits("IntVar::IntVar");
       if (min > max)
-        throw Int::VariableEmptyDomain("IntVar::IntVar");
+      throw Int::VariableEmptyDomain("IntVar::IntVar"); 
     }
     // access operations
     int min(void) const {
@@ -217,7 +242,7 @@ namespace MPG {
     }
     int max(void) const {
       return x->max();
-    }
+      }
   };
 
   template<class Char, class Traits>
@@ -233,6 +258,11 @@ namespace MPG {
   }
 
 }
+*/
+
+
+
+/*
 // array traits
 namespace MPG {
   class IntVarArgs; class IntVarArray;
@@ -299,7 +329,9 @@ namespace MPG {
   };
 
 }
+*/
 
+/*
 // integer view
 namespace MPG { namespace Int {
 
@@ -550,7 +582,10 @@ namespace MPG { namespace Int {
   }
   
 }}
+*/
 
+
+/*
 // branching
 // branch function types
 namespace MPG {
@@ -1005,5 +1040,6 @@ namespace MPG {
     }
   }
 }
+*/
 
 #endif

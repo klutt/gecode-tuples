@@ -45,10 +45,10 @@
  *  -------------------------------
  */
 
-#include "int.hh"
 #include <gecode/driver.hh>
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
+#include "intpair.hh"
 
 using namespace std;
 using namespace Gecode;

@@ -1,0 +1,21 @@
+1)
+
+Create the .vis file
+
+Mandatory fields are ...
+
+
+
+2) 
+
+Run the command:
+./configure --with-vis <visfile>
+
+
+3)
+
+Create the implementation
+
+4)
+
+make
