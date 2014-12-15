@@ -92,8 +92,8 @@ using Gecode::TieBreak;
 using Gecode::function_cast;
 using Gecode::BrancherHandle;
 
-using namespace MPG::Int;
-
+//using namespace MPG::IntPair;
+//using namespace MPG;
 /*
 // exceptions
 namespace MPG { namespace IntPair {
@@ -118,7 +118,7 @@ namespace MPG { namespace IntPair {
 
 // variable implementation
 
-namespace MPG { namespace Int {
+namespace MPG { namespace IntPair {
 
     /*
   // limits
@@ -140,13 +140,23 @@ namespace MPG { namespace Int {
     }
     }; */
 
-
-    class IntPairVarImp : public IntPairVarImpBase {
-    protected:
       struct Pair {
 	int x, y;
 	Pair(int x, int y) : x(x), y(y) {};
       };
+
+    template<class Char, class Traits>
+    std::basic_ostream<Char,Traits>&
+    operator <<(std::basic_ostream<Char,Traits>& os, const Pair& p) {
+      std::basic_ostringstream<Char,Traits> s;
+      s.copyfmt(os); s.width(0);
+      s << '<' << p.x << ',' << p.y << '>';
+      return os << s.str();
+      };
+
+
+    class IntPairVarImp : public IntPairVarImpBase {
+    protected:
 
     std::vector<Pair> domain;
 
@@ -158,7 +168,13 @@ namespace MPG { namespace Int {
 	  domain.push_back(Pair(x,y));
     }
     // access operations
+      Pair min(void) const {
+	return Pair(domain[0]);
+      }
 
+      Pair max(void) const {
+	return Pair(domain.back());
+      }
     // assignment test
     bool assigned(void) const {
       return domain.size()==1;
@@ -214,11 +230,11 @@ namespace MPG { namespace Int {
 
 }}
 
-/*
+
 // variable
 namespace MPG {
 
-  class IntPairVar : public VarImpVar<IntPair::IntPairVarImp> {
+  class IntPairVar : public VarImpVar<MPG::IntPair::IntPairVarImp> {
   protected:
     using VarImpVar<IntPair::IntPairVarImp>::x;
   public:
@@ -230,35 +246,45 @@ namespace MPG {
     // variable creation
     IntPairVar(Space& home, int xmin,int ymin, int xmax, int ymax)
       : VarImpVar<IntPair::IntPairVarImp>
-	(new (home) Int::IntPairVarImp(home,xmin, ymin, xmax, ymax)) {
-            if ((min < Int::Limits::min) || (max > Int::Limits::max))
-        throw Int::OutOfLimits("IntVar::IntVar");
-      if (min > max)
-      throw Int::VariableEmptyDomain("IntVar::IntVar"); 
+	(new (home) IntPair::IntPairVarImp(home,xmin, ymin, xmax, ymax)) {
+      //            if ((min < Int::Limits::min) || (max > Int::Limits::max))
+      //  throw Int::OutOfLimits("IntVar::IntVar");
+      //if (min > max)
+      //throw Int::VariableEmptyDomain("IntVar::IntVar"); 
     }
     // access operations
-    int min(void) const {
+    
+    IntPair::Pair min(void) const {
       return x->min();
     }
+
+    IntPair::Pair max(void) const {
+      return x->max();
+    }
+    /*
     int max(void) const {
       return x->max();
       }
-  };
+    */
 
+
+
+  };
+  
   template<class Char, class Traits>
   std::basic_ostream<Char,Traits>&
-  operator <<(std::basic_ostream<Char,Traits>& os, const IntVar& x) {
+  operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVar& x) {
     std::basic_ostringstream<Char,Traits> s;
     s.copyfmt(os); s.width(0);
     if (x.assigned())
       s << x.min();
     else
-      s << '[' << x.min() << ".." << x.max() << ']';
+      s << '[' << x.min() <<  ".." << x.max() << ']';
     return os << s.str();
   }
 
 }
-*/
+
 
 
 
@@ -585,11 +611,11 @@ namespace MPG { namespace Int {
 */
 
 
-/*
+
 // branching
 // branch function types
 namespace MPG {
-  typedef bool   (*IntBranchFilter)(const Space& home, 
+  /*  typedef bool   (*IntBranchFilter)(const Space& home, 
                                     IntVar x, int i);
   typedef void   (*IntVarValPrint) (const Space &home, 
                                     const BrancherHandle& bh,
@@ -597,16 +623,18 @@ namespace MPG {
                                     IntVar x, int i, const int& n,
                                     std::ostream& o);
   typedef double (*IntBranchMerit) (const Space& home, 
-                                    IntVar x, int i);
-  typedef int    (*IntBranchVal)   (const Space& home, 
-                                    IntVar x, int i);
-  typedef void   (*IntBranchCommit)(Space& home, unsigned int a,
-                                    IntVar x, int i, int n);
+  IntVar x, int i); */
+  typedef int    (*IntPairBranchVal)   (const Space& home, 
+                                    IntPairVar x, int i);
+  typedef void   (*IntPairBranchCommit)(Space& home, unsigned int a,
+      IntPairVar x, int i, int n); 
 }
+
+  /*  
 // branch traits
 namespace Gecode {
   template<>
-  class BranchTraits<MPG::IntVar> {
+  class BranchTraits<MPG::IntPairVar> {
   public:
     typedef MPG::IntBranchFilter Filter;
     typedef MPG::IntBranchMerit Merit;
@@ -615,7 +643,7 @@ namespace Gecode {
     typedef MPG::IntBranchCommit Commit;
   };
 }
-
+  
 // variable AFC
 namespace MPG {
   class IntAFC : public AFC {
@@ -679,7 +707,80 @@ namespace MPG {
     Activity::init(home,y,d,bm);
   }
 }
+*/
 
+
+// Minimum branching classes
+// Var branch
+namespace MPG {
+  class IntPairVarBranch : public VarBranch {
+  public:
+    enum Select {
+      SEL_NONE
+    };
+
+  protected:
+    Select s;
+    
+  public:
+    IntPairVarBranch(void);
+    IntPairVarBranch(Select s0, BranchTbl t);
+    Select select(void) const;
+  };
+
+  inline
+  IntPairVarBranch::IntPairVarBranch(void)
+    : VarBranch(NULL), s(SEL_NONE) {}
+
+
+  inline
+  IntPairVarBranch::IntPairVarBranch(Select s0, BranchTbl t)
+    : VarBranch(t), s(s0) {}
+
+  inline
+  IntPairVarBranch::Select IntPairVarBranch::select(void) const {
+    return s;
+  }
+
+  IntPairVarBranch INTPAIR_VAR_NONE(void);
+
+  inline IntPairVarBranch
+  INTPAIR_VAR_NONE(void) {
+    return IntPairVarBranch(IntPairVarBranch::SEL_NONE, NULL);
+  }
+
+  // Val branch
+  class IntPairValBranch : public ValBranch {
+  public:
+    enum Select {
+      SEL_MIN, SEL_VAL_COMMIT
+    };
+  protected:
+    Select s;
+  public:
+    IntPairValBranch(Select s0 = SEL_MIN)
+      : s(s0) {}
+    IntPairValBranch(VoidFunction v, VoidFunction c)
+      : ValBranch(v,c), s(SEL_VAL_COMMIT) {}
+    Select select(void) const {
+      return s;
+    }
+  };
+  IntPairValBranch INTPAIR_VAL_MIN(void);
+  IntPairValBranch INTPAIR_VAL(IntPairBranchVal v, IntPairBranchCommit c=NULL);
+  inline IntPairValBranch
+  INTPAIR_VAL_MIN(void) {
+    return IntPairValBranch(IntPairValBranch::SEL_MIN);
+  }
+  inline IntPairValBranch
+  INTPAIR_VAL(IntPairBranchVal v, IntPairBranchCommit c) {
+    return IntPairValBranch(function_cast<VoidFunction>(v),
+                        function_cast<VoidFunction>(c));
+			}
+}
+
+
+/*
 namespace MPG {
   // variable selection class
   class IntVarBranch : public VarBranch {

@@ -1,0 +1,21 @@
+#!/bin/bash
+if [ $# != 1 ] 
+then
+	echo "Usage: compile file.cpp"
+else
+	fullname="$1"
+	filename="${fullname##*/}"
+	base="${filename%.[^.]*}"
+	ext="${filename:${#base} + 1}"
+	if [ "$ext" != "cpp" ]
+	then
+		echo "File must be a .cpp file. Extension is $ext"
+	else
+		echo "Compiling..."
+		g++ -c $filename
+		flags="-lgecodeflatzinc -lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeset -lgecodefloat -lgecodeint -lgecodekernel -lgecodesupport"
+		echo "Linking with flags $flags"
+		echo "Modify script to disable flags if wanted."
+		g++ -o $base $base".o" $flags 
+	fi
+fi 

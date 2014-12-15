@@ -25,7 +25,7 @@
  *
  */
 
-#include "int.hh"
+#include "intpair.hh"
 
 #include <gecode/search.hh>
 

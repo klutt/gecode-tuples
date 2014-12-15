@@ -2,7 +2,7 @@ GECODESRC=~/gecode-4.3.2
 GECODEINSTALLDIR=$(HOME)/gecodelib
 GECODEDISABLE=--disable-examples --disable-thread --disable-float-vars --disable-set-vars
 GECODETUPLEDIR=~/gecode-tuples/src
-GECODEVISFILE=int.vis
+GECODEVISFILE=intpair.vis
 
 configure:
 	cd $(GECODESRC) ; \

@@ -1,6 +1,6 @@
 [General]
 Name:        IntPair
-Namespace:   MPG::Int
+Namespace:   MPG::IntPair
 
 [ModEvent]
 Name:        FAILED=FAILED
