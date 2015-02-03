@@ -1,3 +1,6 @@
+#ifndef INTPAIRBRANCH_HH
+#define INTPAIRBRANCH_HH
+
 // branching
 // branch function types
 namespace MPG {
@@ -99,7 +102,7 @@ namespace MPG {
 // Minimum branching classes
 // Var branch
 namespace MPG {
-  /*
+  
   class IntPairVarBranch : public VarBranch {
   public:
     enum Select {
@@ -134,7 +137,7 @@ namespace MPG {
   inline IntPairVarBranch
   INTPAIR_VAR_NONE(void) {
     return IntPairVarBranch(IntPairVarBranch::SEL_NONE, NULL);
-    } */
+    } 
 
   // Val branch
   class IntPairValBranch : public ValBranch {
@@ -298,11 +301,11 @@ namespace MPG {
                         function_cast<VoidFunction>(c));
   }
 }
-
-namespace MPG { namespace Int {
+*/
+namespace MPG { namespace IntPair {
   // view selection creation function
   // size merit class
-  class MeritSize : public MeritBase<IntView,unsigned int> {
+  class MeritSize : public MeritBase<IntPairView,unsigned int> {
   public:
     MeritSize(Space& home, const VarBranch& vb)
       : MeritBase<IntView,unsigned int>(home,vb) {}
@@ -312,12 +315,12 @@ namespace MPG { namespace Int {
       return x.max() - x.min();
     }
   };
-  inline ViewSel<IntView>*
+  inline ViewSel<IntPairView>*
   viewsel(Space& home, const IntVarBranch& ivb) {
     if (ivb.select() == IntVarBranch::SEL_NONE)
       return new (home) ViewSelNone<IntView>(home,ivb);
-    if (ivb.select() == IntVarBranch::SEL_RND)
-      return new (home) ViewSelRnd<IntView>(home,ivb);
+    //    if (ivb.select() == IntVarBranch::SEL_RND)
+    //  return new (home) ViewSelRnd<IntView>(home,ivb);
     if (ivb.tbl() != NULL) {
       // view selection with tbl-function
       switch (ivb.select()) {
@@ -464,7 +467,7 @@ namespace MPG { namespace Int {
     }
   }
 }}
-
+*/
 namespace MPG {
   // branch function
   inline BrancherHandle
@@ -534,4 +537,5 @@ namespace MPG {
     }
   }
 }
-*/
+
+#endif

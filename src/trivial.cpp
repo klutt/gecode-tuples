@@ -203,7 +203,7 @@ public:
     p(*this, 0, 0, N, N)
   {
 
-    //    branch(*this, p, INTPAIR_VAL_MIN());
+        branch(*this, p, INTPAIR_VAL_MIN());
     //branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
   }
 
