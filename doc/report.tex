@@ -59,6 +59,8 @@ Thanks to Joseph Scott
 
 Constraint programming (CP) is a method to solve problems by first modeling the problem with different types of variables and then adding constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. A very typical problem suitable for constraint programming is sudoku. The most intuitive model is a 9x9 matrix of integer variables. The general constraints for all standard sudokus is that every cell has a domain of 1..9, and that all cells in a row, column and box must be different. For a specific sudoku constraints are added to require specific cells to have specific values.
 
+The available data types limits the options to model a specific problem. There is a famous problem called Queens. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables were available we would have to model the problem with 64 boolean variables. If we instead use integer variables we can use the fact that all rows will have exactly one queen when we model the problem.
+
 \subsection{Gecode}
 Gecode is an open source CP solver blablabla.
 
@@ -68,9 +70,50 @@ When using a CP solver, one wants to avoid the brute force searching. This is do
 
 If we instead look at the case where $x,y=\{1..1000\}$ and the constraint $x=y$ the benefits is more obvious. Using integer variables pruning can not remove anything. If tuple variables were used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful.
 
-\section{Body}
+\section{Tuple Variable}
 
-\subsection{Implementation}
+\subsection{Creating a new Variable}
+\subsubsection{Specification file}
+Creating the specification file is the first thing that needs to be done when designing a new variable. Caution should be taken, because this step may be very hard to modify later. A simple specification file could look like this.
+
+\begin{lstlisting}[frame=single]
+[General]
+Name:      IntTuple
+Namespace: MPG::IntTuple
+
+[ModEvent]
+Name:      FAILED=FAILED
+
+[ModEvent]
+Name:      VAL=ASSIGNED
+
+[ModEvent]
+Name:      NONE=NONE
+
+[PropCond]
+Name:      NONE=NONE
+[End]
+\end{lstlisting}
+
+As can be seen, there are three sections. The specification file must start with the [General] section and end with [End]. There are also sections for modification events and propagation conditions. When the specification file is written a configuration script is used to generate base classes from the specification file.
+
+The [General] section is pretty straight forward. This is where the name and namespace of the variable is specified. Both name and namespace is arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
+
+The [ModEvent] section describes the modification events. For all variables modification events for NONE, FAILED and ASSIGNED are required.
+
+The [PropCond] section describes how the propagators are scheduled.
+
+\subsubsection{Variable implementation}
+The variable implementation class would with the specification file in the previous section be called IntTupleImp and inherit from the generated class IntTupleVarBase. It has to implement a function called assigned that returns true if the variable is assigned.
+\subsubsection{Deltas}
+\subsubsection{Views}
+\subsubsection{Propagators}
+\subsubsection{Branchers}
+
+\subsection{Implementation of exact IntPair}
+The exact version does not approximate the domain.
+\subsection{Implementation of rectangle IntPair}
+This version of IntPair approximates the domain by just storing four pairs. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version.
 
 \subsection{Performance test}
 
@@ -86,7 +129,7 @@ If we instead look at the case where $x,y=\{1..1000\}$ and the constraint $x=y$ 
 \subsection{Reach better performance for a specific problem with an array of pair variables than with two arrays of integer variables}
 
 \section{Git repository}
-\url{http://github.com/patwotrik}
+\url{http://github.com/patwotrik/gecode-tuples}
 
 \section{Legal}
 This document is licensed under GPL v3 and may be redistributed as GPL v3 or later. 
