@@ -35,7 +35,7 @@
 \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
 
 \title{\textbf{Implementing Tuple Variables in Gecode \\
-	Bachelor thesis \\
+	Bachelor Thesis \\
     Uppsala University -- Autumn 2014 \\
   }
 }
@@ -46,6 +46,7 @@
 
 
 \begin{document}
+\maketitle
 
 \begin{abstract}
 This is the abstract
@@ -53,16 +54,29 @@ This is the abstract
 
 \tableofcontents
 \section{Acknowledgements}
-Thanks to Joseph Scott
+Thanks to Jean-Noël Monette for being a helpful supervisor. \\
+Thanks to Joseph Scott for helping me with a bug. \\
 \section{Introduction}
 \subsection{Constraint Programming}
 
 Constraint programming (CP) is a method to solve problems by first modeling the problem with different types of variables and then adding constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. A very typical problem suitable for constraint programming is sudoku. The most intuitive model is a 9x9 matrix of integer variables. The general constraints for all standard sudokus is that every cell has a domain of 1..9, and that all cells in a row, column and box must be different. For a specific sudoku constraints are added to require specific cells to have specific values.
 
-The available data types limits the options to model a specific problem. There is a famous problem called Queens. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables were available we would have to model the problem with 64 boolean variables. If we instead use integer variables we can use the fact that all rows will have exactly one queen when we model the problem.
+The available data types limits the options to model a specific problem. With more data types a specific problem can be modeled in different ways. There is a famous problem called Queens. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables were available we would have to model the problem with 64 boolean variables. If we instead use integer variables we can use the fact that all rows will have exactly one queen when we model the problem. This could be solved with booleans by redundant constraints, but it is more efficient to implement the constraints directly in the model.
+
+\subsection{Terminology}
+\begin{itemize}
+\item{Constraint - A condition that may be hard or soft. Hard conditions must be satisfied, but soft conditions are optional.}
+\item{Pruning} - Removing values from the domain of a Variable with a Propagator.
+\item{Propagator} - In its simplest form it just
+\item{Brancher} -
+\item{Variable} -
+
+\end{itemize}
 
 \subsection{Gecode}
-Gecode is an open source CP solver blablabla.
+Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including data types, branchers and propagators. It is suitable for both education and professional use.
+
+For more information, look at the homepage. \url{http://www.gecode.org}
 
 \section{Background}
 \subsection{The need for tuple variables}
@@ -105,15 +119,59 @@ The [PropCond] section describes how the propagators are scheduled.
 
 \subsubsection{Variable implementation}
 The variable implementation class would with the specification file in the previous section be called IntTupleImp and inherit from the generated class IntTupleVarBase. It has to implement a function called assigned that returns true if the variable is assigned.
+\subsubsection{Variable class}
+The variable class is the class that is used when modeling the actual problem and inherits from the variable implementation. It is a read only user interface, and a programmer that does not program any custom branchers or propagators will not use anything else than this. This class would be called IntTupleVar.
+
 \subsubsection{Deltas}
 \subsubsection{Views}
+The variable class does not offer any methods for removing values. These methods are instead implemented in a view.
 \subsubsection{Propagators}
+A propagator implements constraints and prunes variables. They interact with the views and not variable class and have four possible return values.
+\begin{itemize}
+\item{ES\_FAILED} - There are no values in the domain that satisfies the constraint.
+\item{ES\_FIX} - It is impossible for the propagator to prune more values before the domain has changed by either a brancher or another propagator.
+\item{ES\_SUBSUMED} - The propagator is done. Regardless of any changes made to the variable this particular propagator will not be able to do anything more.
+\item{ES\_NOFIX} - None of the others are applicable.
+\end{itemize}
+The propagator must implement ES\_FAILED and at least one of the others. Furthermore, the propagator needs the following methods.
+\begin{itemize}
+\item{post}
+\item{disposal} - This works as a destructor. The only reason to not have a regular destructor is that destructors in C++ can't take arguments.
+\item{copy} - A method to copy the constructor.
+\item{cost} - Estimates the cost to run the propagator.
+\item{propagate}
+\end{itemize}
+
 \subsubsection{Branchers}
 
 \subsection{Implementation of exact IntPair}
-The exact version does not approximate the domain.
+The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
+
+The specification is as follows.
+\begin{lstlisting}[frame=single]
+[General]
+Name:      IntPair
+Namespace: Gecode::IntPair
+
+[ModEvent]
+Name:      FAILED=FAILED
+
+[ModEvent]
+Name:      VAL=ASSIGNED
+
+[ModEvent]
+Name:      NONE=NONE
+
+[PropCond]
+Name:      NONE=NONE
+[End]
+\end{lstlisting}
+
+\subsection{Restrictions}
+To keep things simple only two-dimensional integer tuples are considered, so called Pairs.
+
 \subsection{Implementation of rectangle IntPair}
-This version of IntPair approximates the domain by just storing four pairs. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version.
+This version of IntPair approximates the domain by just storing four pairs. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version. Another benefit for future work is that an approximation is possible to extend to float numbers.
 
 \subsection{Performance test}
 
@@ -126,6 +184,7 @@ This version of IntPair approximates the domain by just storing four pairs. The 
 \subsection{Write the implementation in such a way that it may be accepted in a new Gecode release}
 \subsection{Test different implementations with different domain representations}
 \subsection{Extend the tuples to arbitrary dimensions and not just pairs}
+\subsection{Extend the tuples to floats}
 \subsection{Reach better performance for a specific problem with an array of pair variables than with two arrays of integer variables}
 
 \section{Git repository}
@@ -133,6 +192,7 @@ This version of IntPair approximates the domain by just storing four pairs. The 
 
 \section{Legal}
 This document is licensed under GPL v3 and may be redistributed as GPL v3 or later. 
+
 
 \begin{thebibliography}{99}
 \bibitem{Calculus}
