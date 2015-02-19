@@ -1,0 +1,13 @@
+dbgmacro.h
+intpairbranch.hh
+intpairtype.hh
+intpairvar.hh
+intpairvarimp.hh
+intpairview.hh
+pair.hh
+propagators.hh
+putting-everything-together.cpp
+queens.cpp
+squarepacking.cpp
+test.c
+trivial.cpp
