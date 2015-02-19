@@ -1,7 +1,11 @@
-#ifndef INTPAIRVIEW_HH
-#define INTPAIRVIEW_HH
+#ifndef __INTPAIRVIEW_HH__
+#define __INTPAIRVIEW_HH__
 
-// view
+#include "intpairvar.hh"
+
+using Gecode::VarImpView;
+using Gecode::ConstView;
+
 namespace MPG { namespace IntPair {
 
     class IntPairView : public VarImpView<IntPairVar> {
@@ -14,17 +18,21 @@ namespace MPG { namespace IntPair {
       IntPairView(IntPairVarImp* y)
 	: VarImpView<IntPairVar>(y) {}
       // access operations
-      int min(void) const {
-	return x->min();
+      IntPair::Pair first(void) const { return x->first(); }
+      IntPair::Pair last(void) const { 	return x->last();  }
+      int xmax(void) const { return x->xmax(); }
+      int size(void) const { return x->size(); }
+
+      ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
+
+      void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+	x->subscribe(home, prop, pc, schedule);
       }
-      int max(void) const {
-	return x->max();
+
+      void cancel(Space& home, Propagator& prop, PropCond pc) {
+	x->cancel(home, prop, pc);
       }
       /*
-    // modification operations
-    ModEvent lq(Space& home, int n) {
-      return x->lq(home,n);
-    }
     ModEvent gq(Space& home, int n) {
       return x->gq(home,n);
     }
@@ -43,29 +51,36 @@ namespace MPG { namespace IntPair {
       std::basic_ostringstream<Char,Traits> s;
       s.copyfmt(os); s.width(0);
       if (x.assigned())
-	s << x.min();
+	s << x.first();
       else
-	s << '[' << x.min() << ".." << x.max() << ']';
+	s << '[' << x.first() << ".." << x.last() << ']';
       return os << s.str();
     }
 
-  }}
+  }
+}
+
 // constant integer view
 namespace MPG { namespace IntPair {
 
-    class ConstPairIntView : public ConstView<IntPairView> {
+    class ConstIntPairView : public ConstView<IntPairView> {
     protected:
-      Pair x;
+      Pair p;
     public:
-      ConstIntView(void) : p.x(0), p.y(0) {}
-      ConstIntView(int n, int m) : p.x(n), p.y(m) {}
+      ConstIntPairView(void) : p(0,0) {}
+      ConstIntPairView(int x, int y) : p(x,y) {}
 
+      IntPair::Pair first(void) const {
+	return p;
+      }
+
+      /*
       int min(void) const {
 	return x;
       }
       int max(void) const {
 	return x;
-      }
+	} */
 
       /*
     ModEvent lq(Space& home, int n) {
@@ -84,7 +99,7 @@ namespace MPG { namespace IntPair {
       // update during cloning
       void update(Space& home, bool share, ConstIntPairView& y) {
 	ConstView<IntPairView>::update(home,share,y);
-	x = y.x;
+	p.x = y.p.x; p.y=y.p.y;
       }
     };
     // view tests
@@ -99,7 +114,7 @@ namespace MPG { namespace IntPair {
     template<class Char, class Traits>
     std::basic_ostream<Char,Traits>&
     operator <<(std::basic_ostream<Char,Traits>& os, const ConstIntPairView& x) {
-      return os << x.min();
+      return os << x.first();
     }
 
   }}

@@ -70,7 +70,7 @@ The available data types limits the options to model a specific problem. With mo
 \item{Propagator} - In its simplest form it just
 \item{Brancher} -
 \item{Variable} -
-
+\item{Searching} - 
 \end{itemize}
 
 \subsection{Gecode}
@@ -92,20 +92,19 @@ Creating the specification file is the first thing that needs to be done when de
 
 \begin{lstlisting}[frame=single]
 [General]
-Name:      IntTuple
-Namespace: MPG::IntTuple
-
+Name:        IntTuple
+Namespace:   MPG::IntTuple
 [ModEvent]
-Name:      FAILED=FAILED
-
+Name:        FAILED=FAILED
 [ModEvent]
-Name:      VAL=ASSIGNED
-
+Name:        VAL=ASSIGNED
 [ModEvent]
-Name:      NONE=NONE
-
+Name:        NONE=NONE
 [PropCond]
-Name:      NONE=NONE
+Name:        NONE=NONE
+[PropCond]
+Name:        VAL=ASSIGNED
+ScheduledBy: VAL
 [End]
 \end{lstlisting}
 
@@ -113,9 +112,9 @@ As can be seen, there are three sections. The specification file must start with
 
 The [General] section is pretty straight forward. This is where the name and namespace of the variable is specified. Both name and namespace is arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
 
-The [ModEvent] section describes the modification events. For all variables modification events for NONE, FAILED and ASSIGNED are required.
+The [ModEvent] section describes the modification events. For all variables, modification events for NONE, FAILED and ASSIGNED are required.
 
-The [PropCond] section describes how the propagators are scheduled.
+The [PropCond] section describes how the propagators are scheduled. For all variables, propagator conditions for NONE and ASSIGNED are required.
 
 \subsubsection{Variable implementation}
 The variable implementation class would with the specification file in the previous section be called IntTupleImp and inherit from the generated class IntTupleVarBase. It has to implement a function called assigned that returns true if the variable is assigned.
@@ -143,6 +142,16 @@ The propagator must implement ES\_FAILED and at least one of the others. Further
 \end{itemize}
 
 \subsubsection{Branchers}
+When there are no propagators able to prune any variables the CP solver must start searching. The branchers determines how this is done. The simplest brancher just picks the first value in the first branch and the rest of the values in a second branch. Another way is to pick a random value in the domain, but more sophisticated ways exist.
+
+A brancher must implement the following methods:
+\begin{itemize}
+\item{status}
+\item{choice}
+\item{commit}
+\item{print}
+\item{ngl}
+\end{itemize}
 
 \subsection{Implementation of exact IntPair}
 The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
@@ -150,20 +159,42 @@ The exact version does not approximate the domain, that is, the implementation i
 The specification is as follows.
 \begin{lstlisting}[frame=single]
 [General]
-Name:      IntPair
-Namespace: Gecode::IntPair
+Name:        IntPair
+Namespace:   Gecode::IntPair
 
 [ModEvent]
-Name:      FAILED=FAILED
-
+Name:        FAILED=FAILED
 [ModEvent]
-Name:      VAL=ASSIGNED
-
+Name:        NONE=NONE
 [ModEvent]
-Name:      NONE=NONE
+Name:        VAL=ASSIGNED
 
 [PropCond]
-Name:      NONE=NONE
+Name:        NONE=NONE
+[PropCond]
+Name:        VAL=ASSIGNED
+ScheduledBy: VAL
+[PropCond]
+Name:        BND
+ScheduledBy: VAL, BND, XBND, YBND, XMIN, YMIN, XMAX, YMAX
+[PropCond]
+Name:        XBND
+ScheduledBy: VAL, BND, XMIN, XMAX
+[PropCond]
+Name:        YBND
+ScheduledBy: VAL, BND, YMIN, YMAX
+[PropCond]
+Name:        XMIN
+ScheduledBy: VAL, BND, XMIN, XBND
+[PropCond]
+Name:        XMAX
+ScheduledBy: VAL, BND, XMAX, XBND
+[PropCond]
+Name:        YMIN
+ScheduledBy: VAL, BND, YMIN, YBND
+[PropCond]
+Name:        YMAX
+ScheduledBy: VAL, BND, YMAX, YBND
 [End]
 \end{lstlisting}
 

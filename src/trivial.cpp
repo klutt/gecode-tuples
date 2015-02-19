@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <cstdio>
-#include "intpair.hh"
+#include "intpairvar.hh"
+#include "propagators.hh"
 
 using namespace std;
 using namespace Gecode;
@@ -203,8 +204,8 @@ public:
     p(*this, 0, 0, N, N)
   {
 
-        branch(*this, p, INTPAIR_VAL_MIN());
-    //branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
+    // branch(*this, p, INTPAIR_VAL_MIN());
+    // branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
   }
 
   Squarepack(bool share, Squarepack& sh) : Script(share, sh) {

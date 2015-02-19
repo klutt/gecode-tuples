@@ -36,3 +36,7 @@ doc/*.toc
 
 # Temps
 *~
+
+# Other
+external/gecodelib
+external/gecode-4.3.2/*

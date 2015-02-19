@@ -1,18 +1,24 @@
 [General]
-Name:        IntPair
-Namespace:   MPG::IntPair
+Name:		IntPair
+Namespace:   	MPG::IntPair
 
 [ModEvent]
-Name:        FAILED=FAILED
+Name:		FAILED=FAILED
 [ModEvent]
-Name:        NONE=NONE
+Name:		NONE=NONE
 [ModEvent]
-Name:        VAL=ASSIGNED
-Combine:     VAL=VAL
+Name:		VAL=ASSIGNED
+Combine:     	VAL=VAL
+[ModEvent]
+Name:		BND=SUBSCRIBE
+Combine:	VAL=VAL, BND=BND
+[PropCond]
+Name:		NONE=NONE
+[PropCond]
+Name:		VAL=ASSIGNED
+ScheduledBy: 	VAL
+[PropCond]
+Name:		DOM
+ScheduledBy:	VAL, DOM
 
-[PropCond]
-Name:        NONE=NONE
-[PropCond]
-Name:        VAL=ASSIGNED
-ScheduledBy: VAL
 [End]
