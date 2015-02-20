@@ -10,8 +10,8 @@ Name:		NONE=NONE
 Name:		VAL=ASSIGNED
 Combine:     	VAL=VAL
 [ModEvent]
-Name:		BND=SUBSCRIBE
-Combine:	VAL=VAL, BND=BND
+Name:		DOM=SUBSCRIBE
+Combine:	VAL=VAL, DOM=DOM
 [PropCond]
 Name:		NONE=NONE
 [PropCond]

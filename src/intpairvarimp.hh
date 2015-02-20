@@ -28,6 +28,16 @@ namespace MPG { namespace IntPair {
     };
     
     class IntPairVarImp : public IntPairVarImpBase {
+    private:
+      Pair first(void) const {
+	return Pair(domain[0]);
+      }
+
+      Pair last(void) const {
+	return Pair(domain.back());
+      }
+
+
     protected:
       std::vector<Pair> domain;
       
@@ -39,14 +49,6 @@ namespace MPG { namespace IntPair {
 	    domain.push_back(Pair(x,y));
       }
       // access operations
-      Pair first(void) const {
-	return Pair(domain[0]);
-      }
-
-      Pair last(void) const {
-	return Pair(domain.back());
-      }
-
       int xmax(void) const {
 	return domain.back().x;
       }
@@ -55,7 +57,7 @@ namespace MPG { namespace IntPair {
 	return domain[0].x;
       }
 
-      // For cost computation
+      // For cost computation and printout
       int size(void) const {
 	return domain.size();
       }
@@ -88,20 +90,40 @@ namespace MPG { namespace IntPair {
       
     };
   
+    template<class Char, class Traits>
+    std::basic_ostream<Char,Traits>&
+    operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
+      std::basic_ostringstream<Char,Traits> s;
+      s.copyfmt(os); s.width(0);
+      if (x.assigned())
+	s << x.first();
+      else
+	s << '[' << x.first() <<  ".." << x.last() << "][" << x.size() << "]";
+      return os << s.str();
+    }
+    
 
+
+    
 
 
   ModEvent IntPairVarImp::xlq(Space& home, int n) {
 	bool modified=false;
-	for(int i=0; i<domain.size(); i++)
+	std::cout << "xlq" << std::endl;
+	
+	for(int i=0; i<domain.size(); i++) {
+	  std::cout << "Test " << domain[i] << std::endl;
 	  if (domain[i].x > n) {
-	    modified=true;
+	    std::cout << "Erase " << domain[i] << std::endl;
+	    modified=true; 
 	    domain.erase(domain.begin() + i);
+	    i--;
 	  }
+	}
 	if(domain.size()==0)
 	  return ME_INTPAIR_FAILED;
 	else if(modified)
-	  return ME_INTPAIR_VAL; // TODO: Or NONE?
+	  return ME_INTPAIR_DOM; // TODO: Or NONE?
 	else
 	  return ME_INTPAIR_NONE;
       }

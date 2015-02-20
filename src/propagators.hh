@@ -36,9 +36,9 @@ public:
   }
 
   virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
-    if (x.gr(home, p.xmax()) == Int::ME_INT_FAILED)
+    if (x.gr(home, p.xmin()) == Int::ME_INT_FAILED)
       return ES_FAILED;
-    if (p.xlq(home, x.min()) == IntPair::ME_INTPAIR_FAILED)
+    if (p.xlq(home, x.max()) == IntPair::ME_INTPAIR_FAILED)
       return ES_FAILED;
     return ES_NOFIX;
   }
