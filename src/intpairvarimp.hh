@@ -13,121 +13,187 @@ using Gecode::PropCond;
 
 namespace MPG { namespace IntPair {
 
-    struct Pair {
-      int x, y;
-      Pair(int x, int y) : x(x), y(y) {};
-    };
+struct Pair {
+    int x, y;
+    Pair(int x, int y) : x(x), y(y) {};
+};
 
-    template<class Char, class Traits>
-    std::basic_ostream<Char,Traits>&
-    operator <<(std::basic_ostream<Char,Traits>& os, const Pair& p) {
-      std::basic_ostringstream<Char,Traits> s;
-      s.copyfmt(os); s.width(0);
-      s << '<' << p.x << ',' << p.y << '>';
-      return os << s.str();
-    };
-    
-    class IntPairVarImp : public IntPairVarImpBase {
-    private:
-      Pair first(void) const {
-	return Pair(domain[0]);
-      }
+template<class Char, class Traits>
+std::basic_ostream<Char,Traits>&
+operator <<(std::basic_ostream<Char,Traits>& os, const Pair& p) {
+    std::basic_ostringstream<Char,Traits> s;
+    s.copyfmt(os); s.width(0);
+    s << '<' << p.x << ',' << p.y << '>';
+    return os << s.str();
+};
 
-      Pair last(void) const {
-	return Pair(domain.back());
-      }
+class IntPairVarImp : public IntPairVarImpBase {
+protected:
+    std::vector<Pair> domain;
 
-
-    protected:
-      std::vector<Pair> domain;
-      
-    public:
-      IntPairVarImp(Space& home, int x_min, int y_min, int x_max, int y_max)
-	: IntPairVarImpBase(home) {
-	for(int x=x_min; x<=x_max; x++)
-	  for(int y=y_min; y<=y_max; y++)
-	    domain.push_back(Pair(x,y));
-      }
-      // access operations
-      int xmax(void) const {
-	return domain.back().x;
-      }
-
-      int xmin(void) const {
-	return domain[0].x;
-      }
-
-      // For cost computation and printout
-      int size(void) const {
-	return domain.size();
-      }
-      
-      // assignment test
-      bool assigned(void) const {
-	return domain.size()==1;
-      }
-
-      // Mod events
-      ModEvent xlq(Space& home, int n);
-
-      // Subscriptions and cancel
-      void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
-	IntPairVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
-      }
-
-      void cancel(Space& home, Propagator& prop, PropCond pc) {
-	IntPairVarImpBase::cancel(home, prop, pc, assigned());
-      }
-      
-      IntPairVarImp(Space& home, bool share, IntPairVarImp& y)
-	: IntPairVarImpBase(home,share,y), domain(y.domain) {}
-      IntPairVarImp* copy(Space& home, bool share) {
-	if (copied())
-	  return static_cast<IntPairVarImp*>(forward());
-	else
-	  return new (home) IntPairVarImp(home,share,*this);
-      }
-      
-    };
-  
-    template<class Char, class Traits>
-    std::basic_ostream<Char,Traits>&
-    operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
-      std::basic_ostringstream<Char,Traits> s;
-      s.copyfmt(os); s.width(0);
-      if (x.assigned())
-	s << x.first();
-      else
-	s << '[' << x.first() <<  ".." << x.last() << "][" << x.size() << "]";
-      return os << s.str();
+public:
+    IntPairVarImp(Space& home, int x_min, int x_max, int y_min, int y_max)
+        : IntPairVarImpBase(home) {
+        for(int x=x_min; x<=x_max; x++)
+            for(int y=y_min; y<=y_max; y++)
+                domain.push_back(Pair(x,y));
     }
-    
+    // For printouts only
+    Pair first() const {
+        return domain[0];
+    }
+
+    Pair last() const {
+        return domain.back();
+    }
+
+    // access operations
+    int xmax(void) const {
+        return domain.back().x;
+    }
+
+    int xmin(void) const {
+        if(domain.size()==0)
+            std::cout << "xmin: Size is zero" << std::endl;
+        return domain[0].x;
+    }
+
+    bool contains(const Pair& p) const {
+        for(int i=0; i<domain.size(); i++)
+            if(p.x == domain[i].x && p.y==domain[i].y)
+                return true;
+        return false;
+    }
+
+    // For cost computation and printout
+    int size(void) const {
+        return domain.size();
+    }
+
+    // assignment test
+    bool assigned(void) const {
+        return domain.size()==1;
+    }
+
+    // Mod events
+    ModEvent xlq(Space& home, int n);
+    ModEvent eq(Space& home, const Pair& p);
+    ModEvent eq(Space& home, const IntPairVarImp& p);
+    ModEvent neq(Space& home, const Pair& p);
+
+    // Subscriptions and cancel
+    void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+        IntPairVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
+    }
+
+    void cancel(Space& home, Propagator& prop, PropCond pc) {
+        IntPairVarImpBase::cancel(home, prop, pc, assigned());
+    }
+
+    IntPairVarImp(Space& home, bool share, IntPairVarImp& y)
+        : IntPairVarImpBase(home,share,y), domain(y.domain) {}
+    IntPairVarImp* copy(Space& home, bool share) {
+        if (copied())
+            return static_cast<IntPairVarImp*>(forward());
+        else
+            return new (home) IntPairVarImp(home,share,*this);
+    }
+
+};
+
+template<class Char, class Traits>
+std::basic_ostream<Char,Traits>&
+operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
+    std::basic_ostringstream<Char,Traits> s;
+    s.copyfmt(os); s.width(0);
+    if (x.assigned())
+        s << x.first();
+    else
+        s << '[' << x.first() <<  ".." << x.last() << "][" << x.size() << "]";
+    return os << s.str();
+}
+
+ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
+{
+    // Ugly and slow as fuck! Rewrite! TODO
+    bool modified = false;
+    for(int i=0; i<domain.size(); i++) {
+        if (domain[i].x==p.x && domain[i].y==p.y) {
+            domain.erase(domain.begin() + i); i--;
+            modified=true;
+        }
+        if(domain.size()==0)
+            return ME_INTPAIR_FAILED;
+        else if(modified)
+            return ME_INTPAIR_DOM;
+        else
+            return ME_INTPAIR_NONE;
+
+    }
+}
 
 
-    
+ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
+    // Probably the most inefficient in the universe. TODO
+    bool modified=false;
+    std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
+    for(int i=0; i<domain.size(); i++)
+        if(!p.contains(domain[i])) {
+            domain.erase(domain.begin()+i); i--;
+            modified=true;
+        }
+
+    if(modified)
+        return ME_INTPAIR_DOM;
+    else if (domain.size()==0)
+        return ME_INTPAIR_FAILED;
+    else
+        return ME_INTPAIR_NONE;
+}
+
+ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
+{
+    // Ugly and slow as fuck! Rewrite! TODO
+    bool modified = false;
+    for(int i=0; i<domain.size(); i++) {
+        if (domain[i].x!=p.x && domain[i].y!=p.y) {
+            domain.erase(domain.begin() + i); i--;
+            modified=true;
+        }
+        if(domain.size()==0)
+            return ME_INTPAIR_FAILED;
+        else if(modified)
+            return ME_INTPAIR_DOM;
+        else
+            return ME_INTPAIR_NONE;
+
+    }
+}
 
 
-  ModEvent IntPairVarImp::xlq(Space& home, int n) {
-	bool modified=false;
-	std::cout << "xlq" << std::endl;
-	
-	for(int i=0; i<domain.size(); i++) {
-	  std::cout << "Test " << domain[i] << std::endl;
-	  if (domain[i].x > n) {
-	    std::cout << "Erase " << domain[i] << std::endl;
-	    modified=true; 
-	    domain.erase(domain.begin() + i);
-	    i--;
-	  }
-	}
-	if(domain.size()==0)
-	  return ME_INTPAIR_FAILED;
-	else if(modified)
-	  return ME_INTPAIR_DOM; // TODO: Or NONE?
-	else
-	  return ME_INTPAIR_NONE;
-      }
 
-  }}
+ModEvent IntPairVarImp::xlq(Space& home, int n) {
+    bool modified=false;
+    //	std::cout << "xlq" << std::endl;
+    std::cout << "Erase " << domain.size() << std::endl;
+
+    for(int i=0; i<domain.size(); i++) {
+        //	  std::cout << "Test " << domain[i] << std::endl;
+        if (domain[i].x > n) {
+            //	    std::cout << "Erase " << domain[i] << std::endl;
+            modified=true;
+            domain.erase(domain.begin() + i);
+            i--;
+        }
+    }
+    if(domain.size()==0)
+        return ME_INTPAIR_FAILED;
+    else if(modified)
+        return ME_INTPAIR_DOM;
+    else
+        return ME_INTPAIR_NONE;
+}
+
+}}
 #endif
 

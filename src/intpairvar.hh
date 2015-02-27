@@ -27,7 +27,7 @@ namespace MPG {
   
   template<class Char, class Traits>
   std::basic_ostream<Char,Traits>&
-  operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVar& x) { os << x.varimp(); }
+  operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVar& x) { MPG::IntPair::IntPairVarImp *ptr = x.varimp(); os << *ptr; }
 }    
 
 #endif

@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <cstdio>
-#include "intpairvar.hh"
-#include "propagators.hh"
-
+//#include "intpairvar.hh"
+//#include "propagators.hh"
+#include "intpair.h"
 using namespace std;
 using namespace Gecode;
 using namespace Gecode::Driver;
@@ -198,18 +198,29 @@ using namespace MPG;
 class Squarepack : public Script {
 public:
 
+  //  IntPairVar p;
+  IntPairVar x;
   IntPairVar p;
-
+  IntVar y;
   Squarepack(const SizeOptions& opt) :
-    p(*this, 0, 0, N, N)
+    //    p(*this, 7, 1, 10, 1),
+    x(*this, 5, 9, 2, 5),
+    p(*this, 2, 10, 5, 6),
+    y(*this, 6,8)
+    
   {
-
+    xlq(*this, p, y);
+    //    eq(*this, x, p);
+    //    xlq(*this, p, x);
     // branch(*this, p, INTPAIR_VAL_MIN());
     // branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
   }
 
   Squarepack(bool share, Squarepack& sh) : Script(share, sh) {
-    p.update(*this, share, sh.p);
+      p.update(*this, share, sh.p);
+      x.update(*this, share, sh.x);
+      y.update(*this, share, sh.y);
+
   }
 
 	virtual Space* copy(bool share) {
@@ -217,7 +228,7 @@ public:
 	}
 
 	virtual void print(std::ostream& os) const {
-	  os << "n: " << N << endl;
+	  os << "x: " << x << endl;
 
 		os << "p: " << p << endl; 
 		  //os << N << " & ";
@@ -238,15 +249,15 @@ int main(int argc, char* argv[]) {
 	SizeOptions opt("Squarepack");
 	
 	// comment out the following line to get a graphical view of the search tree
-	//opt.mode(Gecode::SM_GIST);
+	//			opt.mode(Gecode::SM_GIST);
 
-	if(argc < 2) return 1;
-	N = atoi(argv[1]); 
+	//	if(argc < 2) return 1;
+	//	N = atoi(argv[1]); 
 	/*	if(N < 2) {
 		cout << "The solver does not accept n < 2." << endl;
 		return 0;
 		}*/
-	n = N-1;
+	//	n = N-1;
 	
 	//	std::stringstream filename;
 	//	filename << "project1-t" << TeamNr << "-n" << N << ".txt";

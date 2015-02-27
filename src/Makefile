@@ -21,10 +21,14 @@ CXX=g++
 FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
 
 trivial:
-	/usr/bin/g++ -c trivial.cpp -I/usr/local/include
-	/usr/bin/g++ -o trivial trivial.o $(FLAGS) -L /usr/local/lib
+	/usr/bin/g++ -c trivial.cpp -I/usr/local/include -fdiagnostics-color=always
+	/usr/bin/g++ -o trivial trivial.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
 
-configure: ../external/gecodeprefix ../external/gecodeeprefix ../external/gecodedatarootdir
+debug:
+	/usr/bin/g++ -g -c trivial.cpp -I/usr/local/include -fdiagnostics-color=always
+	/usr/bin/g++ -g -o trivial trivial.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
+
+configure: 
 	cd $(GCSRC) ; \
 	./configure $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
 
@@ -34,6 +38,6 @@ pair: configure
 	cd $(GCSRC) ; make ; sudo make install
 
 clean:
-	rm *.o *~ a.out
+	rm *.o *~ a.out trivial
 
 

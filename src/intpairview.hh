@@ -2,6 +2,7 @@
 #define __INTPAIRVIEW_HH__
 
 #include "intpairvar.hh"
+#include <iostream>
 
 using Gecode::VarImpView;
 using Gecode::ConstView;
@@ -21,8 +22,12 @@ namespace MPG { namespace IntPair {
       int xmax(void) const { return x->xmax(); }
       int xmin(void) const { return x->xmin(); }
       int size(void) const { return x->size(); }
+      bool contains(const Pair &p) const { return x->contains(p); }
 
       ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
+      ModEvent eq(Space& home, const Pair& p) { return x->eq(home,p);  }
+      ModEvent eq(Space& home, const IntPairView& p) { return x->eq(home,*p.varimp());  }
+      ModEvent neq(Space& home, const Pair& p) { return x->neq(home,p);  }
 
       void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
 	x->subscribe(home, prop, pc, schedule);
@@ -49,7 +54,7 @@ namespace MPG { namespace IntPair {
     operator<<(std::basic_ostream<Char,Traits>& os, const IntPairView& x) { os << x.varimp(); }
   }
 }
-
+/*
 // constant integer view
 namespace MPG { namespace IntPair {
 
@@ -59,10 +64,10 @@ namespace MPG { namespace IntPair {
     public:
       ConstIntPairView(void) : p(0,0) {}
       ConstIntPairView(int x, int y) : p(x,y) {}
-
+      /*
       IntPair::Pair first(void) const {
 	return p;
-      }
+	}*/
 
       /*
       int min(void) const {
@@ -85,7 +90,7 @@ namespace MPG { namespace IntPair {
     }
     int max(const Delta& d) const {
       GECODE_NEVER; return 0;
-      } */
+      } 
       // update during cloning
       void update(Space& home, bool share, ConstIntPairView& y) {
 	ConstView<IntPairView>::update(home,share,y);
@@ -93,20 +98,20 @@ namespace MPG { namespace IntPair {
       }
     };
     // view tests
-    /*
+    
   inline bool same(const ConstIntPairView& x, const ConstIntPairView& y) {
     return x.min() == y.min();
   }
   inline bool before(const ConstIntPairView& x, const ConstIntPairView& y) {
     return x.min() < y.min();
   }
-    */
+    
     template<class Char, class Traits>
     std::basic_ostream<Char,Traits>&
     operator <<(std::basic_ostream<Char,Traits>& os, const ConstIntPairView& x) { return os << x.varimp; }
 
   }}
-
+*/
 /*
 // minus view
 namespace MPG { namespace Int {
