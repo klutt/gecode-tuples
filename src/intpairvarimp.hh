@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <assert.h>
 
 using Gecode::Space;
 using Gecode::ModEvent;
@@ -34,31 +35,35 @@ protected:
 public:
     IntPairVarImp(Space& home, int x_min, int x_max, int y_min, int y_max)
         : IntPairVarImpBase(home) {
+        assert(x_min<=x_max && y_min<=y_max);
         for(int x=x_min; x<=x_max; x++)
             for(int y=y_min; y<=y_max; y++)
                 domain.push_back(Pair(x,y));
     }
     // For printouts only
     Pair first() const {
+        assert(domain.size()>0);
         return domain[0];
     }
 
     Pair last() const {
+        assert(domain.size()>0);
         return domain.back();
     }
 
     // access operations
     int xmax(void) const {
+        assert(domain.size()>0);
         return domain.back().x;
     }
 
     int xmin(void) const {
-        if(domain.size()==0)
-            std::cout << "xmin: Size is zero" << std::endl;
+        assert(domain.size()>0);
         return domain[0].x;
     }
 
     bool contains(const Pair& p) const {
+        assert(domain.size()>0);
         for(int i=0; i<domain.size(); i++)
             if(p.x == domain[i].x && p.y==domain[i].y)
                 return true;
@@ -143,10 +148,10 @@ ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
             modified=true;
         }
 
-    if(modified)
+    if (domain.size()==0)
+           return ME_INTPAIR_FAILED;
+    else if(modified)
         return ME_INTPAIR_DOM;
-    else if (domain.size()==0)
-        return ME_INTPAIR_FAILED;
     else
         return ME_INTPAIR_NONE;
 }
