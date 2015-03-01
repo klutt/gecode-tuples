@@ -202,14 +202,18 @@ public:
   IntPairVar x;
   IntPairVar p;
   IntVar y;
+  IntPairArray a;
   Squarepack(const SizeOptions& opt) :
-    //    p(*this, 7, 1, 10, 1),
-    x(*this, 5, 9, 2, 5),
-    p(*this, 2, 10, 5, 6),
-    y(*this, 6,8)
-    
+    // IMPORTANT!
+    // Pull ALL these where next IMPORTANT occurs
+    x(*this, 0, 9, 0, 5),
+    p(*this, 0, 10, 0, 6),
+    y(*this, 6,8),
+    a(*this, 8, 1,2,1,2)
   {
     xlq(*this, p, y);
+    eq(*this, x, p);
+    eq(*this, p, a[0]);
     //    eq(*this, x, p);
     //    xlq(*this, p, x);
     // branch(*this, p, INTPAIR_VAL_MIN());
@@ -217,10 +221,12 @@ public:
   }
 
   Squarepack(bool share, Squarepack& sh) : Script(share, sh) {
+      // IMPORTANT!
+      // All variables should be here
       p.update(*this, share, sh.p);
       x.update(*this, share, sh.x);
       y.update(*this, share, sh.y);
-
+      a.update(*this, share, sh.a);
   }
 
 	virtual Space* copy(bool share) {
