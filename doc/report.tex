@@ -67,14 +67,14 @@ The available data types limits the options to model a specific problem. With mo
 \begin{itemize}
 \item{Constraint - A condition that may be hard or soft. Hard conditions must be satisfied, but soft conditions are optional.}
 \item{Pruning} - Removing values from the domain of a Variable with a Propagator.
-\item{Propagator} - In its simplest form it just
-\item{Brancher} -
+\item{Propagator} - In its simplest form it just tells if there exists a solution in current domain, but more often it also performs pruning.
+\item{Brancher} - When no propagator can prune anything searching is needed. This is done with a brancher, which splits the domain in two or more parts, creating a search tree.
 \item{Variable} -
 \item{Searching} - 
 \end{itemize}
 
 \subsection{Gecode}
-Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including data types, branchers and propagators. It is suitable for both education and professional use.
+Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including data types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 was used.
 
 For more information, look at the homepage. \url{http://www.gecode.org}
 
@@ -140,6 +140,7 @@ The propagator must implement ES\_FAILED and at least one of the others. Further
 \item{cost} - Estimates the cost to run the propagator.
 \item{propagate}
 \end{itemize}
+A propagator must also subscribe to variables, that is, telling Gecode when the propagator should be awaken. For instance, a propagator that says that x should be less than y should subscribe to the maximum value of x and minimum value of y.
 
 \subsubsection{Branchers}
 When there are no propagators able to prune any variables the CP solver must start searching. The branchers determines how this is done. The simplest brancher just picks the first value in the first branch and the rest of the values in a second branch. Another way is to pick a random value in the domain, but more sophisticated ways exist.
@@ -153,7 +154,7 @@ A brancher must implement the following methods:
 \item{ngl}
 \end{itemize}
 
-\subsection{Implementation of exact IntPair}
+\subsection{Implementation of Exact IntPair}
 The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
 
 The specification is as follows.
@@ -221,8 +222,12 @@ This version of IntPair approximates the domain by just storing four pairs. The 
 \section{Git repository}
 \url{http://github.com/patwotrik/gecode-tuples}
 
+\section{Links}
+\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}
+
 \section{Legal}
 This document is licensed under GPL v3 and may be redistributed as GPL v3 or later. 
+
 
 
 \begin{thebibliography}{99}
@@ -233,7 +238,6 @@ This document is licensed under GPL v3 and may be redistributed as GPL v3 or lat
 \bibitem{os}
 	Operating systems and its concepts,
 	Galvin
-	
 \end{thebibliography}
 
 \end{document}
