@@ -16,8 +16,11 @@ namespace MPG { namespace IntPair {
 
 struct Pair {
     int x, y;
+    Pair() {};
     Pair(int x, int y) : x(x), y(y) {};
 };
+
+typedef bool(*IP_INT_REL) (int, int);
 
 template<class Char, class Traits>
 std::basic_ostream<Char,Traits>&
@@ -81,6 +84,9 @@ public:
     }
 
     // Mod events
+
+    ModEvent rel(Space&home, IP_INT_REL, int dim, int n);
+    ModEvent lq(Space& home, int dim, int n);
     ModEvent xlq(Space& home, int n);
     ModEvent eq(Space& home, const Pair& p);
     ModEvent eq(Space& home, const IntPairVarImp& p);
@@ -118,25 +124,66 @@ operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
     return os << s.str();
 }
 
-ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
-{
-    // Ugly and slow as fuck! Rewrite! TODO
-    bool modified = false;
-    for(int i=0; i<domain.size(); i++) {
-        if (domain[i].x==p.x && domain[i].y==p.y) {
-            domain.erase(domain.begin() + i); i--;
-            modified=true;
-        }
-        if(domain.size()==0)
-            return ME_INTPAIR_FAILED;
-        else if(modified)
-            return ME_INTPAIR_DOM;
-        else
-            return ME_INTPAIR_NONE;
 
+// Remove all Pairs that does not fullfill the relation p[dim] r n
+ModEvent IntPairVarImp::rel(Space&home, IP_INT_REL r, int dim, int n)
+{
+    // This is very inefficient with the current representation.
+    // It would be much better with vector<vector<int>> istead
+    // of vector<Pair>
+    bool modified=false;
+
+    for(int i=0; i<domain.size(); i++) {
+        //	  std::cout << "Test " << domain[i] << std::endl;
+        int *ptr;
+        if(dim==0)
+            ptr=&domain[i].x;
+        else if(dim==1)
+            ptr=&domain[i].y;
+        if (r(*ptr,n)) {
+            //	    std::cout << "Erase " << domain[i] << std::endl;
+            modified=true;
+            domain.erase(domain.begin() + i);
+            i--;
+        }
     }
+    if(domain.size()==0)
+        return ME_INTPAIR_FAILED;
+    else if(modified)
+        return ME_INTPAIR_DOM;
+    else
+        return ME_INTPAIR_NONE;
 }
 
+
+ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
+{
+    // This is very inefficient with the current representation.
+    // It would be much better with vector<vector<int>> istead
+    // of vector<Pair>
+    bool modified=false;
+
+    for(int i=0; i<domain.size(); i++) {
+        //	  std::cout << "Test " << domain[i] << std::endl;
+        int *ptr;
+        if(dim==0)
+            ptr=&domain[i].x;
+        else if(dim==1)
+            ptr=&domain[i].y;
+        if (*ptr > n) {
+            //	    std::cout << "Erase " << domain[i] << std::endl;
+            modified=true;
+            domain.erase(domain.begin() + i);
+            i--;
+        }
+    }
+    if(domain.size()==0)
+        return ME_INTPAIR_FAILED;
+    else if(modified)
+        return ME_INTPAIR_DOM;
+    else
+        return ME_INTPAIR_NONE;
+}
 
 ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
     // Probably the most inefficient in the universe. TODO
@@ -160,43 +207,50 @@ ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
 {
     // Ugly and slow as fuck! Rewrite! TODO
     bool modified = false;
+    std::cout << "Eq" << std::endl;
     for(int i=0; i<domain.size(); i++) {
-        if (domain[i].x!=p.x && domain[i].y!=p.y) {
+        std::cout << "Eq trying " << p << " and " << domain[i] << std::endl;
+
+        if (domain[i].x!=p.x || domain[i].y!=p.y) {
+            std::cout << "Eq erase " << domain[i] << std::endl;
             domain.erase(domain.begin() + i); i--;
             modified=true;
+
         }
+    }
         if(domain.size()==0)
             return ME_INTPAIR_FAILED;
         else if(modified)
             return ME_INTPAIR_DOM;
         else
             return ME_INTPAIR_NONE;
+}
 
+ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
+{
+    // Ugly and slow as fuck! Rewrite! TODO
+    bool modified = false;
+    std::cout << "Neq" << std::endl;
+    for(int i=0; i<domain.size(); i++) {
+        std::cout << "Neq trying " << p << " and " << domain[i] << std::endl;
+        if (domain[i].x==p.x && domain[i].y==p.y) {
+            std::cout << "Neq erase " << domain[i] << std::endl;
+            domain.erase(domain.begin() + i); i--;
+            modified=true;
+        }
     }
+        if(domain.size()==0)
+            return ME_INTPAIR_FAILED;
+        else if(modified)
+            return ME_INTPAIR_DOM;
+        else
+            return ME_INTPAIR_NONE;
 }
 
 
 
 ModEvent IntPairVarImp::xlq(Space& home, int n) {
-    bool modified=false;
-    //	std::cout << "xlq" << std::endl;
-    std::cout << "Erase " << domain.size() << std::endl;
-
-    for(int i=0; i<domain.size(); i++) {
-        //	  std::cout << "Test " << domain[i] << std::endl;
-        if (domain[i].x > n) {
-            //	    std::cout << "Erase " << domain[i] << std::endl;
-            modified=true;
-            domain.erase(domain.begin() + i);
-            i--;
-        }
-    }
-    if(domain.size()==0)
-        return ME_INTPAIR_FAILED;
-    else if(modified)
-        return ME_INTPAIR_DOM;
-    else
-        return ME_INTPAIR_NONE;
+    return lq(home, 0, n);
 }
 
 }}

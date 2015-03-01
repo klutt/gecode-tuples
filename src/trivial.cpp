@@ -199,33 +199,37 @@ class Squarepack : public Script {
 public:
 
   //  IntPairVar p;
-  IntPairVar x;
+ // IntPairVar x;
   IntPairVar p;
-  IntVar y;
+  //IntVar y;
   IntPairArray a;
   Squarepack(const SizeOptions& opt) :
     // IMPORTANT!
     // Pull ALL these where next IMPORTANT occurs
-    x(*this, 0, 9, 0, 5),
-    p(*this, 0, 10, 0, 6),
-    y(*this, 6,8),
-    a(*this, 8, 1,2,1,2)
+    // x(*this, 0, 9, 0, 5),
+    //p(*this, 1, 2, 1, 2),
+    // y(*this, 6,8),
+    a(*this, 2, 1,2,1,2)
   {
-    xlq(*this, p, y);
-    eq(*this, x, p);
-    eq(*this, p, a[0]);
+    //xlq(*this, p, y);
+    // eq(*this, x, p);
+    eq(*this, a[1], a[0]);
     //    eq(*this, x, p);
     //    xlq(*this, p, x);
     // branch(*this, p, INTPAIR_VAL_MIN());
     // branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
+//    nonemin(*this, x);
+ //   nonemin(*this, p);
+    nonemin(*this, a);
+    //branch(*this, y, INT_VAL_MIN());
   }
 
   Squarepack(bool share, Squarepack& sh) : Script(share, sh) {
       // IMPORTANT!
       // All variables should be here
-      p.update(*this, share, sh.p);
-      x.update(*this, share, sh.x);
-      y.update(*this, share, sh.y);
+      //    p.update(*this, share, sh.p);
+      //x.update(*this, share, sh.x);
+     // y.update(*this, share, sh.y);
       a.update(*this, share, sh.a);
   }
 
@@ -234,9 +238,10 @@ public:
 	}
 
 	virtual void print(std::ostream& os) const {
-	  os << "x: " << x << endl;
+    //  os << "x: " << x << endl;
+          os << "a[0]: " << a[0] << endl;
 
-		os << "p: " << p << endl; 
+        os << "a[1]: " << a[1] << endl;
 		  //os << N << " & ";
 
 	}
@@ -255,7 +260,7 @@ int main(int argc, char* argv[]) {
 	SizeOptions opt("Squarepack");
 	
 	// comment out the following line to get a graphical view of the search tree
-	//			opt.mode(Gecode::SM_GIST);
+            opt.mode(Gecode::SM_GIST);
 
 	//	if(argc < 2) return 1;
 	//	N = atoi(argv[1]); 
