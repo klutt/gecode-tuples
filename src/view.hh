@@ -25,6 +25,7 @@ namespace MPG { namespace IntPair {
       int size(void) const { return x->size(); }
       bool contains(const Pair &p) const { return x->contains(p); }
 
+      // For branching
       Pair first() const { return x->first(); }
 
       ModEvent rel(Space&home, IP_INT_REL r, int dim, int n) { return x->rel(home, r, dim, n); }
@@ -33,13 +34,13 @@ namespace MPG { namespace IntPair {
       ModEvent eq(Space& home, const IntPairView& p) { return x->eq(home,*p.varimp());  }
       ModEvent neq(Space& home, const Pair& p) { return x->neq(home,p);  }
 
-      void
-      cribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
-	x->subscribe(home, prop, pc, schedule);
+      void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+          std::cout << "Subscribing" << std::endl;
+        x->subscribe(home, prop, pc, schedule);
       }
 
       void cancel(Space& home, Propagator& prop, PropCond pc) {
-	x->cancel(home, prop, pc);
+        x->cancel(home, prop, pc);
       }
       /*
     ModEvent gq(Space& home, int n) {
