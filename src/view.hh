@@ -1,7 +1,7 @@
 #ifndef __INTPAIRVIEW_HH__
 #define __INTPAIRVIEW_HH__
 
-#include "intpairvar.hh"
+#include "var.hh"
 #include <iostream>
 
 using Gecode::VarImpView;
@@ -33,7 +33,8 @@ namespace MPG { namespace IntPair {
       ModEvent eq(Space& home, const IntPairView& p) { return x->eq(home,*p.varimp());  }
       ModEvent neq(Space& home, const Pair& p) { return x->neq(home,p);  }
 
-      void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+      void
+      cribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
 	x->subscribe(home, prop, pc, schedule);
       }
 

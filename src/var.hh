@@ -1,7 +1,7 @@
 #ifndef __MPG_INTPAIRVAR_HH__
 #define __MPG_INTPAIRVAR_HH__
 
-#include "intpairvarimp.hh"
+#include "varimp.hh"
 
 using Gecode::VarImpVar;
 

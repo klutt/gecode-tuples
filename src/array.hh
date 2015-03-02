@@ -1,7 +1,7 @@
 #ifndef INTPAIRARRAY_HH
 #define INTPAIRARRAY_HH
 
-#include "intpairvar.hh"
+#include "var.hh"
 
 using Gecode::VarArray;
 using Gecode::VarArgArray;

@@ -11,14 +11,28 @@ using Gecode::Space;
 using Gecode::ModEvent;
 using Gecode::Propagator;
 using Gecode::PropCond;
+using Gecode::Archive;
 
 namespace MPG { namespace IntPair {
 
 struct Pair {
     int x, y;
     Pair() {};
+    Pair(const Pair& p) : x(p.x), y(p.y) {};
     Pair(int x, int y) : x(x), y(y) {};
 };
+
+Archive&
+operator <<(Archive& os, const Pair& p) {
+    return os << p.x << p.y;
+};
+
+
+Archive&
+operator >> (Archive& os, Pair& p) {
+    return os >> p.y >> p.x;
+};
+
 
 typedef bool(*IP_INT_REL) (int, int);
 
@@ -187,6 +201,7 @@ ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
 
 ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
     // Probably the most inefficient in the universe. TODO
+    std::cout << "Eq pair pair" << std::endl;
     bool modified=false;
     std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
     for(int i=0; i<domain.size(); i++)
@@ -197,6 +212,8 @@ ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
 
     if (domain.size()==0)
            return ME_INTPAIR_FAILED;
+    if(assigned())
+        return ME_INTPAIR_VAL;
     else if(modified)
         return ME_INTPAIR_DOM;
     else
@@ -220,6 +237,8 @@ ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
     }
         if(domain.size()==0)
             return ME_INTPAIR_FAILED;
+        else if(assigned())
+            return ME_INTPAIR_VAL;
         else if(modified)
             return ME_INTPAIR_DOM;
         else
@@ -241,6 +260,8 @@ ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
     }
         if(domain.size()==0)
             return ME_INTPAIR_FAILED;
+        else if(assigned())
+            return ME_INTPAIR_VAL;
         else if(modified)
             return ME_INTPAIR_DOM;
         else

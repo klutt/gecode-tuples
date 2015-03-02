@@ -1,5 +1,4 @@
-#include "intpairvar.hh"
-// #include "intpairarray.hh"
+#include "var.hh"
 #include "propagators.hh"
-#include "intpairarray.hh"
-#include "intpairbranch.hh"
+#include "array.hh"
+#include "branch.hh"

@@ -1,26 +1,5 @@
-#ifndef INTPAIRBRANCH_HH
-#define INTPAIRBRANCH_HH
-
-#include "intpair.h"
-
-using namespace Gecode;
-using namespace MPG;
-using namespace MPG::IntPair;
-
-namespace MPG { namespace IntPair {
-
-Archive&
-operator <<(Archive& os, const Pair& p) {
-    return os << p.x << p.y;
-};
-
-
-Archive&
-operator >> (Archive& os, Pair& p) {
-    return os >> p.y >> p.x;
-};
-
-}}
+#ifndef NONEMIN_H
+#define NONEMIN_H
 
 class NoneMin : public Brancher {
 protected:
@@ -109,4 +88,4 @@ void nonemin(Home home, const IntPairArgs& x) {
 }
 
 
-#endif
+#endif // NONEMIN_H
