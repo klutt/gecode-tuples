@@ -13,6 +13,6 @@ using Gecode::Space;
 #include "propagators/eq.h"
 #include "propagators/rel.h"
 #include "propagators/xlq.h"
-
+#include "propagators/distinct.h"
 
 #endif

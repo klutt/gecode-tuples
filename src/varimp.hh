@@ -91,6 +91,11 @@ public:
         return false;
     }
 
+    Pair val() const {
+        assert(assigned());
+        return Pair(domain[0]);
+    }
+
     // For cost computation and printout
     int size(void) const {
         return domain.size();
@@ -103,7 +108,6 @@ public:
 
     // Mod events
 
-    ModEvent rel(Space&home, IP_INT_REL, int dim, int n);
     ModEvent lq(Space& home, int dim, int n);
     ModEvent xlq(Space& home, int n);
     ModEvent eq(Space& home, const Pair& p);
@@ -144,33 +148,7 @@ operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
 }
 
 
-// Remove all Pairs that does not fullfill the relation p[dim] r n
-ModEvent IntPairVarImp::rel(Space&home, IP_INT_REL r, int dim, int n)
-{
-    // This is very inefficient with the current representation.
-    // It would be much better with vector<vector<int>> istead
-    // of vector<Pair>
-    bool modified=false;
 
-    for(int i=0; i<domain.size(); i++) {
-        int *ptr;
-        if(dim==0)
-            ptr=&domain[i].x;
-        else if(dim==1)
-            ptr=&domain[i].y;
-        if (r(*ptr,n)) {
-            modified=true;
-            domain.erase(domain.begin() + i);
-            i--;
-        }
-    }
-    if(domain.size()==0)
-        return ME_INTPAIR_FAILED;
-    else if(modified)
-        return ME_INTPAIR_DOM;
-    else
-        return ME_INTPAIR_NONE;
-}
 
 
 ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
@@ -194,12 +172,12 @@ ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
             i--;
         }
     }
-    if(domain.size()==0)
-        return ME_INTPAIR_FAILED;
-    else if(modified)
-        return ME_INTPAIR_DOM;
-    else
-        return ME_INTPAIR_NONE;
+    if (!modified)
+      return ME_INTPAIR_NONE;
+    else if (domain.size()==0)
+      return ME_INTPAIR_FAILED;
+    DummyDelta d;
+    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
 ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
@@ -261,14 +239,13 @@ ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
         }
     }
     std::cout << "Neq after " << *this << std::endl;
-        if(domain.size()==0)
-            return ME_INTPAIR_FAILED;
-        else if(assigned())
-            return ME_INTPAIR_VAL;
-        else if(modified)
-            return ME_INTPAIR_DOM;
-        else
-            return ME_INTPAIR_NONE;
+
+    if (!modified)
+      return ME_INTPAIR_NONE;
+    else if (domain.size()==0)
+      return ME_INTPAIR_FAILED;
+    DummyDelta d;
+    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
 

@@ -23,6 +23,7 @@ namespace MPG {
 
     int size(void) const { return x->size(); }
     bool assigned() const { return x->assigned(); }
+    IntPair::Pair val() const { return x->val(); }
   };
   
   template<class Char, class Traits>

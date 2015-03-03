@@ -209,11 +209,11 @@ public:
     // x(*this, 0, 9, 0, 5),
     //p(*this, 1, 2, 1, 2),
     // y(*this, 6,8),
-    a(*this, 2, 1,2,1,2)
+    a(*this, 8, 1,8,1,8)
   {
     //xlq(*this, p, y);
     // eq(*this, x, p);
-    eq(*this, a[1], a[0]);
+    distinct(*this, a);
     //    eq(*this, x, p);
     //    xlq(*this, p, x);
     // branch(*this, p, INTPAIR_VAL_MIN());
@@ -239,9 +239,8 @@ public:
 
 	virtual void print(std::ostream& os) const {
     //  os << "x: " << x << endl;
-          os << "a[0]: " << a[0] << endl;
-
-        os << "a[1]: " << a[1] << endl;
+          for(int i=0; i<a.size(); i++)
+              os << "a[" << i << "]: " << a[i] << endl;
 		  //os << N << " & ";
 
 	}

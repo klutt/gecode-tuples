@@ -24,11 +24,12 @@ namespace MPG { namespace IntPair {
       int xmin(void) const { return x->xmin(); }
       int size(void) const { return x->size(); }
       bool contains(const Pair &p) const { return x->contains(p); }
+      Pair val() { return x->val(); }
+
 
       // For branching
       Pair first() const { return x->first(); }
 
-      ModEvent rel(Space&home, IP_INT_REL r, int dim, int n) { return x->rel(home, r, dim, n); }
       ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
       ModEvent eq(Space& home, const Pair& p) { return x->eq(home,p);  }
       ModEvent eq(Space& home, const IntPairView& p) { return x->eq(home,*p.varimp());  }
