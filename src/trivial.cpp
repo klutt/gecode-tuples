@@ -220,7 +220,7 @@ public:
     // branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
 //    nonemin(*this, x);
  //   nonemin(*this, p);
-    nonemin(*this, a);
+    nonenone(*this, a);
     //branch(*this, y, INT_VAL_MIN());
   }
 

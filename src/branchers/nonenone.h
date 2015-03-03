@@ -1,14 +1,14 @@
 #ifndef NONEMIN_H
 #define NONEMIN_H
 
-class NoneMin : public Brancher {
+class NoneNone : public Brancher {
 protected:
   ViewArray<IntPair::IntPairView> x;
   // choice definition
   class PosVal : public Choice {
   public:
     int pos; Pair val;
-    PosVal(const NoneMin& b, int p, Pair v)
+    PosVal(const NoneNone& b, int p, Pair v)
       : Choice(b,2), pos(p), val(v) {}
     virtual size_t size(void) const {
       return sizeof(*this);
@@ -19,21 +19,21 @@ protected:
     }
   };
 public:
-  NoneMin(Home home, ViewArray<IntPair::IntPairView>& x0)
+  NoneNone(Home home, ViewArray<IntPair::IntPairView>& x0)
     : Brancher(home), x(x0) {}
   static void post(Home home, ViewArray<IntPair::IntPairView>& x) {
-    (void) new (home) NoneMin(home,x);
+    (void) new (home) NoneNone(home,x);
   }
   virtual size_t dispose(Space& home) {
     (void) Brancher::dispose(home);
     return sizeof(*this);
   }
-  NoneMin(Space& home, bool share, NoneMin& b)
+  NoneNone(Space& home, bool share, NoneNone& b)
     : Brancher(home,share,b) {
     x.update(home,share,b.x);
   }
   virtual Brancher* copy(Space& home, bool share) {
-    return new (home) NoneMin(home,share,*this);
+    return new (home) NoneNone(home,share,*this);
   }
   // status
   virtual bool status(const Space& home) const {
@@ -81,10 +81,10 @@ public:
       o << "x[" << pos << "] != " << val;
   }
 };
-void nonemin(Home home, const IntPairArgs& x) {
+void nonenone(Home home, const IntPairArgs& x) {
   if (home.failed()) return;
   ViewArray<IntPair::IntPairView> y(home,x);
-  NoneMin::post(home,y);
+  NoneNone::post(home,y);
 }
 
 
