@@ -12,9 +12,13 @@ using Gecode::ModEvent;
 using Gecode::Propagator;
 using Gecode::PropCond;
 using Gecode::Archive;
+using Gecode::Delta;
 
 namespace MPG { namespace IntPair {
 
+    class DummyDelta : public Delta {
+    };
+    
 struct Pair {
     int x, y;
     Pair() {};
@@ -108,6 +112,7 @@ public:
 
     // Subscriptions and cancel
     void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+        std::cout << "Subscribing from varimp" << std::endl;
         IntPairVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
     }
 
@@ -148,14 +153,12 @@ ModEvent IntPairVarImp::rel(Space&home, IP_INT_REL r, int dim, int n)
     bool modified=false;
 
     for(int i=0; i<domain.size(); i++) {
-        //	  std::cout << "Test " << domain[i] << std::endl;
         int *ptr;
         if(dim==0)
             ptr=&domain[i].x;
         else if(dim==1)
             ptr=&domain[i].y;
         if (r(*ptr,n)) {
-            //	    std::cout << "Erase " << domain[i] << std::endl;
             modified=true;
             domain.erase(domain.begin() + i);
             i--;
@@ -210,14 +213,13 @@ ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
             modified=true;
         }
 
-    if (domain.size()==0)
-           return ME_INTPAIR_FAILED;
-    if(assigned())
-        return ME_INTPAIR_VAL;
-    else if(modified)
-        return ME_INTPAIR_DOM;
-    else
-        return ME_INTPAIR_NONE;
+
+    if (!modified)
+      return ME_INTPAIR_NONE;
+    else if (domain.size()==0)
+      return ME_INTPAIR_FAILED;
+    DummyDelta d;
+    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
 ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
@@ -235,21 +237,21 @@ ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
 
         }
     }
-        if(domain.size()==0)
-            return ME_INTPAIR_FAILED;
-        else if(assigned())
-            return ME_INTPAIR_VAL;
-        else if(modified)
-            return ME_INTPAIR_DOM;
-        else
-            return ME_INTPAIR_NONE;
+
+
+    if (!modified)
+      return ME_INTPAIR_NONE;
+    else if (domain.size()==0)
+      return ME_INTPAIR_FAILED;
+    DummyDelta d;
+    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
 ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
 {
     // Ugly and slow as fuck! Rewrite! TODO
     bool modified = false;
-    std::cout << "Neq" << std::endl;
+    std::cout << "Neq before " << *this << std::endl;
     for(int i=0; i<domain.size(); i++) {
         std::cout << "Neq trying " << p << " and " << domain[i] << std::endl;
         if (domain[i].x==p.x && domain[i].y==p.y) {
@@ -258,6 +260,7 @@ ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
             modified=true;
         }
     }
+    std::cout << "Neq after " << *this << std::endl;
         if(domain.size()==0)
             return ME_INTPAIR_FAILED;
         else if(assigned())
