@@ -61,7 +61,7 @@ public:
             for(int y=y_min; y<=y_max; y++)
                 domain.push_back(Pair(x,y));
     }
-    // For printouts only
+    // For printouts and brancher
     Pair first() const {
         assert(domain.size()>0);
         return domain[0];

@@ -203,17 +203,20 @@ public:
   IntPairVar p;
   //IntVar y;
   IntPairArray a;
+  BoolVar b;
   Squarepack(const SizeOptions& opt) :
     // IMPORTANT!
     // Pull ALL these where next IMPORTANT occurs
     // x(*this, 0, 9, 0, 5),
     //p(*this, 1, 2, 1, 2),
     // y(*this, 6,8),
-    a(*this, 8, 1,8,1,8)
+    a(*this, 2, 1,4,1,4),
+    b(*this, 0, 1)
   {
+    eq(*this, a[0], a[1], b);
     //xlq(*this, p, y);
     // eq(*this, x, p);
-    distinct(*this, a);
+    //distinct(*this, a);
     //    eq(*this, x, p);
     //    xlq(*this, p, x);
     // branch(*this, p, INTPAIR_VAL_MIN());
@@ -231,6 +234,7 @@ public:
       //x.update(*this, share, sh.x);
      // y.update(*this, share, sh.y);
       a.update(*this, share, sh.a);
+      b.update(*this, share, sh.b);
   }
 
 	virtual Space* copy(bool share) {
@@ -241,7 +245,7 @@ public:
     //  os << "x: " << x << endl;
           for(int i=0; i<a.size(); i++)
               os << "a[" << i << "]: " << a[i] << endl;
-		  //os << N << " & ";
+          os << "b: " << b << endl;
 
 	}
 

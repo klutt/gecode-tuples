@@ -11,7 +11,7 @@ public:
   Distinct(Space& home, ViewArray<IntPair::IntPairView> a)
     : Propagator(home), va(a)
   {
-    va.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
+    va.subscribe(home, *this, IntPair::PC_INTPAIR_VAL);
   }
 
   Distinct(Space& home, bool share, Distinct& prop)
@@ -25,6 +25,7 @@ public:
   }
 
   virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
+
     for(int i=0; i<va.size(); i++) {
         if(va[i].assigned())
             for(int j=0; j<va.size(); j++) {
@@ -34,12 +35,11 @@ public:
                     return ES_FAILED;
                 }
     }
-
-    return ES_NOFIX;
+    return ES_FIX;
   }
 
   virtual size_t dispose(Space& home) {
-    va.cancel(home, *this, IntPair::PC_INTPAIR_DOM);
+    va.cancel(home, *this, IntPair::PC_INTPAIR_VAL);
     (void) Propagator::dispose(home);
     return sizeof(*this);
   }
