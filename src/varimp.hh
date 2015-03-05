@@ -38,8 +38,6 @@ operator >> (Archive& os, Pair& p) {
 };
 
 
-typedef bool(*IP_INT_REL) (int, int);
-
 template<class Char, class Traits>
 std::basic_ostream<Char,Traits>&
 operator <<(std::basic_ostream<Char,Traits>& os, const Pair& p) {
@@ -107,8 +105,18 @@ public:
     }
 
     // Mod events
+    enum IP_INT_REL { IP_LQ, IP_LT, IP_GQ, IP_GT, IP_EQ, IP_NQ };
 
-    ModEvent lq(Space& home, int dim, int n);
+
+    ModEvent rel(Space &home, int dim, int n, IP_INT_REL r);
+
+    ModEvent lq(Space& home, int dim, int n) { return rel(home, dim, n, IP_LQ); }
+    ModEvent lt(Space& home, int dim, int n) { return rel(home, dim, n, IP_LT); }
+    ModEvent gq(Space& home, int dim, int n) { return rel(home, dim, n, IP_GQ); }
+    ModEvent gt(Space& home, int dim, int n) { return rel(home, dim, n, IP_GT); }
+    ModEvent eq(Space& home, int dim, int n) { return rel(home, dim, n, IP_EQ); }
+    ModEvent nq(Space& home, int dim, int n) { return rel(home, dim, n, IP_NQ); }
+
     ModEvent xlq(Space& home, int n);
     ModEvent eq(Space& home, const Pair& p);
     ModEvent eq(Space& home, const IntPairVarImp& p);
@@ -147,11 +155,7 @@ operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
     return os << s.str();
 }
 
-
-
-
-
-ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
+ModEvent IntPairVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
 {
     // This is very inefficient with the current representation.
     // It would be much better with vector<vector<int>> istead
@@ -165,7 +169,19 @@ ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
             ptr=&domain[i].x;
         else if(dim==1)
             ptr=&domain[i].y;
-        if (*ptr > n) {
+
+        bool erase = false;
+        switch (r) {
+            case IP_LQ : if(*ptr > n) erase = true; break;
+            case IP_LT : if(*ptr >= n) erase = true; break;
+            case IP_GQ : if(*ptr < n) erase = true; break;
+            case IP_GT : if(*ptr <= n) erase = true; break;
+            case IP_EQ : if(*ptr != n) erase = true; break;
+            case IP_NQ : if(*ptr == n) erase = true; break;
+        default : break;
+        }
+
+        if (erase) {
             //	    std::cout << "Erase " << domain[i] << std::endl;
             modified=true;
             domain.erase(domain.begin() + i);
@@ -179,6 +195,8 @@ ModEvent IntPairVarImp::lq(Space&home, int dim, int n)
     DummyDelta d;
     return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
+
+
 
 ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
     // Probably the most inefficient in the universe. TODO
