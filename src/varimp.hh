@@ -26,6 +26,10 @@ struct Pair {
     Pair(int x, int y) : x(x), y(y) {};
 };
 
+bool operator==(const Pair& p1, const Pair& p2) {
+    return (p1.x==p2.x && p1.y==p2.y);
+}
+
 Archive&
 operator <<(Archive& os, const Pair& p) {
     return os << p.x << p.y;
@@ -109,6 +113,7 @@ public:
 
 
     ModEvent rel(Space &home, int dim, int n, IP_INT_REL r);
+
 
     ModEvent lq(Space& home, int dim, int n) { return rel(home, dim, n, IP_LQ); }
     ModEvent lt(Space& home, int dim, int n) { return rel(home, dim, n, IP_LT); }
