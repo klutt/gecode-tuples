@@ -30,9 +30,10 @@ public:
   }
 
   MyDFA(Space& home, bool share, MyDFA& prop)
-    : Propagator(home, share, prop) {
+    : Propagator(home, share, prop), S(prop.S), C(prop.C) {
     P.update(home, share, prop.P);
     Q.update(home, share, prop.Q);
+    Z.update(home, share, prop.Z);
   }
 
   static ExecStatus post(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, StateFunction s, CostFunction c) {
@@ -41,9 +42,7 @@ public:
   }
 
   virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
-// Find the set of reachable states S'
-// P.eq(x, S')
-//
+
   }
 
   virtual size_t dispose(Space& home) {
@@ -59,7 +58,7 @@ public:
   }
 
   virtual PropCost cost(const Space&, const ModEventDelta&) const {
-      // Probably way wrong TODO
+      // Probably way wrong, but not very important. TODO
     return PropCost::linear(PropCost::HI, P.size());
   }
 
