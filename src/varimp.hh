@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <gecode/int.hh>
 
 using Gecode::Space;
 using Gecode::ModEvent;
@@ -13,6 +14,7 @@ using Gecode::Propagator;
 using Gecode::PropCond;
 using Gecode::Archive;
 using Gecode::Delta;
+using namespace Gecode;
 
 namespace MPG { namespace IntPair {
 
@@ -122,9 +124,11 @@ public:
     ModEvent eq(Space& home, int dim, int n) { return rel(home, dim, n, IP_EQ); }
     ModEvent nq(Space& home, int dim, int n) { return rel(home, dim, n, IP_NQ); }
 
+
     ModEvent xlq(Space& home, int n);
     ModEvent eq(Space& home, const Pair& p);
     ModEvent eq(Space& home, const IntPairVarImp& p);
+
     ModEvent neq(Space& home, const Pair& p);
 
     // Subscriptions and cancel
