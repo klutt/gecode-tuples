@@ -31,7 +31,7 @@ public:
             for(int j=0; j<va.size(); j++) {
                 if(j==i)
                     continue;
-                else if(va[j].neq(home, va[i].val()) == IntPair::ME_INTPAIR_FAILED)
+                else if(va[j].nq(home, va[i].val()) == IntPair::ME_INTPAIR_FAILED)
                     return ES_FAILED;
                 }
     }
@@ -54,7 +54,7 @@ public:
 
   };
 
-void distinct(Space& home, const IntPairArgs& a) {
+void distinct(Space& home, const IntPairVarArgs& a) {
     std::cout << "Init distinct prop" << std::endl;
   ViewArray<IntPair::IntPairView> va(home, a);
   if (Distinct::post(home, va) != ES_OK)

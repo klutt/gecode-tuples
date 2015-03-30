@@ -24,16 +24,15 @@ public:
   }
 
   virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
-      std::cout << "Propagating Neq " << std::endl;
-    if (p1.neq(home, p2.val()) == IntPair::ME_INTPAIR_FAILED)
+//      std::cout << "Propagating Neq " << std::endl;
+    if (p1.nq(home, p2.val()) == IntPair::ME_INTPAIR_FAILED)
       return ES_FAILED;
-    if (p2.neq(home, p1.val()) == IntPair::ME_INTPAIR_FAILED)
+    if (p2.nq(home, p1.val()) == IntPair::ME_INTPAIR_FAILED)
       return ES_FAILED;
     return ES_NOFIX;
   }
 
   virtual size_t dispose(Space& home) {
-      std::cout << "Eq dispose" << std::endl;
     p1.cancel(home, *this, IntPair::PC_INTPAIR_VAL);
     p2.cancel(home, *this, IntPair::PC_INTPAIR_VAL);
     (void) Propagator::dispose(home);
@@ -51,7 +50,7 @@ public:
   };
 
 void neq(Space& home, IntPairVar p, IntPairVar q) {
-    std::cout << "Init Neq prop" << std::endl;
+  //  std::cout << "Init Neq prop" << std::endl;
   IntPair::IntPairView pv(p);
   IntPair::IntPairView qv(q);
   if (Neq::post(home, pv, qv) != ES_OK)

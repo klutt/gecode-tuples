@@ -49,10 +49,10 @@ public:
             }
             else if(b.zero()) {
                 if (p2.assigned())
-                    if (p1.neq(home, p2.val()) == IntPair::ME_INTPAIR_FAILED)
+                    if (p1.nq(home, p2.val()) == IntPair::ME_INTPAIR_FAILED)
                         return ES_FAILED;
                 if (p1.assigned())
-                    if (p2.neq(home, p1.val()) == IntPair::ME_INTPAIR_FAILED)
+                    if (p2.nq(home, p1.val()) == IntPair::ME_INTPAIR_FAILED)
                         return ES_FAILED;
             }
         return ES_NOFIX;

@@ -14,6 +14,7 @@ namespace MPG { namespace IntPair {
       using VarImpView<IntPairVar>::x;
     public:
 
+
       IntPairView(void) {}
       IntPairView(const IntPairVar& y)
 	: VarImpView<IntPairVar>(y.varimp()) {}
@@ -25,6 +26,7 @@ namespace MPG { namespace IntPair {
       int size(void) const { return x->size(); }
       bool contains(const Pair &p) const { return x->contains(p); }
       Pair val() { return x->val(); }
+      Pair getElement(int n) { return x->getElement(n); }
 
 
       // For branching
@@ -33,7 +35,7 @@ namespace MPG { namespace IntPair {
       ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
       ModEvent eq(Space& home, const Pair& p) { return x->eq(home,p);  }
       ModEvent eq(Space& home, const IntPairView& p) { return x->eq(home,*p.varimp());  }
-      ModEvent neq(Space& home, const Pair& p) { return x->neq(home,p);  }
+      ModEvent nq(Space& home, const Pair& p) { return x->nq(home,p);  }
 
       void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
           std::cout << "Subscribing" << std::endl;
@@ -59,8 +61,10 @@ namespace MPG { namespace IntPair {
     template<class Char, class Traits>
     std::basic_ostream<Char,Traits>&
     operator<<(std::basic_ostream<Char,Traits>& os, const IntPairView& x) { os << x.varimp(); }
+
   }
 }
+
 /*
 // constant integer view
 namespace MPG { namespace IntPair {

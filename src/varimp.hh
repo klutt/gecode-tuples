@@ -17,7 +17,6 @@ using Gecode::Delta;
 using namespace Gecode;
 
 namespace MPG { namespace IntPair {
-
     class DummyDelta : public Delta {
     };
     
@@ -52,6 +51,8 @@ operator <<(std::basic_ostream<Char,Traits>& os, const Pair& p) {
     s << '<' << p.x << ',' << p.y << '>';
     return os << s.str();
 };
+
+
 
 class IntPairVarImp : public IntPairVarImpBase {
 protected:
@@ -100,6 +101,11 @@ public:
         return Pair(domain[0]);
     }
 
+    Pair getElement(int n) { // Should probably be replaced by an iterator TODO
+        assert(n<domain.size());
+        return Pair(domain[n]);
+    }
+
     // For cost computation and printout
     int size(void) const {
         return domain.size();
@@ -129,7 +135,9 @@ public:
     ModEvent eq(Space& home, const Pair& p);
     ModEvent eq(Space& home, const IntPairVarImp& p);
 
-    ModEvent neq(Space& home, const Pair& p);
+    ModEvent eq(Space& home, const std::vector<Pair> & v);
+
+    ModEvent nq(Space& home, const Pair& p);
 
     // Subscriptions and cancel
     void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
@@ -209,9 +217,9 @@ ModEvent IntPairVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
 
 ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
     // Probably the most inefficient in the universe. TODO
-    std::cout << "Eq pair pair" << std::endl;
+//    std::cout << "Eq pair pair" << std::endl;
     bool modified=false;
-    std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
+//    std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
     for(int i=0; i<domain.size(); i++)
         if(!p.contains(domain[i])) {
             domain.erase(domain.begin()+i); i--;
@@ -227,16 +235,39 @@ ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
     return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
+ModEvent IntPairVarImp::eq(Space& home, const std::vector<Pair> & v) {
+    // Probably the most inefficient in the universe. TODO
+//    std::cout << "Eq vector" << std::endl;
+    bool modified=false;
+//    std::cout << "Erase " << domain.size() << " " << v.size() << std::endl;
+    for(int i=0; i<domain.size(); i++)
+        for(int j=0; j<v.size(); j++)
+            if(domain[i] == v[j]) {
+                domain.erase(domain.begin()+i); i--;
+                modified=true;
+            }
+
+
+    if (!modified)
+      return ME_INTPAIR_NONE;
+    else if (domain.size()==0)
+      return ME_INTPAIR_FAILED;
+    DummyDelta d;
+    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
+}
+
+
+
 ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
 {
     // Ugly and slow as fuck! Rewrite! TODO
     bool modified = false;
     std::cout << "Eq" << std::endl;
     for(int i=0; i<domain.size(); i++) {
-        std::cout << "Eq trying " << p << " and " << domain[i] << std::endl;
+//        std::cout << "Eq trying " << p << " and " << domain[i] << std::endl;
 
         if (domain[i].x!=p.x || domain[i].y!=p.y) {
-            std::cout << "Eq erase " << domain[i] << std::endl;
+  //          std::cout << "Eq erase " << domain[i] << std::endl;
             domain.erase(domain.begin() + i); i--;
             modified=true;
 
@@ -252,20 +283,20 @@ ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
     return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
-ModEvent IntPairVarImp::neq(Space& home, const Pair& p)
+ModEvent IntPairVarImp::nq(Space& home, const Pair& p)
 {
     // Ugly and slow as fuck! Rewrite! TODO
     bool modified = false;
-    std::cout << "Neq before " << *this << std::endl;
+//    std::cout << "Neq before " << *this << std::endl;
     for(int i=0; i<domain.size(); i++) {
-        std::cout << "Neq trying " << p << " and " << domain[i] << std::endl;
+   //     std::cout << "Neq trying " << p << " and " << domain[i] << std::endl;
         if (domain[i].x==p.x && domain[i].y==p.y) {
-            std::cout << "Neq erase " << domain[i] << std::endl;
+ //           std::cout << "Neq erase " << domain[i] << std::endl;
             domain.erase(domain.begin() + i); i--;
             modified=true;
         }
     }
-    std::cout << "Neq after " << *this << std::endl;
+//    std::cout << "Neq after " << *this << std::endl;
 
     if (!modified)
       return ME_INTPAIR_NONE;

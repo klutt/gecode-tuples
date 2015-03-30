@@ -14,7 +14,7 @@ using Gecode::Space;
 #include "propagators/rel.h"
 #include "propagators/xlq.h"
 #include "propagators/distinct.h"
-#include "propagators/neq.h"
+#include "propagators/nq.h"
 #include "propagators/eqreif.h"
 #include "propagators/dfa.h"
 

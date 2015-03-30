@@ -28,6 +28,11 @@ debug:
 	/usr/bin/g++ -g -c trivial.cpp -I/usr/local/include -fdiagnostics-color=always
 	/usr/bin/g++ -g -o trivial trivial.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
 
+test:
+	/usr/bin/g++ -g -c testingeqprop.cpp -I/usr/local/include -fdiagnostics-color=always
+	/usr/bin/g++ -g -o testingeqprop testingeqprop.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
+
+
 configure: 
 	cd $(GCSRC) ; \
 	./configure $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)

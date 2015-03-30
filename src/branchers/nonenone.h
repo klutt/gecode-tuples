@@ -66,7 +66,7 @@ public:
     if (a == 0)
       return me_failed(x[pos].eq(home,val)) ? ES_FAILED : ES_OK;
     else
-      return me_failed(x[pos].neq(home,val)) ? ES_FAILED : ES_OK;
+      return me_failed(x[pos].nq(home,val)) ? ES_FAILED : ES_OK;
   }
   // print
   virtual void print(const Space& home, const Choice& c,
@@ -81,7 +81,7 @@ public:
       o << "x[" << pos << "] != " << val;
   }
 };
-void nonenone(Home home, const IntPairArgs& x) {
+void nonenone(Home home, const IntPairVarArgs& x) {
   if (home.failed()) return;
   ViewArray<IntPair::IntPairView> y(home,x);
   NoneNone::post(home,y);

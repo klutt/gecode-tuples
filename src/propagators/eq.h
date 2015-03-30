@@ -25,7 +25,7 @@ public:
   }
 
   virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
-      std::cout << "Propagating Eq " << std::endl;
+ //     std::cout << "Propagating Eq " << std::endl;
     if (p1.eq(home, p2) == IntPair::ME_INTPAIR_FAILED)
       return ES_FAILED;
     if (p2.eq(home, p1) == IntPair::ME_INTPAIR_FAILED)
@@ -34,7 +34,7 @@ public:
   }
 
   virtual size_t dispose(Space& home) {
-      std::cout << "Eq dispose" << std::endl;
+//      std::cout << "Eq dispose" << std::endl;
     p1.cancel(home, *this, IntPair::PC_INTPAIR_DOM);
     p2.cancel(home, *this, IntPair::PC_INTPAIR_DOM);
     (void) Propagator::dispose(home);
@@ -52,7 +52,7 @@ public:
   };
 
 void eq(Space& home, IntPairVar p, IntPairVar q) {
-    std::cout << "Init Eq prop" << std::endl;
+//    std::cout << "Init Eq prop" << std::endl;
   IntPair::IntPairView pv(p);
   IntPair::IntPairView qv(q);
   if (Eq::post(home, pv, qv) != ES_OK)

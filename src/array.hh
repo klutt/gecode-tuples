@@ -8,54 +8,54 @@ using Gecode::VarArgArray;
 
 // array traits
 namespace MPG {
-class IntPairArgs;
-class IntPairArray;
+class IntPairVarArgs;
+class IntPairVarArray;
 }
 namespace Gecode {
 template<> class ArrayTraits<Gecode::VarArray<MPG::IntPairVar> > {
 public:
-    typedef MPG::IntPairArray StorageType;
+    typedef MPG::IntPairVarArray StorageType;
     typedef MPG::IntPairVar ValueType;
-    typedef MPG::IntPairArgs ArgsType;
+    typedef MPG::IntPairVarArgs ArgsType;
 };
-template<> class ArrayTraits<MPG::IntPairArray> {
+template<> class ArrayTraits<MPG::IntPairVarArray> {
 public:
-    typedef MPG::IntPairArray StorageType;
+    typedef MPG::IntPairVarArray StorageType;
     typedef MPG::IntPairVar ValueType;
-    typedef MPG::IntPairArgs ArgsType;
+    typedef MPG::IntPairVarArgs ArgsType;
 };
 template<> class ArrayTraits<Gecode::VarArgArray<MPG::IntPairVar> > {
 public:
-    typedef MPG::IntPairArgs StorageType;
+    typedef MPG::IntPairVarArgs StorageType;
     typedef MPG::IntPairVar ValueType;
-    typedef MPG::IntPairArgs ArgsType;
+    typedef MPG::IntPairVarArgs ArgsType;
 };
-template<> class ArrayTraits<MPG::IntPairArgs> {
+template<> class ArrayTraits<MPG::IntPairVarArgs> {
 public:
-    typedef MPG::IntPairArgs StorageType;
+    typedef MPG::IntPairVarArgs StorageType;
     typedef MPG::IntPairVar ValueType;
-    typedef MPG::IntPairArgs ArgsType;
+    typedef MPG::IntPairVarArgs ArgsType;
 };
 }
 // variable arrays
 namespace MPG {
-class IntPairArgs : public VarArgArray<IntPairVar> {
+class IntPairVarArgs : public VarArgArray<IntPairVar> {
 public:
-    IntPairArgs(void) {}
-    IntPairArgs(const IntPairArgs& a) : VarArgArray<IntPairVar>(a) {}
-    IntPairArgs(const VarArray<IntPairVar>& a) : VarArgArray<IntPairVar>(a) {}
-    IntPairArgs(Space& home, int n, int xmin, int xmax, int ymin, int ymax) : VarArgArray<IntPairVar>(n) {
+    IntPairVarArgs(void) {}
+    IntPairVarArgs(const IntPairVarArgs& a) : VarArgArray<IntPairVar>(a) {}
+    IntPairVarArgs(const VarArray<IntPairVar>& a) : VarArgArray<IntPairVar>(a) {}
+    IntPairVarArgs(Space& home, int n, int xmin, int xmax, int ymin, int ymax) : VarArgArray<IntPairVar>(n) {
         for(int i=0; i<n; i++) {
             (*this)[i] = IntPairVar(home, xmin, xmax, ymin, ymax);
         }
     }
 };
-class IntPairArray : public VarArray<IntPairVar> {
+class IntPairVarArray : public VarArray<IntPairVar> {
 public:
-    IntPairArray(void) {}
-    IntPairArray(const IntPairArray& a) : VarArray<IntPairVar>(a) {}
-    IntPairArray(Space& home, int n) : VarArray<IntPairVar>(home, n) {}
-    IntPairArray(Space& home, int n, int xmin, int xmax, int ymin, int ymax) : VarArray<IntPairVar>(home, n) {
+    IntPairVarArray(void) {}
+    IntPairVarArray(const IntPairVarArray& a) : VarArray<IntPairVar>(a) {}
+    IntPairVarArray(Space& home, int n) : VarArray<IntPairVar>(home, n) {}
+    IntPairVarArray(Space& home, int n, int xmin, int xmax, int ymin, int ymax) : VarArray<IntPairVar>(home, n) {
         for(int i=0; i<n; i++) {
             (*this)[i] = IntPairVar(home, xmin, xmax, ymin, ymax);
         }

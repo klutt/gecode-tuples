@@ -195,25 +195,51 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
 // using namespace MPG::IntPair;
 using namespace MPG;
 
+int states[4][4];
+int costs[4][4];
+
+void initdfa() {
+    for(int i = 0; i<4; i++)
+        for(int j=0; j<4; j++)
+            states[i][j]=costs[i][j]=0;
+    states[1][1]=2;
+    states[2][1]=1;
+    states[2][2]=3;
+    states[3][3]=2;
+    costs[1][1]=1;
+    costs[2][1]=1;
+    costs[2][2]=2;
+    costs[3][3]=2;
+}
+
+int statefun(int s, int z)
+{
+    return states[s][z];
+}
+
+int costfun(int s, int z)
+{
+    return costs[s][z];
+}
+
 class Squarepack : public Script {
 public:
 
   //  IntPairVar p;
  // IntPairVar x;
-  IntPairVar p;
-  //IntVar y;
-  IntPairArray a;
-  BoolVar b;
+  IntPairVarArray p;
+  IntVar z;
+
   Squarepack(const SizeOptions& opt) :
     // IMPORTANT!
     // Pull ALL these where next IMPORTANT occurs
     // x(*this, 0, 9, 0, 5),
     //p(*this, 1, 2, 1, 2),
     // y(*this, 6,8),
-    a(*this, 2, 1,4,1,4),
-    b(*this, 0, 1)
+    p(*this, 2, 1, 4,1,4),
+    z(*this, 1, 10)
   {
-    eq(*this, a[0], a[1], b);
+    mydfa(*this, p[0],p[1], z, &statefun, &costfun);
     //xlq(*this, p, y);
     // eq(*this, x, p);
     //distinct(*this, a);
@@ -223,29 +249,33 @@ public:
     // branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
 //    nonemin(*this, x);
  //   nonemin(*this, p);
-    nonenone(*this, a);
+ //   nonenone(*this, p);
     //branch(*this, y, INT_VAL_MIN());
   }
 
   Squarepack(bool share, Squarepack& sh) : Script(share, sh) {
+
       // IMPORTANT!
       // All variables should be here
       //    p.update(*this, share, sh.p);
       //x.update(*this, share, sh.x);
      // y.update(*this, share, sh.y);
-      a.update(*this, share, sh.a);
-      b.update(*this, share, sh.b);
-  }
+      p.update(*this, share, sh.p);
+      z.update(*this, share, sh.z);
+      }
 
 	virtual Space* copy(bool share) {
 		return new Squarepack(share, *this);
 	}
 
 	virtual void print(std::ostream& os) const {
-    //  os << "x: " << x << endl;
-          for(int i=0; i<a.size(); i++)
-              os << "a[" << i << "]: " << a[i] << endl;
-          os << "b: " << b << endl;
+      os << "z: " << z << endl;
+      os << "p: " << p[0] << endl;
+      os << "q: " << p[1] << endl;
+
+         // for(int i=0; i<a.size(); i++)
+           //   os << "a[" << i << "]: " << a[i] << endl;
+          //os << "b: " << b << endl;
 
 	}
 
@@ -260,6 +290,7 @@ public:
 
 int main(int argc, char* argv[]) {
 
+    initdfa();
 	SizeOptions opt("Squarepack");
 	
 	// comment out the following line to get a graphical view of the search tree

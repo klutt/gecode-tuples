@@ -1,6 +1,8 @@
 #ifndef DFA_H
 #define DFA_H
 
+#include <vector>
+
 // Pre: S is current state, Z is next token
 // Post: Returns next state. 0 is garbage state.
 typedef int (*StateFunction)(int S, int Z);
@@ -22,7 +24,7 @@ protected:
     CostFunction C;
 public:
   MyDFA(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, StateFunction s, CostFunction c)
-    : Propagator(home), P(a), Q(b), Z(Z), S(s), C(c)
+    : Propagator(home), P(a), Q(b), Z(z), S(s), C(c)
   {
       P.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
       Q.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
@@ -42,7 +44,43 @@ public:
   }
 
   virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
+   // std::vector<Pair> keep;
+      std::cout << "Propagating DFA" << std::endl;
+      Gecode::Int::ViewValues<Int::IntView> iter(Z);
+      std::vector<MPG::IntPair::Pair> newP;
+      std::vector<MPG::IntPair::Pair> newQ;
+      std::vector<int> newZ;
+      while(iter()) {
+          for(int i=0; i<Q.size(); i++) {
+            MPG::IntPair::Pair q = Q.getElement(i);
+            MPG::IntPair::Pair p = MPG::IntPair::Pair(S(q.x, iter.val()), q.y + C(q.y, iter.val()));
+            if(P.contains(p)) {
+                newP.push_back(p);
+                newQ.push_back(q);
+                newZ.push_back(iter.val());
 
+            }
+            std::cout << "i: " << i << std::endl;
+            if(iter.val() == Z.max()) // TODO Ugly hack
+                goto finish;
+            ++iter;
+          }
+          finish:
+          std::cout << "Removing values" << std::endl;
+
+          for(int i=0; i<newZ.size(); i++)
+              if(Z.nq(home, newZ[i])==Int::ME_INT_FAILED)
+                  return ES_FAILED;
+          for(int i=0; i<newQ.size(); i++)
+              if(Q.nq(home, newQ[i])==IntPair::ME_INTPAIR_FAILED)
+                  return ES_FAILED;
+          for(int i=0; i<newP.size(); i++)
+              if(P.nq(home, newP[i])==IntPair::ME_INTPAIR_FAILED)
+                  return ES_FAILED;
+
+          std::cout << "Finish DFA" << std::endl;
+          return ES_NOFIX;
+      }
   }
 
   virtual size_t dispose(Space& home) {
