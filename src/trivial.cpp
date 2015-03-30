@@ -195,12 +195,22 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
 // using namespace MPG::IntPair;
 using namespace MPG;
 
-int states[4][4];
-int costs[4][4];
+int states[4][10];
+int costs[4][10];
+
+
+class Dfa {
+private:
+    std::vector< std::vector<int> > dfa;
+public:
+    Dfa() {
+
+    }
+};
 
 void initdfa() {
     for(int i = 0; i<4; i++)
-        for(int j=0; j<4; j++)
+        for(int j=0; j<10; j++)
             states[i][j]=costs[i][j]=0;
     states[1][1]=2;
     states[2][1]=1;
@@ -214,11 +224,15 @@ void initdfa() {
 
 int statefun(int s, int z)
 {
+    if(z>3 || s>3)
+        return 0;
     return states[s][z];
 }
 
 int costfun(int s, int z)
 {
+    if(z>3 || s>3)
+        return 0;
     return costs[s][z];
 }
 
@@ -249,8 +263,8 @@ public:
     // branch(*this, p, INT_VAR_NONE(), INT_VAL_MIN());
 //    nonemin(*this, x);
  //   nonemin(*this, p);
- //   nonenone(*this, p);
-    //branch(*this, y, INT_VAL_MIN());
+    nonenone(*this, p);
+    branch(*this, z, INT_VAL_MIN());
   }
 
   Squarepack(bool share, Squarepack& sh) : Script(share, sh) {
