@@ -17,5 +17,6 @@ using Gecode::Space;
 #include "propagators/nq.h"
 #include "propagators/eqreif.h"
 #include "propagators/dfa.h"
+#include "propagators/dfaint.h"
 
 #endif
