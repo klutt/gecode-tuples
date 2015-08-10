@@ -2,12 +2,15 @@ GCDISABLE=--disable-examples --disable-thread --disable-float-vars --disable-set
 GCVISFILE=intpair.vis
 
 TUPLED=$(CURDIR)
-INSTD=$(patsubst %src, %external/gecode, $(TUPLED))
-GCSRC=$(patsubst %src, %external/gecode-4.3.2, $(TUPLED))
+#INSTD=$(patsubst %src,%external/gecode, $(TUPLED))
+INSTD=/usr/local
+GCSRC=$(patsubst %src,%external/gecode-4.3.3, $(TUPLED))
 
 LD_LIBRARY_PATH=/usr/local/lib
 
 CXX=g++
+LIBS=-L$(INSTD)/lib
+INCLUDES=-I$(INSTD)/include
 
 #../external/gecodeprefix:
 #	mkdir ../external/gecodeprefix
@@ -18,29 +21,42 @@ CXX=g++
 #../external/gecodedatarootdir:
 #	mkdir ../external/gecodedatarootdir
 
-FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
+#FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
+FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
 
 trivial:
-	/usr/bin/g++ -c trivial.cpp -I/usr/local/include -fdiagnostics-color=always
-	/usr/bin/g++ -o trivial trivial.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
+	/usr/bin/g++ -c trivial.cpp $(INCLUDES) -fdiagnostics-color=always
+	/usr/bin/g++ -o trivial trivial.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 debug:
-	/usr/bin/g++ -g -c trivial.cpp -I/usr/local/include -fdiagnostics-color=always
-	/usr/bin/g++ -g -o trivial trivial.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
+	/usr/bin/g++ -g -c trivial.cpp $(INCLUDES) -fdiagnostics-color=always
+	/usr/bin/g++ -g -o trivial trivial.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
-test:
-	/usr/bin/g++ -g -c testingeqprop.cpp -I/usr/local/include -fdiagnostics-color=always
-	/usr/bin/g++ -g -o testingeqprop testingeqprop.o $(FLAGS) -L /usr/local/lib -fdiagnostics-color=always
+testingeqprop:
+	/usr/bin/g++ -g -c testingeqprop.cpp $(INCLUDES) -fdiagnostics-color=always
+	/usr/bin/g++ -g -o testingeqprop testingeqprop.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
+test/%: %.cpp *.hh
+	/usr/bin/g++ -g -c $*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always
+	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	test/$*
 
-configure: 
-	cd $(GCSRC) ; \
-	./configure $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
+test: \
+	test/queens01test \
+	test/arraytest 
+	echo "All tests passed"
 
-#	./configure --prefix=$(INSTD)prefix --exec-prefix=$(INSTD)execprefix $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
+configure:
+	echo $(INSTD)
+	cd $(GCSRC); \
+	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
+	#./configure $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
+
+#./configure --prefix=$(INSTD)prefix --exec-prefix=$(INSTD)execprefix $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
 
 pair: configure
-	cd $(GCSRC) ; make ; sudo make install
+	cd $(GCSRC) ; make -j12; make install
+	echo run "sudo make install" in "$(GCSRC)"
 
 clean:
 	rm *.o *~ a.out trivial
