@@ -308,16 +308,10 @@ int main(int argc, char* argv[]) {
         0, 1, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 1, 0,
         0, 0, 0, 0, 1, 0, 0, 0 };
-    if (0 == memcmp(&queens_results[0],gold,8*8*sizeof(int)))
-    {
-        cout << "Ok" << endl;
-        return 0;
-    }
-    else
-    {
-        cout << "Fail" << endl;
-        return 1;
-    }
+    assert (0 == memcmp(&queens_results[0],gold,8*8*sizeof(int)));
+
+    cout << "Ok" << endl;
+    return 0;
 }
 
 // STATISTICS: example-any
