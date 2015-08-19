@@ -36,8 +36,8 @@ testingeqprop:
 	/usr/bin/g++ -g -c testingeqprop.cpp $(INCLUDES) -fdiagnostics-color=always
 	/usr/bin/g++ -g -o testingeqprop testingeqprop.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
-test/%: %.cpp *.hh
-	/usr/bin/g++ -g -c $*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always
+test/%: testsrc/%.cpp *.hh
+	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 	test/$*
 
@@ -59,6 +59,6 @@ pair: configure
 	echo run "sudo make install" in "$(GCSRC)"
 
 clean:
-	rm *.o *~ a.out trivial
+	rm *.o *~ a.out trivial test/*
 
 
