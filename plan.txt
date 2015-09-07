@@ -1,8 +1,8 @@
-1	Skriva propagator för DFA som tar IntVar
-2 	Skriva en approximativ IntPair
-2.1 	Designa den nya IntPair
-2.2 	Implementera
-2.3 	Skriva propagator för DFA som tar approximativ IntPair
-3 	Skriva tester för verifikation
-4 	Testa IntPair
-5	Skriva klart rapporten
+1	4h	Skriva propagator för DFA som tar IntVar
+2 		Skriva en approximativ IntPair
+2.1 	2h	Designa den nya IntPair
+2.2 	24h	Implementera
+2.3 	4h	Skriva propagator för DFA som tar approximativ IntPair
+3 		Skriva tester för verifikation
+4 		Testa IntPair
+5		Skriva klart rapporten

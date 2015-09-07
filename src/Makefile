@@ -43,8 +43,9 @@ test/%: testsrc/%.cpp *.hh
 
 test: \
 	test/queens01test \
-	test/arraytest 
-	echo "All tests passed"
+	test/testtemplate \
+	test/zerosolutions
+	@echo "All tests passed"
 
 configure:
 	echo $(INSTD)

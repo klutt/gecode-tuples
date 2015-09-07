@@ -54,13 +54,15 @@ using namespace std;
 using namespace Gecode;
 using namespace Gecode::Driver;
 
-class Queens;
+class Test;
+// int noSolutions;
 
 template<class BaseSpace>
 class ScriptBaseCustom : public BaseSpace {
 public:
-    /// Default constructor
-    ScriptBaseCustom(void) {}
+public:
+  /// Default constructor
+  ScriptBaseCustom(void) {}
     /// Constructor used for cloning
     ScriptBaseCustom(bool share, ScriptBaseCustom& e) : BaseSpace(share,e) {}
     /// Print a solution to \a os
@@ -80,6 +82,7 @@ private:
     static void runMeta(const Options& opt, Script* s);
     /// Catch wrong definitions of copy constructor
     explicit ScriptBaseCustom(ScriptBaseCustom& e);
+
 };
 
 typedef ScriptBaseCustom<Space> ScriptOutput;
@@ -121,7 +124,6 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
     
     ostream& s_out = select_ostream(o.out_file(), sol_file);
     ostream& l_out = select_ostream(o.log_file(), log_file);
-    
     try {
         switch (o.mode()) {
             case SM_SOLUTION:
@@ -147,7 +149,7 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
                 
 				{
                     Meta<Engine,Script> e(s,so);
-                    if (o.print_last()) {
+                    /*                    if (o.print_last()) {
                         Script* px = NULL;
                         do {
                             Script* ex = e.next();
@@ -162,7 +164,7 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
                                 px = ex;
                             }
                         } while (--i != 0);
-                    } else {
+                        } else { */
                         do {
                             Script* ex = e.next();
                             if (ex == NULL)
@@ -170,12 +172,12 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
                             ex->print(s_out);
                             delete ex;
                         } while (--i != 0);
-                    }
+                        //                    }
                     if (o.interrupt())
                         CombinedStop::installCtrlHandler(false);
                     Search::Statistics stat = e.statistics();
 
-					cout << o.size() << " & ";
+                    //					cout << o.size() << " & ";
 
                     //                    s_out << endl;
                     if (e.stopped()) {
@@ -196,24 +198,25 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
                         }
                     }
                     else {
-                        double runtime_msec = t.stop();
-                        double runtime_sec = runtime_msec/1000;
+                      //                        double runtime_msec = t.stop();
+                      //                        double runtime_sec = runtime_msec/1000;
+                        
                         //l_out.width(8);
 //                    cout.fill(' ');
-                        l_out << showpoint << fixed
-                        << setprecision(3) << runtime_sec ;
+//                        l_out << showpoint << fixed
+                        //                      << setprecision(3) << runtime_sec ;
                         //                    cout << " (";
                         //                    cout.width(9);
                         //                    cout.fill('0');
                         //                    cout << runtime_msec << " ms)";
                     }
-                    cout << " & " << stat.fail << " \\\\" << endl;
+                    //                    cout << " & " << stat.fail << " \\\\" << endl;
                 }
                 delete so.stop;
             }
                 break;
             default:
-                Script::template run<Queens,DFS,SizeOptions>(o);
+                Script::template run<Test,DFS,SizeOptions>(o);
         }
     } catch (Exception& e) {
         cerr << "Exception: " << e.what() << "." << endl
@@ -229,90 +232,4 @@ ScriptBaseCustom<Space>::runMeta(const Options& o, Script* s) {
     if (log_file.is_open())
         log_file.close();
 }
-
-std::vector<int> queens_results;
-
-class Queens : public Script {
-public:
-    /// Position of queens on boards
-	BoolVarArray b;
-	int size; //used for printing tables
-
-    /// The actual problem
-    Queens(const SizeOptions& opt) : b(*this, opt.size()*opt.size(), 0, 1)
-	{
-        const int n = opt.size();
-		size = n;
-		
-		for (int i = 0; i < n; i++) {
-			linear(*this, b.slice(i*n, 1, n), IRT_EQ, 1); //Rows
-			linear(*this, b.slice(i, n, n), IRT_EQ, 1); //Columns
-		}
-		
-		linear(*this, b.slice(0, n+1, n), IRT_LQ, 1); //Middle descend. diag.
-		linear(*this, b.slice(n-1, n-1, n), IRT_LQ, 1); //Middle asscend. diag.	
-
-		for (int i = 1; i < n-1; i++) {
-			linear(*this, b.slice(i, n+1, n-i), IRT_LQ, 1); //Upper descend. diag.
-			linear(*this, b.slice(n*i, n+1, n-i), IRT_LQ, 1); //Lower descend. diag.
-			linear(*this, b.slice(n-(i+1), n-1, n-i), IRT_LQ, 1); //Upper ascend. diag.
-			linear(*this, b.slice(n*(i+1)-1, n-1, n-i), IRT_LQ, 1); //Lower ascend. diag.
-		}
-
-		branch(*this, b, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
-    }
-    
-    /// Constructor for cloning \a s
-    Queens(bool share, Queens& s) : Script(share,s), size(s.size) {
-       b.update(*this, share, s.b);
-    }
-    
-    /// Perform copying during cloning
-    virtual Space*
-    copy(bool share) {
-        return new Queens(share,*this);
-    }
-    
-    /// Print solution
-    virtual void print(std::ostream& os) const {
-		int n = size;
-        // comment out the following lines to output the solution
-        os << "queens\t\n";
-        for (int i = 0; i < b.size(); i++) {
-            queens_results.push_back (b[i].val());
-        }
-        os << std::endl;
-    }
-};
-
-int main(int argc, char* argv[]) {
-    // "It should ..."
-    // The arraytest.cpp file should do this or that.
-
-    SizeOptions opt("Queens");
-    opt.iterations(500);
-    opt.size(8);
-    
-    // comment out the following line to get a graphical view of the search tree
-	//opt.mode(Gecode::SM_GIST);
-    
-    opt.parse(argc,argv);
-    ScriptOutput::run<Queens,DFS,SizeOptions>(opt);
-
-    int gold[] = {
-        0, 0, 0, 0, 0, 0, 0, 1,
-        0, 0, 0, 1, 0, 0, 0, 0,
-        1, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 1, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 1, 0, 0,
-        0, 1, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 1, 0,
-        0, 0, 0, 0, 1, 0, 0, 0 };
-    assert (0 == memcmp(&queens_results[0],gold,8*8*sizeof(int)));
-
-    cout << "Ok" << endl;
-    return 0;
-}
-
-// STATISTICS: example-any
 
