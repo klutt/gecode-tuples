@@ -44,7 +44,10 @@ test/%: testsrc/%.cpp *.hh
 test: \
 	test/queens01test \
 	test/testtemplate \
-	test/zerosolutions
+	test/zerosolutions \
+	test/simpleintpairarray \
+	test/simpleintpair \
+	test/simpledfa
 	@echo "All tests passed"
 
 configure:

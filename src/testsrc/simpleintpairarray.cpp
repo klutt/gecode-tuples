@@ -2,6 +2,7 @@
 
 #include "_testbase.cpp"
 
+
 int noSolutions;
 
 using namespace MPG::IntPair;
@@ -9,8 +10,11 @@ using namespace MPG::IntPair;
 class Test : public Script {
 public:
   /// The actual problem
-  Test(const SizeOptions& opt)
+  IntPairVarArray a;
+  Test(const SizeOptions& opt) : a(*this, 2,0,1,3,4)
   {
+    eq(*this, a[0], a[1]);
+    nonenone(*this, a);
   }
 
   
@@ -22,7 +26,7 @@ public:
   Test(bool share, Test& s) : Script(share,s) {
     // To update a variable var use:
     // GC_UPDATE(var)
-
+    GC_UPDATE(a);
   }
     
   /// Perform copying during cloning
@@ -43,12 +47,10 @@ int main(int argc, char* argv[]) {
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
     
-    const int expected_no_solutions = 1;
+    const int expected_no_solutions = 4;
     
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
-
-    // cout << "No solutions: " << noSolutions << endl;
     assert (expected_no_solutions == noSolutions);
 
     cout << "  Ok" << endl;

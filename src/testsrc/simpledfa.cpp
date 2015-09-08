@@ -6,11 +6,21 @@ int noSolutions;
 
 using namespace MPG::IntPair;
 
+  int statef(int s, int t) { if(s==1 && t==1) return 1; return 0; }
+  int costf(int, int) { return 1; }
+
+
 class Test : public Script {
 public:
   /// The actual problem
-  Test(const SizeOptions& opt)
+  IntPairVarArray a;
+  IntVar z;
+  
+  Test(const SizeOptions& opt) : a(*this, 2,1,2,1,2), z(*this, 1,2)
   {
+    mydfa(*this, a[0],a[1],z,&statef, &costf);
+    nonenone(*this, a);
+    branch(*this, z, INT_VAL_MIN());
   }
 
   
@@ -22,7 +32,8 @@ public:
   Test(bool share, Test& s) : Script(share,s) {
     // To update a variable var use:
     // GC_UPDATE(var)
-
+    GC_UPDATE(a);
+    GC_UPDATE(z);
   }
     
   /// Perform copying during cloning
