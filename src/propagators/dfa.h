@@ -15,16 +15,28 @@ typedef int (*CostFunction)(int S, int Z);
 // P.x = S(Q.x, Z)
 // P.y = Q.y + S(Q.y, Z)
 
+namespace MPG { namespace IntPair {
+class DFA_I {
+ public:
+  virtual int S(int, int) = 0; // State function
+  virtual int C(int, int) = 0; // Cost function
+};
+}}
+
+using namespace MPG::IntPair;
+
 class MyDFA : public Propagator {
 protected:
     IntPair::IntPairView P;
     IntPair::IntPairView Q;
     Int::IntView Z;
-    StateFunction S;
-    CostFunction C;
+    //    StateFunction S;
+    //    CostFunction C;
+    DFA_I *D;
+    
 public:
-    MyDFA(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, StateFunction s, CostFunction c)
-        : Propagator(home), P(a), Q(b), Z(z), S(s), C(c)
+    MyDFA(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, DFA_I *d)
+      : Propagator(home), P(a), Q(b), Z(z), D(d)
     {
         P.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
         Q.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
@@ -32,14 +44,14 @@ public:
     }
 
     MyDFA(Space& home, bool share, MyDFA& prop)
-        : Propagator(home, share, prop), S(prop.S), C(prop.C) {
+        : Propagator(home, share, prop), D(prop.D) {
         P.update(home, share, prop.P);
         Q.update(home, share, prop.Q);
         Z.update(home, share, prop.Z);
     }
 
-    static ExecStatus post(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, StateFunction s, CostFunction c) {
-        (void) new (home) MyDFA(home, a, b, z, s, c);
+    static ExecStatus post(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, DFA_I *d) {
+        (void) new (home) MyDFA(home, a, b, z, d);
         return ES_OK;
     }
 
@@ -53,7 +65,7 @@ public:
         while(iter()) {
             for(int i=0; i<Q.size(); i++) {
                 MPG::IntPair::Pair q = Q.getElement(i);
-                MPG::IntPair::Pair p = MPG::IntPair::Pair(S(q.x, iter.val()), q.y + C(q.y, iter.val()));
+                MPG::IntPair::Pair p = MPG::IntPair::Pair(D->S(q.x, iter.val()), q.y + D->C(q.y, iter.val()));
                 std::cout << "z: " << iter.val() << "  q.x: " << q.x << "  p.x: " << p.x << std::endl;
                 if(p.x==0) {
                     std::cout << "garbage state" << std::endl;
@@ -139,12 +151,12 @@ public:
 };
 
 //
-void mydfa(Space& home, IntPairVar P, IntPairVar Q, IntVar Z, StateFunction S, CostFunction C) {
+void mydfa(Space& home, IntPairVar P, IntPairVar Q, IntVar Z, DFA_I *D) {
     std::cout << "Init DFA prop" << std::endl;
     IntPair::IntPairView vp(P);
     IntPair::IntPairView vq(Q);
     Int::IntView vz(Z);
-    if (MyDFA::post(home, vp, vq, vz, S, C) != ES_OK)
+    if (MyDFA::post(home, vp, vq, vz, D) != ES_OK)
         home.fail();
 }
 

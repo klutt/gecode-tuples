@@ -1,4 +1,5 @@
 #include "../intpair.h"
+#include "../propagators/dfa.h"
 
 #include "_testbase.cpp"
 
@@ -6,9 +7,12 @@ int noSolutions;
 
 using namespace MPG::IntPair;
 
-  int statef(int s, int t) { if(s==1 && t==1) return 1; return 0; }
-  int costf(int, int) { return 1; }
+class Dfa_t : public DFA_I {
+int S(int s, int t) { if(s==1 && t==1) return 1; return 0; }
+  int C(int, int) { return 1; }
+};
 
+    Dfa_t df;
 
 class Test : public Script {
 public:
@@ -18,7 +22,7 @@ public:
   
   Test(const SizeOptions& opt) : a(*this, 2,1,2,1,2), z(*this, 1,2)
   {
-    mydfa(*this, a[0],a[1],z,&statef, &costf);
+    mydfa(*this, a[0],a[1],z,&df);
     nonenone(*this, a);
     branch(*this, z, INT_VAL_MIN());
   }
