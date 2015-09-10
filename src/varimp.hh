@@ -262,7 +262,7 @@ ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
 {
     // Ugly and slow as fuck! Rewrite! TODO
     bool modified = false;
-    std::cout << "Eq" << std::endl;
+    //    std::cout << "VarImp::Eq" << std::endl;
     for(int i=0; i<domain.size(); i++) {
 //        std::cout << "Eq trying " << p << " and " << domain[i] << std::endl;
 

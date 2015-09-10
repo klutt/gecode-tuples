@@ -57,18 +57,18 @@ public:
 
     virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
         // std::vector<Pair> keep;
-        std::cout << "Propagating DFA" << std::endl;
+      //        std::cout << "Propagating DFA" << std::endl;
         Gecode::Int::ViewValues<Int::IntView> iter(Z);
-        std::vector<MPG::IntPair::Pair> newP;
-        std::vector<MPG::IntPair::Pair> newQ;
-        std::vector<int> newZ;
+	std::vector<MPG::IntPair::Pair> newP;
+	std::vector<MPG::IntPair::Pair> newQ;
+	std::vector<int> newZ;
         while(iter()) {
             for(int i=0; i<Q.size(); i++) {
                 MPG::IntPair::Pair q = Q.getElement(i);
-                MPG::IntPair::Pair p = MPG::IntPair::Pair(D->S(q.x, iter.val()), q.y + D->C(q.y, iter.val()));
-                std::cout << "z: " << iter.val() << "  q.x: " << q.x << "  p.x: " << p.x << std::endl;
+                MPG::IntPair::Pair p = MPG::IntPair::Pair(D->S(q.x, iter.val()), q.y + D->C(q.x, iter.val()));
+		//  std::cout << "z: " << iter.val() << "  q.x: " << q.x << "  p.x: " << p.x << std::endl;
                 if(p.x==0) {
-                    std::cout << "garbage state" << std::endl;
+		  //                    std::cout << "garbage state" << std::endl;
                     continue;
                 }
                 if(P.contains(p)) {
@@ -77,18 +77,18 @@ public:
                     newZ.push_back(iter.val());
                 }
             }
-            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
+	    //            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
             if(iter.val() == Z.max()) // TODO Ugly hack
                 break;
             ++iter;
         }
 
         if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) {
-            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
+          //  std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
             return ES_FAILED;
         }
 
-        std::cout << "Removing values" << std::endl;
+	//        std::cout << "Removing values" << std::endl;
 
         Gecode::Int::ViewValues<Int::IntView> iter2(Z);
 
@@ -109,14 +109,14 @@ public:
     //        std::cout << "bajs4" << std::endl;
 
         }
-        std::cout << "Z done ";
+	//        std::cout << "Z done ";
         for(int i=0; i<Q.size(); i++) {
             IntPair::Pair q = Q.getElement(i);
             if(std::find(newQ.begin(), newQ.end(), q) == newQ.end())
                 if(Q.nq(home, q) == IntPair::ME_INTPAIR_FAILED)
                     return ES_FAILED;
         }
-        std::cout << "Q done ";
+	//        std::cout << "Q done ";
 
         for(int i=0; i<P.size(); i++) {
             IntPair::Pair p = P.getElement(i);
@@ -124,9 +124,9 @@ public:
                 if(P.nq(home, p) == IntPair::ME_INTPAIR_FAILED)
                     return ES_FAILED;
         }
-        std::cout << "P done " << std::endl;
+	//        std::cout << "P done " << std::endl;
 
-        std::cout << "Finish DFA" << std::endl;
+	//        std::cout << "Finish DFA" << std::endl;
         return ES_FIX;
 
     }

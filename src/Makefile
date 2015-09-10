@@ -37,7 +37,7 @@ testingeqprop:
 	/usr/bin/g++ -g -o testingeqprop testingeqprop.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 test/%: testsrc/%.cpp *.hh
-	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always
+	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always -std=c++11
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 	test/$*
 
@@ -47,7 +47,9 @@ test: \
 	test/zerosolutions \
 	test/simpleintpairarray \
 	test/simpleintpair \
-	test/simpledfa
+	test/simpledfa \
+	test/3statedfanocost \
+	test/3statedfawithcost
 	@echo "All tests passed"
 
 configure:
