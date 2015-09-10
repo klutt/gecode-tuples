@@ -3,25 +3,7 @@
 
 #include <vector>
 
-// Pre: S is current state, Z is next token
-// Post: Returns next state. 0 is garbage state.
-typedef int (*StateFunction)(int S, int Z);
-
-// Pre: S is current state, Z is next token
-// Post: returns the cost for next transition
-
-typedef int (*CostFunction)(int S, int Z);
-
-// P.x = S(Q.x, Z)
-// P.y = Q.y + S(Q.y, Z)
-
-namespace MPG { namespace IntPair {
-class DFA_I {
- public:
-  virtual int S(int, int) = 0; // State function
-  virtual int C(int, int) = 0; // Cost function
-};
-}}
+#include "dfainterface.h"
 
 using namespace MPG::IntPair;
 

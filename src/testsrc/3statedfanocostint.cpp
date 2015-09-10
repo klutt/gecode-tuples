@@ -22,31 +22,35 @@ public:
 		   {0,1,0,3},
 		   {0,0,2,0}
     };
-    cost  = matrix{{0,0,0,0},
-		   {0,1,1,1},
-		   {0,1,0,1},
-		   {0,0,1,0}
-    };
+    
   }
   int S(int s, int t) { return state[s][t]; }
-  int C(int s, int t) { return cost[s][t]; }
+  int C(int s, int t) { return 0; } // { return cost[s][t]; }
 };
 
 
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairVarArray a;
+  IntVar px, py, qx, qy;
   IntVar z;
   Dfa_t *df;
 
   
-  Test(const SizeOptions& opt) : a(*this, 2,1,3,1,4), z(*this, 1,3)
+  Test(const SizeOptions& opt) : px(*this, 1,3),
+				 qx(*this, 1,3),
+				 py(*this, 1,1),
+				 qy(*this, 1,1),
+				 z(*this, 1,3)
   {
     df = new Dfa_t();
-    mydfa(*this, a[0],a[1],z,df);
-    nonenone(*this, a);
+    myintdfa(*this, px, py, qx, qy, z,df);
+
     branch(*this, z, INT_VAL_MIN());
+    branch(*this, px, INT_VAL_MIN());
+    branch(*this, qx, INT_VAL_MIN());
+    branch(*this, py, INT_VAL_MIN());
+    branch(*this, qy, INT_VAL_MIN());
   }
 
   
@@ -58,7 +62,10 @@ public:
   Test(bool share, Test& s) : Script(share,s) {
     // To update a variable var use:
     // GC_UPDATE(var)
-    GC_UPDATE(a);
+    GC_UPDATE(px);
+    GC_UPDATE(qx);
+    GC_UPDATE(py);
+    GC_UPDATE(qy);
     GC_UPDATE(z);
   }
     
@@ -70,8 +77,7 @@ public:
 
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
-    // Strange place to put this, but since this functions is called once for every solution ...  
-    os << "a[0]: " << a[0] << "   a[1]: " << a[1] <<  "   z: " << z << endl;
+    // Strange place to put this, but since this functions is called once for every solution ...
     noSolutions++;
   }
 };
@@ -82,12 +88,12 @@ int main(int argc, char* argv[]) {
     noSolutions=0;
 
     
-    const int expected_no_solutions = 18;
+    const int expected_no_solutions = 6;
     
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
 
-    cout << "No solutions: " << noSolutions << endl;
+    // cout << "No solutions: " << noSolutions << endl;
     assert (expected_no_solutions == noSolutions);
 
     cout << "  Ok" << endl;

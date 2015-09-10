@@ -39,17 +39,18 @@ testingeqprop:
 test/%: testsrc/%.cpp *.hh
 	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always -std=c++11
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-	test/$*
+	test/$* -threads 1
 
 test: \
+	test/3statedfawithcost \
+	test/3statedfanocostint \
 	test/queens01test \
 	test/testtemplate \
 	test/zerosolutions \
 	test/simpleintpairarray \
 	test/simpleintpair \
 	test/simpledfa \
-	test/3statedfanocost \
-	test/3statedfawithcost
+	test/3statedfanocost 
 	@echo "All tests passed"
 
 configure:
