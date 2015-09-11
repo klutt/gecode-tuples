@@ -109,7 +109,7 @@ public:
 	//        std::cout << "P done " << std::endl;
 
 	//        std::cout << "Finish DFA" << std::endl;
-        return ES_FIX;
+        return ES_NOFIX;
 
     }
 

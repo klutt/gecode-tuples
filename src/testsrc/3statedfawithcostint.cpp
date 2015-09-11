@@ -22,10 +22,17 @@ public:
 		   {0,1,0,3},
 		   {0,0,2,0}
     };
+    cost  = matrix{{0,0,0,0},
+		   {0,1,1,1},
+		   {0,1,0,1},
+		   {0,0,1,0}
+    };
+    
     
   }
   int S(int s, int t) { if(s>3 || t>3) return 0; return state[s][t]; }
-  int C(int s, int t) { return 0; } // { return cost[s][t]; }
+
+  int C(int s, int t) { return cost[s][t]; }
 };
 
 
@@ -38,9 +45,9 @@ public:
   
   Test(const SizeOptions& opt) : px(*this, 1,3),
 				 qx(*this, 1,3),
-				 py(*this, 1,1),
-				 qy(*this, 1,1),
-				 z(*this, 1,4)
+				 py(*this, 1,4),
+				 qy(*this, 1,4),
+				 z(*this, 1,3)
   {
     df = new Dfa_t();
     myintdfa(*this, px, py, qx, qy, z,df);
@@ -91,7 +98,7 @@ int main(int argc, char* argv[]) {
     noSolutions=0;
 
     
-    const int expected_no_solutions = 6;
+    const int expected_no_solutions = 18;
     
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);

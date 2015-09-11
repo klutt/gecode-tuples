@@ -42,6 +42,7 @@ test/%: testsrc/%.cpp *.hh
 	test/$* -threads 1
 
 test: \
+	test/3statedfawithcostint \
 	test/3statedfawithcost \
 	test/3statedfanocostint \
 	test/queens01test \

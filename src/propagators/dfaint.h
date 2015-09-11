@@ -44,19 +44,17 @@ protected:
     }
 
     virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
-      //      std::vector<int> newpx, newpy, newqx, newqy, newz;
-      //      Gecode::Int::ViewValues<Int::IntView> iqx(Qx), iz(Z);
-      /*
+            std::vector<int> newpx, newpy, newqx, newqy, newz;
+            Gecode::Int::ViewValues<Int::IntView> iz(Z);
+      
       while(iz()) {
-	std::cout << " z " << std::endl;
+            Gecode::Int::ViewValues<Int::IntView> iqx(Qx);
+	    //	std::cout << " z " << iz.val() << " zmax: " << Z.max() << std::endl;
 	while(iqx()) {
-	  std::cout << " qx " << iqx.val() << " Qxmax " << Qx.max() << std::endl;
-	  int state = D->S(iqx.val(), iz.val());
-	  if(state == 0) {
-	    ++iqx; // TODO Dangerous duplication
-	    continue;
-	  }
-	  if(Px.in(state)) {
+	  //	  std::cout << " qx " << iqx.val() << " Qxmax " << Qx.max() << std::endl;
+	  	  int state = D->S(iqx.val(), iz.val());
+	  //	  std::cout << " state: " << state << std::endl;
+	  if(state>0 && Px.in(state)) {
 	    newqx.push_back(iqx.val());
 	    newpx.push_back(state);
 	    newz.push_back(iz.val());
@@ -75,20 +73,30 @@ protected:
 	  if(iqx.val() == Qx.max()) // TODO Ugly hack
 	     break;
 	  ++iqx;
-	  std::cout << " balle " << std::endl;
+	  //	  std::cout << " balle " << std::endl;
 	}
 	if(iz.val() == Z.max())
 	  break;
 	++iz;
       }
-      std::cout << "mydfaint done searching" << std::endl;
+      //      std::cout << "mydfaint done searching" << std::endl;
 
       if(newz.size()==0 || newpx.size()==0 || newqx.size()==0 || newpy.size()==0 || newqy.size()==0) {
 	return ES_FAILED;
       }
-      */
-      std::cout << " mydfaint not failed " << std::endl;
-      /*
+      
+      //      std::cout << " mydfaint not failed " << std::endl;
+#define _printvec(vec) { \
+      std::cout << #vec << ": "; \
+      for (std::vector<int>::const_iterator i = vec.begin(); i != vec.end(); ++i) \
+	std::cout << *i << ' '; \
+      std::cout << std::endl; \
+      }
+      //      _printvec(newpx)
+      //	_printvec(newpy)
+      //	_printvec(newqx)
+      //	_printvec(newqy)
+      //	_printvec(newz)
 #define _prune(var, newvar) {					\
 	Gecode::Int::ViewValues<Int::IntView> iter(var);	\
 	iter.init(var);						\
@@ -101,14 +109,15 @@ protected:
 	    break;							\
 	  ++iter;							\
 	}								\
-	} */
+	} 
       
-      //      _prune(Z, newz)
+            _prune(Z, newz)
 	
-	//	_prune(Px, newpx)
-	//	_prune(Py, newpy)
-	//	_prune(Qx, newqx)
-	//	_prune(Qy, newqy)
+		_prune(Px, newpx)
+		_prune(Py, newpy)
+		_prune(Qx, newqx)
+		_prune(Qy, newqy)
+      return ES_NOFIX;
       
       
     }
