@@ -1,10 +1,11 @@
 GCDISABLE=--disable-examples --disable-thread --disable-float-vars --disable-set-vars
-GCVISFILE=intpair.vis
+GCVISFILE_EXACT=exact/intpair.vis
+GCVISFILE_APPROX=approx/intpair.vis
 
 TUPLED=$(CURDIR)
 #INSTD=$(patsubst %src,%external/gecode, $(TUPLED))
 INSTD=/usr/local
-GCSRC=$(patsubst %src,%external/gecode-4.3.3, $(TUPLED))
+GCSRC=$(patsubst %src,%external/gecode-4.3.2, $(TUPLED))
 
 LD_LIBRARY_PATH=/usr/local/lib
 
@@ -57,12 +58,22 @@ test: \
 configure:
 	echo $(INSTD)
 	cd $(GCSRC); \
-	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
+	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE_EXACT)
 	#./configure $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
 
 #./configure --prefix=$(INSTD)prefix --exec-prefix=$(INSTD)execprefix $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE)
 
-pair: configure
+configapprox:
+	echo $(INSTD)
+	cd $(GCSRC); \
+	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE_APPROX)
+
+
+exact: configure
+	cd $(GCSRC) ; make -j12; make install
+	echo run "sudo make install" in "$(GCSRC)"
+
+appros: configapprox
 	cd $(GCSRC) ; make -j12; make install
 	echo run "sudo make install" in "$(GCSRC)"
 
