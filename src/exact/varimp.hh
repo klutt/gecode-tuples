@@ -2,7 +2,6 @@
 #define __MPG_INTPAIRVARIMP_HH__
 
 #include <gecode/kernel.hh>
-
 #include <iostream>
 #include <vector>
 #include <assert.h>
@@ -16,44 +15,13 @@ using Gecode::Archive;
 using Gecode::Delta;
 using namespace Gecode;
 
+#include "../common/pair.hh"
+#include "../common/dummydelta.hh"
+
+using namespace MPG::IntPair;
+
+
 namespace MPG { namespace IntPair {
-    class DummyDelta : public Delta {
-    };
-    
-struct Pair {
-    int x, y;
-    Pair() {};
-    Pair(const Pair& p) : x(p.x), y(p.y) {};
-    Pair(int x, int y) : x(x), y(y) {};
-};
-
-bool operator==(const Pair& p1, const Pair& p2) {
-    return (p1.x==p2.x && p1.y==p2.y);
-}
-
-Archive&
-operator <<(Archive& os, const Pair& p) {
-    return os << p.x << p.y;
-};
-
-
-Archive&
-operator >> (Archive& os, Pair& p) {
-    return os >> p.y >> p.x;
-};
-
-
-template<class Char, class Traits>
-std::basic_ostream<Char,Traits>&
-operator <<(std::basic_ostream<Char,Traits>& os, const Pair& p) {
-    std::basic_ostringstream<Char,Traits> s;
-    s.copyfmt(os); s.width(0);
-    s << '<' << p.x << ',' << p.y << '>';
-    return os << s.str();
-};
-
-
-
 class IntPairVarImp : public IntPairVarImpBase {
 protected:
     std::vector<Pair> domain;
@@ -141,7 +109,7 @@ public:
 
     // Subscriptions and cancel
     void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
-        std::cout << "Subscribing from varimp" << std::endl;
+      //        std::cout << "Subscribing from varimp" << std::endl;
         IntPairVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
     }
 
@@ -312,6 +280,6 @@ ModEvent IntPairVarImp::xlq(Space& home, int n) {
     return lq(home, 0, n);
 }
 
-}}
+  }}
 #endif
 
