@@ -10,11 +10,11 @@ namespace MPG {
   protected:
     using VarImpVar<IntPair::IntPairApproxVarImp>::x;
   public:
-    IntPairVar(void) {}
-    IntPairVar(const IntPairVar& y)
-      : VarImpVar<IntPair::IntPairVarImp>(y.varimp()) {}
-    IntPairVar(IntPair::IntPairVarImp* y)
-      : VarImpVar<IntPair::IntPairVarImp>(y) {}
+    IntPairApproxVar(void) {}
+    IntPairApproxVar(const IntPairApproxVar& y)
+      : VarImpVar<IntPair::IntPairApproxVarImp>(y.varimp()) {}
+    IntPairApproxVar(IntPair::IntPairApproxVarImp* y)
+      : VarImpVar<IntPair::IntPairApproxVarImp>(y) {}
     // variable creation
     IntPairApproxVar(Space& home, int xmin,int ymin, int xmax, int ymax)
       : VarImpVar<IntPair::IntPairApproxVarImp>

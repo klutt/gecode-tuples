@@ -9,16 +9,16 @@ using Gecode::ConstView;
 
 namespace MPG { namespace IntPair {
 
-    class IntPairView : public VarImpView<IntPairApproxVar> {
+    class IntPairApproxView : public VarImpView<IntPairApproxVar> {
     protected:
       using VarImpView<IntPairApproxVar>::x;
     public:
 
 
-      IntPairView(void) {}
-      IntPairView(const IntPairApproxVar& y)
+      IntPairApproxView(void) {}
+      IntPairApproxView(const IntPairApproxVar& y)
 	: VarImpView<IntPairApproxVar>(y.varimp()) {}
-      IntPairView(IntPairApproxVarImp* y)
+      IntPairApproxView(IntPairApproxVarImp* y)
 	: VarImpView<IntPairApproxVar>(y) {}
       // access operations
       int xmax(void) const { return x->xmax(); }
@@ -34,7 +34,7 @@ namespace MPG { namespace IntPair {
 
       ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
       ModEvent eq(Space& home, const Pair& p) { return x->eq(home,p);  }
-      ModEvent eq(Space& home, const IntPairView& p) { return x->eq(home,*p.varimp());  }
+      ModEvent eq(Space& home, const IntPairApproxView& p) { return x->eq(home,*p.varimp());  }
       ModEvent nq(Space& home, const Pair& p) { return x->nq(home,p);  }
 
       void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
@@ -60,7 +60,7 @@ namespace MPG { namespace IntPair {
     
     template<class Char, class Traits>
     std::basic_ostream<Char,Traits>&
-    operator<<(std::basic_ostream<Char,Traits>& os, const IntPairView& x) { os << x.varimp(); }
+    operator<<(std::basic_ostream<Char,Traits>& os, const IntPairApproxView& x) { os << x.varimp(); }
 
   }
 }
@@ -69,12 +69,12 @@ namespace MPG { namespace IntPair {
 // constant integer view
 namespace MPG { namespace IntPair {
 
-    class ConstIntPairView : public ConstView<IntPairView> {
+    class ConstIntPairApproxView : public ConstView<IntPairApproxView> {
     protected:
       Pair p;
     public:
-      ConstIntPairView(void) : p(0,0) {}
-      ConstIntPairView(int x, int y) : p(x,y) {}
+      ConstIntPairApproxView(void) : p(0,0) {}
+      ConstIntPairApproxView(int x, int y) : p(x,y) {}
       /*
       IntPair::Pair first(void) const {
 	return p;
@@ -103,23 +103,23 @@ namespace MPG { namespace IntPair {
       GECODE_NEVER; return 0;
       } 
       // update during cloning
-      void update(Space& home, bool share, ConstIntPairView& y) {
-	ConstView<IntPairView>::update(home,share,y);
+      void update(Space& home, bool share, ConstIntPairApproxView& y) {
+	ConstView<IntPairApproxView>::update(home,share,y);
 	p.x = y.p.x; p.y=y.p.y;
       }
     };
     // view tests
     
-  inline bool same(const ConstIntPairView& x, const ConstIntPairView& y) {
+  inline bool same(const ConstIntPairApproxView& x, const ConstIntPairApproxView& y) {
     return x.min() == y.min();
   }
-  inline bool before(const ConstIntPairView& x, const ConstIntPairView& y) {
+  inline bool before(const ConstIntPairApproxView& x, const ConstIntPairApproxView& y) {
     return x.min() < y.min();
   }
     
     template<class Char, class Traits>
     std::basic_ostream<Char,Traits>&
-    operator <<(std::basic_ostream<Char,Traits>& os, const ConstIntPairView& x) { return os << x.varimp; }
+    operator <<(std::basic_ostream<Char,Traits>& os, const ConstIntPairApproxView& x) { return os << x.varimp; }
 
   }}
 */

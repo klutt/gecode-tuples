@@ -103,7 +103,7 @@ public:
     ModEvent eq(Space& home, const Pair& p);
     ModEvent eq(Space& home, const IntPairVarImp& p);
 
-    ModEvent eq(Space& home, const std::vector<Pair> & v);
+  //    ModEvent eq(Space& home, const std::vector<Pair> & v);
 
     ModEvent nq(Space& home, const Pair& p);
 
@@ -140,6 +140,17 @@ operator <<(std::basic_ostream<Char,Traits>& os, const IntPairVarImp& x) {
     return os << s.str();
 }
 
+#ifndef MOD_CLEANUP
+#define MOD_CLEANUP { \
+    if (domain.size()==0)\
+      return ME_INTPAIR_FAILED;\
+    else if (!modified)       \
+      return ME_INTPAIR_NONE;\
+    DummyDelta d;\
+    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);\
+  }
+#endif
+    
 ModEvent IntPairVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
 {
     // This is very inefficient with the current representation.
@@ -172,13 +183,8 @@ ModEvent IntPairVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
             domain.erase(domain.begin() + i);
             i--;
         }
+	MOD_CLEANUP
     }
-    if (!modified)
-      return ME_INTPAIR_NONE;
-    else if (domain.size()==0)
-      return ME_INTPAIR_FAILED;
-    DummyDelta d;
-    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
 }
 
 
@@ -194,15 +200,10 @@ ModEvent IntPairVarImp::eq(Space& home, const IntPairVarImp& p) {
             modified=true;
         }
 
-
-    if (!modified)
-      return ME_INTPAIR_NONE;
-    else if (domain.size()==0)
-      return ME_INTPAIR_FAILED;
-    DummyDelta d;
-    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
+    MOD_CLEANUP
 }
 
+    /*
 ModEvent IntPairVarImp::eq(Space& home, const std::vector<Pair> & v) {
     // Probably the most inefficient in the universe. TODO
 //    std::cout << "Eq vector" << std::endl;
@@ -216,13 +217,8 @@ ModEvent IntPairVarImp::eq(Space& home, const std::vector<Pair> & v) {
             }
 
 
-    if (!modified)
-      return ME_INTPAIR_NONE;
-    else if (domain.size()==0)
-      return ME_INTPAIR_FAILED;
-    DummyDelta d;
-    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
-}
+    MOD_CLEANUP
+    } */
 
 
 
@@ -243,12 +239,7 @@ ModEvent IntPairVarImp::eq(Space& home, const Pair& p)
     }
 
 
-    if (!modified)
-      return ME_INTPAIR_NONE;
-    else if (domain.size()==0)
-      return ME_INTPAIR_FAILED;
-    DummyDelta d;
-    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
+    MOD_CLEANUP
 }
 
 ModEvent IntPairVarImp::nq(Space& home, const Pair& p)
@@ -266,12 +257,7 @@ ModEvent IntPairVarImp::nq(Space& home, const Pair& p)
     }
 //    std::cout << "Neq after " << *this << std::endl;
 
-    if (!modified)
-      return ME_INTPAIR_NONE;
-    else if (domain.size()==0)
-      return ME_INTPAIR_FAILED;
-    DummyDelta d;
-    return notify(home, assigned() ? ME_INTPAIR_VAL : ME_INTPAIR_DOM, d);
+    MOD_CLEANUP
 }
 
 
