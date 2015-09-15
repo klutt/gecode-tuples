@@ -134,7 +134,7 @@ public:
 
 //
 void mydfa(Space& home, IntPairVar P, IntPairVar Q, IntVar Z, DFA_I *D) {
-    std::cout << "Init DFA prop" << std::endl;
+  //    std::cout << "Init DFA prop" << std::endl;
     IntPair::IntPairView vp(P);
     IntPair::IntPairView vq(Q);
     Int::IntView vz(Z);

@@ -1,7 +1,7 @@
 #ifndef DISTINCT_H
 #define DISTINCT_H
 
-#include "../array.hh"
+#include "../exact/array.hh"
 
 class Distinct : public Propagator {
 protected:

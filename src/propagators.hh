@@ -1,9 +1,9 @@
 #ifndef __PROPAGATORS__HH__
 #define __PROPAGATORS__HH__
 
-#include "var.hh"
+#include "exact/var.hh"
 #include <gecode/int.hh>
-#include "view.hh"
+#include "exact/view.hh"
 #include <iostream>
 
 using namespace Gecode;

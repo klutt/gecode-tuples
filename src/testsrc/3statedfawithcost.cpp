@@ -71,7 +71,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...  
-    os << "a[0]: " << a[0] << "   a[1]: " << a[1] <<  "   z: " << z << endl;
+    //    os << "a[0]: " << a[0] << "   a[1]: " << a[1] <<  "   z: " << z << endl;
     noSolutions++;
   }
 };

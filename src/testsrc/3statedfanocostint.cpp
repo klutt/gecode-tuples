@@ -79,8 +79,8 @@ public:
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
     
-    cout << " Solution  "<< " px: " << px << " py: " << py
-	 << " qx: " << qx << " qy: " << qy << " z: " << z << endl;
+    //    cout << " Solution  "<< " px: " << px << " py: " << py
+    //	 << " qx: " << qx << " qy: " << qy << " z: " << z << endl;
     noSolutions++;
   }
 };
