@@ -23,7 +23,7 @@ INCLUDES=-I$(INSTD)/include
 #	mkdir ../external/gecodedatarootdir
 
 #FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
-FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport 
+FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -lgecodegist
 
 trivial:
 	/usr/bin/g++ -c trivial.cpp $(INCLUDES) -fdiagnostics-color=always
@@ -40,9 +40,10 @@ testingeqprop:
 test/%: testsrc/%.cpp *.hh
 	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-	test/$* -threads 1
+#	test/$* -threads 1
 
 test:
+	test/simpledfaapprox \
 	test/simpleintpairapprox \
 	test/3statedfawithcostint \
 	test/3statedfawithcost \

@@ -27,11 +27,16 @@ namespace MPG { namespace IntPair {
       bool contains(const Pair &p) const { return x->contains(p); }
       Pair val() { return x->val(); }
       Pair getElement(int n) { return x->getElement(n); }
-
-
+      int domsize() const { return x->domsize(); }
+      int getx(int i) const { return x->getx(i); }
+      int getl(int i) const { return x->getl(i); }
+      int geth(int i) const { return x->geth(i); }
       // For branching
       Pair first() const { return x->first(); }
 
+      PairApprox getpa(int i) const { return x->getpa(i); }
+      int getxindex(int i) const { return x->getxindex(i); }
+      ModEvent xeq(Space&home, const PairApprox& p) { x->xeq(home, p); }
       ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
       ModEvent eq(Space& home, const Pair& p) { return x->eq(home,p);  }
       ModEvent eq(Space& home, const IntPairApproxView& p) { return x->eq(home,*p.varimp());  }

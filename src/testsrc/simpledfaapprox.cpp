@@ -1,24 +1,30 @@
 #include "../intpairapprox.h"
+#include "../propagators/dfaapprox.h"
 
 #include "_testbase.cpp"
-
 
 int noSolutions;
 
 using namespace MPG::IntPair;
 
+class Dfa_t : public DFA_I {
+int S(int s, int t) { if(s==1 && t==1) return 1; return 0; }
+  int C(int, int) { return 1; }
+};
+
+    Dfa_t df;
+
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairApproxVar p, q;
   IntPairApproxVarArray a;
-  Test(const SizeOptions& opt) : a(*this, 2,0,10,0,10), p(*this, 1,3,0,3), q(*this, 3,3,2,3)
+  IntVar z;
+  
+  Test(const SizeOptions& opt) : a(*this, 2,1,2,1,2), z(*this, 1,2)
   {
-    std::cout << "p: " << p << "  q: " << q << "   a:" << a << std::endl;
-    eq(*this, q, p);
-    eq(*this, a[0], p);
-    eq(*this, a[1], q);
+    mydfa(*this, a[0],a[1],z,&df);
     nonenone(*this, a);
+    branch(*this, z, INT_VAL_MIN());
   }
 
   
@@ -31,8 +37,7 @@ public:
     // To update a variable var use:
     // GC_UPDATE(var)
     GC_UPDATE(a);
-    GC_UPDATE(p);
-    GC_UPDATE(q);
+    GC_UPDATE(z);
   }
     
   /// Perform copying during cloning
@@ -44,7 +49,6 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
-    std::cout << "a[0] " << a[0] << "   a[1]: " << a[1] << std::endl;
     noSolutions++;
   }
 };
@@ -53,13 +57,13 @@ int main(int argc, char* argv[]) {
     SizeOptions opt("Queens");
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
-    //    opt.mode(Gecode::SM_GIST);    
-    const int expected_no_solutions = 2;
+    
+    const int expected_no_solutions = 1;
     
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
+
     cout << "No solutions: " << noSolutions << endl;
-    
     assert (expected_no_solutions == noSolutions);
 
     cout << "  Ok" << endl;

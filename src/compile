@@ -12,10 +12,10 @@ else
 		echo "File must be a .cpp file. Extension is $ext"
 	else
 		echo "Compiling..."
-		g++ -c $filename -fdiagnostics-color=always
+		g++ -c $filename -fdiagnostics-color=always -lgecodegist
 		# flags="-lgecodeflatzinc -lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeset -lgecodefloat -lgecodeint -lgecodekernel -lgecodesupport"
 		#flags="-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport"
-		flags="-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport"
+		flags="-lgecodegist -lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport"
 		echo "Linking with flags $flags"
 		echo "Modify script to disable flags if wanted."
 		g++ -o $base $base".o" $flags 

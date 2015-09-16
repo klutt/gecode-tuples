@@ -1,3 +1,4 @@
+#include <gecode/gist.hh>
 #include <gecode/driver.hh>
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
@@ -328,7 +329,7 @@ int main(int argc, char* argv[]) {
 	SizeOptions opt("Squarepack");
 	
 	// comment out the following line to get a graphical view of the search tree
-	//opt.mode(Gecode::SM_GIST);
+	opt.mode(Gecode::SM_GIST);
 
 	if(argc < 2) return 1;
 	N = atoi(argv[1]); 
@@ -338,9 +339,9 @@ int main(int argc, char* argv[]) {
 	}
 	n = N-1;
 	
-	std::stringstream filename;
-	filename << "project1-t" << TeamNr << "-n" << N << ".txt";
-	freopen(filename.str().c_str(),"w",stdout);
+	//	std::stringstream filename;
+	//	filename << "project1-t" << TeamNr << "-n" << N << ".txt";
+	//	freopen(filename.str().c_str(),"w",stdout);
 	
 	//cout << "enter n: " << endl;
 	//cin >> N;

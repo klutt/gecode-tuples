@@ -78,25 +78,15 @@ public:
     }
 
   int getxindex(int x) const {
+    int ret = -1;
     for(int i=0; i<domain.size(); i++)
       if(domain[i].x==x)
-	return i;
-    return -1;
+	ret = i;
+    std::cout << "getxindex returning " << ret << " while searching for " << x << std::endl;
+    return ret;
   }
  
-  // Needs rewriting
-    Pair getElement(int n) const {
-      //    assert(n<domain.size());
-      assert(n<size());
-      int x=0;
-      for(int i=0; i<n; i++) {
-	for(int y=domain[x].l;y<domain[x].h;y++) {
-	  if(i==n)
-	    return Pair(x,y);
-	}
-	x++;
-      }
-    }
+  Pair getElement(int n) const;
 
     // For cost computation and printout
     int size(void) const {
@@ -106,9 +96,16 @@ public:
       return sum;
     }
 
+  int domsize(void) const { return domain.size(); }
+
+  int getx(int i) const { return domain[i].x; }
+
+  int getl(int i) const { return domain[i].l;}
+  int geth(int i) const { return domain[i].h;}
+  PairApprox getpa(int i) const { return domain[i]; }
     // assignment test
     bool assigned(void) const {
-        return domain.size()==1;
+        return domain.size()==1 && domain[0].l == domain[0].h;
     }
 
     // Mod events
@@ -117,7 +114,7 @@ public:
 
     ModEvent rel(Space &home, int dim, int n, IP_INT_REL r);
 
-
+  
     ModEvent lq(Space& home, int dim, int n) { return rel(home, dim, n, IP_LQ); }
     ModEvent lt(Space& home, int dim, int n) { return rel(home, dim, n, IP_LT); }
     ModEvent gq(Space& home, int dim, int n) { return rel(home, dim, n, IP_GQ); }
@@ -129,7 +126,7 @@ public:
     ModEvent xlq(Space& home, int n);
     ModEvent eq(Space& home, const Pair& p);
     ModEvent eq(Space& home, const IntPairApproxVarImp& p);
-
+  ModEvent xeq(Space& home, const PairApprox& p);
   //    ModEvent eq(Space& home, const std::vector<Pair> & v);
 
     ModEvent nq(Space& home, const Pair& p);
@@ -155,6 +152,39 @@ public:
 
 };
 
+    // limits the pairapprox a where a.x=p.x to p.l and p.h if that x value exists
+    ModEvent IntPairApproxVarImp::xeq(Space& home, const PairApprox& p) {
+      int index=getxindex(p.x);
+      if(index==-1)
+	return ME_INTPAIRAPPROX_NONE;
+      bool modified=false;
+      if(p.l>domain[index].l) {
+	domain[index].l=p.l;
+	modified=true;
+      }
+      if(p.h<domain[index].h){
+	domain[index].h=p.h;
+	modified=true;
+      }
+      if(domain[index].h<domain[index].l) 
+	domain.erase(domain.begin()+index);
+
+
+      if(domain.size()==0)
+	return ME_INTPAIRAPPROX_FAILED;
+      
+      if(modified) {
+	  DummyDelta d;
+	  return notify(home, assigned() ? ME_INTPAIRAPPROX_VAL : ME_INTPAIRAPPROX_DOM, d);
+      }
+
+      return ME_INTPAIRAPPROX_NONE;
+    }
+	  
+
+	
+  
+
 template<class Char, class Traits>
 std::basic_ostream<Char,Traits>&
 operator <<(std::basic_ostream<Char,Traits>& os, const IntPairApproxVarImp& x) {
@@ -166,6 +196,30 @@ operator <<(std::basic_ostream<Char,Traits>& os, const IntPairApproxVarImp& x) {
         s << '[' << x.first() <<  ".." << x.last() << "][" << x.size() << "]";
     return os << s.str();
 }
+
+Pair IntPairApproxVarImp::getElement(int n) const {
+      assert(n<size());
+      int i=0, j=0;
+      int m=0;
+      std::cout << "getElement searching for "<< n << " in " << *this << std::endl;
+      while(i<domain.size()) {
+	//	  std::cout << "outer loop i: " << i << "   j:" << j << std::endl;
+
+	j=0;
+	while(j<domain[i].h-domain[i].l+1) {
+	  std::cout << "inner loop i: " << i << "   j:" << j << std::endl;
+	  if(m==n) {
+	    Pair p (domain[i].x, domain[i].l+j);
+	    std::cout << "getElement returning " << p << std::endl;
+	  }
+  	  m++;
+
+	  j++;
+	}
+	i++;
+      }
+      
+    }
 
 #ifndef MOD_CLEANUP
 #define MOD_CLEANUP { \
@@ -179,6 +233,36 @@ operator <<(std::basic_ostream<Char,Traits>& os, const IntPairApproxVarImp& x) {
 #endif
 
 
+ModEvent IntPairApproxVarImp::eq(Space& home, const IntPairApproxVarImp& p) {
+    // Probably the most inefficient in the universe. TODO
+//    std::cout << "Eq pair pair" << std::endl;
+     std::cout << "IntPairApproxVarImp::eq IPAVI" << std::endl;
+    bool modified=false;
+//    std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
+    std::cout << "Modifying "  << *this << " with argument " << p << std::endl;
+    for(int i=0; i<domain.size(); i++) {
+      int index=p.getxindex(domain[i].x);
+      if(index==-1) {
+	std::cout << "Erasing " << p << std::endl;
+	domain.erase(domain.begin()+i); i--; modified=true; break;
+      }
+      else {
+	if(domain[i].l < p.domain[index].l) {
+	  std::cout << "Changing lower bound to " << domain[i].l <<  std::endl;
+	  domain[i].l=p.domain[index].l; modified = true;
+	}
+	if(domain[i].h > p.domain[index].h) {
+	  std::cout << "Changing upper bound to "<< domain[i].h  << std::endl;
+	  domain[i].h=p.domain[index].h; modified = true;
+	}
+      } 
+    }
+
+
+    MOD_CLEANUP
+}
+
+    
 ModEvent IntPairApproxVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
 {
     // This is very inefficient with the current representation.
@@ -234,35 +318,6 @@ ModEvent IntPairApproxVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
 
 
 
-ModEvent IntPairApproxVarImp::eq(Space& home, const IntPairApproxVarImp& p) {
-    // Probably the most inefficient in the universe. TODO
-//    std::cout << "Eq pair pair" << std::endl;
-     std::cout << "IntPairApproxVarImp::eq IPAVI" << std::endl;
-    bool modified=false;
-//    std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
-    for(int i=0; i<domain.size(); i++) {
-      std::cout << "i: " << i << std::endl;
-      int index=p.getxindex(domain[i].x);
-      if(index==-1) {
-	std::cout << "Erasing" << std::endl;
-	domain.erase(domain.begin()+i); i--; modified=true;
-      }
-      else {
-	if(domain[i].l < p.domain[index].l) {
-	  std::cout << "Changing lower bound " << std::endl;
-	  domain[i].l=p.domain[index].l; modified = true;
-	}
-	if(domain[i].h > p.domain[index].h) {
-	  std::cout << "Changing upper bound " << std::endl;
-	  domain[i].h=p.domain[index].h; modified = true;
-	}
-      } 
-    }
-
-
-    MOD_CLEANUP
-}
-
 /*
 ModEvent IntPairApproxVarImp::eq(Space& home, const std::vector<Pair> & v) {
     // Probably the most inefficient in the universe. TODO
@@ -283,10 +338,9 @@ ModEvent IntPairApproxVarImp::eq(Space& home, const std::vector<Pair> & v) {
 
 ModEvent IntPairApproxVarImp::eq(Space& home, const Pair& p)
 {
-     std::cout << "IntPairApproxVarImp::eq Pair" << std::endl;
+  //     std::cout << "IntPairApproxVarImp::eq Pair" << std::endl;
     // Ugly and slow as fuck! Rewrite! TODO
     bool modified = false;
-    //    std::cout << "VarImp::Eq" << std::endl;
     int index = getxindex(p.x);
     if(index == -1)
       return ME_INTPAIRAPPROX_FAILED;
