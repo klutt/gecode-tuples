@@ -6,6 +6,27 @@
 #include "dfainterface.h"
 
 using namespace MPG::IntPair;
+using namespace std;
+
+int findPairX (std::vector<PairApprox> v, int x) {
+  for(int i=0; i<v.size(); i++)
+    if(v[i].x==x)
+      return i;
+  return -1;
+}
+
+void mergePair(std::vector<PairApprox> &v, PairApprox p) {
+  int i=findPairX(v, p.x);
+  if(i==-1)
+    v.push_back(p);
+  else {
+    if(v[i].l > p.l)
+      v[i].l = p.l;
+    if(v[i].h < p.h)
+      v[i].h = p.h;
+  }
+}
+  
 
 class MyDFA : public Propagator {
 protected:
@@ -50,15 +71,16 @@ public:
 	      MPG::IntPair::PairApprox p(D->S(q.x, iter.val()),
 					 q.l + D->C(q.x, iter.val()),
 					 q.h + D->C(q.x, iter.val()));
-		//  std::cout << "z: " << iter.val() << "  q.x: " << q.x << "  p.x: " << p.x << std::endl;
+		std::cout << "z: " << iter.val() << "  q: " << q << "  p: " << p << std::endl;
+		//		std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
+		cout <<  "  p: " << p << endl;
 	      if(p.x==0) {
 		  //                    std::cout << "garbage state" << std::endl;
 		continue;
 	      }
 
-	      PairApprox w = P.getpa(P.getxindex(q.x));
-	      if(P.xeq(home, p) == ME_INTPAIRAPPROX_FAILED)
-		return ES_FAILED;
+	      mergePair(newP, p);
+	      mergePair(newQ, q);
 	      newZ.push_back(iter.val());
             }
 	    //            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
@@ -67,6 +89,11 @@ public:
             ++iter;
         }
 
+	cout << "newP: ";
+	for(int i=0; i<newP.size(); i++)
+	  cout << newP[i] << " ";
+	cout << endl;
+	
         if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) {
           //  std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
             return ES_FAILED;
@@ -97,6 +124,14 @@ public:
 	
 	//        std::cout << "Z done ";
 
+
+	for(int i=0; i<newQ.size(); i++)
+	      if(Q.xeq(home, newQ[i]) == ME_INTPAIRAPPROX_FAILED)
+		return ES_FAILED;
+
+	for(int i=0; i<newP.size(); i++)
+	      if(P.xeq(home, newP[i]) == ME_INTPAIRAPPROX_FAILED)
+		return ES_FAILED;
 
 	/*
         for(int i=0; i<Q.size(); i++) {

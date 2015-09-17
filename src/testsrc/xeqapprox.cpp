@@ -1,31 +1,26 @@
 #include "../intpairapprox.h"
-#include "../propagators/dfaapprox.h"
 
 #include "_testbase.cpp"
+
+#include "../propagators/xeqapprox.h"
+#include <iostream>
+
+
+std::ostringstream res;
 
 int noSolutions;
 
 using namespace MPG::IntPair;
-
-class Dfa_t : public DFA_I {
-int S(int s, int t) { if(s==1 && t==1) return 1; return 0; }
-  int C(int, int) { return 1; }
-};
-
-    Dfa_t df;
+using namespace MPG;
 
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairApproxVarArray a;
-  IntVar z;
-  
-  Test(const SizeOptions& opt) : a(*this, 2,1,2,1,2), z(*this, 1,2)
+  IntPairApproxVar p;
+  Test(const SizeOptions& opt) : p(*this, 1,2,4,6)
   {
-    std::cout << "a[0]: " << a[0] << "   a[1]: " << a[1] << "    z: " << z << std::endl;
-    mydfa(*this, a[0],a[1],z,&df);
-    nonenone(*this, a);
-    branch(*this, z, INT_VAL_MIN());
+    xeq(*this, p, PairApprox(2,3,4));
+    xeq(*this, p, PairApprox(1,8,10));
   }
 
   
@@ -37,8 +32,8 @@ public:
   Test(bool share, Test& s) : Script(share,s) {
     // To update a variable var use:
     // GC_UPDATE(var)
-    GC_UPDATE(a);
-    GC_UPDATE(z);
+    GC_UPDATE(p);
+
   }
     
   /// Perform copying during cloning
@@ -50,6 +45,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    res << p;
     noSolutions++;
   }
 };
@@ -60,11 +56,15 @@ int main(int argc, char* argv[]) {
     noSolutions=0;
     
     const int expected_no_solutions = 1;
-    
+    std::string expected_answer = "<2,4>";
+
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
 
-    cout << "No solutions: " << noSolutions << endl;
+    // cout << "No solutions: " << noSolutions << endl;
+    std::string str = res.str();
+    //    std::cout << str.size() << "   " << expected_answer.size() << std::endl;
+    assert(str.compare(expected_answer) == 0);
     assert (expected_no_solutions == noSolutions);
 
     cout << "  Ok" << endl;

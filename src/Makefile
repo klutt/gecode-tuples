@@ -13,39 +13,22 @@ CXX=g++
 LIBS=-L$(INSTD)/lib
 INCLUDES=-I$(INSTD)/include
 
-#../external/gecodeprefix:
-#	mkdir ../external/gecodeprefix
-
-#../external/gecodeeprefix:
-#	mkdir ../external/gecodeeprefix
-
-#../external/gecodedatarootdir:
-#	mkdir ../external/gecodedatarootdir
-
 #FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
 FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -lgecodegist
 
-trivial:
-	/usr/bin/g++ -c trivial.cpp $(INCLUDES) -fdiagnostics-color=always
-	/usr/bin/g++ -o trivial trivial.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-
-debug:
-	/usr/bin/g++ -g -c trivial.cpp $(INCLUDES) -fdiagnostics-color=always
-	/usr/bin/g++ -g -o trivial trivial.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-
-testingeqprop:
-	/usr/bin/g++ -g -c testingeqprop.cpp $(INCLUDES) -fdiagnostics-color=always
-	/usr/bin/g++ -g -o testingeqprop testingeqprop.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 test/%: testsrc/%.cpp *.hh
 	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-#	test/$* -threads 1
+	test/$* -threads 1
 
-test:
-	test/simpledfaapprox \
-	test/simpleintpairapprox \
-	test/3statedfawithcostint \
+testapprox:	test/xeqapprox \
+		test/simpledfaapprox \
+		test/simpleintpairapprox
+		@echo "All tests passed"
+
+
+test:	test/3statedfawithcostint \
 	test/3statedfawithcost \
 	test/3statedfanocostint \
 	test/queens01test \
@@ -55,7 +38,6 @@ test:
 	test/simpleintpair \
 	test/simpledfa \
 	test/3statedfanocost 
-	@echo "All tests passed"
 
 configure:
 	echo $(INSTD)
@@ -77,6 +59,6 @@ approx: configapprox
 	echo run "sudo make install" in "$(GCSRC)"
 
 clean:
-	rm *.o *~ a.out trivial test/*
+	rm -f *.o *~ a.out trivial test/*
 
 

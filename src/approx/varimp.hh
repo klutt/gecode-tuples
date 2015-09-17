@@ -29,6 +29,15 @@ struct PairApprox {
   PairApprox(int x, int l, int h) : x(x), l(l), h(h) {};
 };
 
+    template<class Char, class Traits>
+    std::basic_ostream<Char,Traits>&
+    operator <<(std::basic_ostream<Char,Traits>& os, const PairApprox& p) {
+      std::basic_ostringstream<Char,Traits> s;
+      s.copyfmt(os); s.width(0);
+      s << '<' << p.x << ",(" << p.l << ',' << p.h << ")>";
+      return os << s.str();
+    };
+    
 
 class IntPairApproxVarImp : public IntPairApproxVarImpBase {
 protected:
@@ -166,9 +175,10 @@ public:
 	domain[index].h=p.h;
 	modified=true;
       }
-      if(domain[index].h<domain[index].l) 
+      if(domain[index].h<domain[index].l) {
+	modified = true;
 	domain.erase(domain.begin()+index);
-
+      }
 
       if(domain.size()==0)
 	return ME_INTPAIRAPPROX_FAILED;
