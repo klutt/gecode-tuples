@@ -356,7 +356,7 @@ ModEvent IntPairApproxVarImp::eq(Space& home, const Pair& p)
       return ME_INTPAIRAPPROX_FAILED;
     else if(p.y < domain[index].l || p.y > domain[index].h) 
       return ME_INTPAIRAPPROX_FAILED;
-    else if(p.y == domain[index].l == domain[index].h)
+    else if(p.y == domain[index].l && p.y == domain[index].h)
       return ME_INTPAIRAPPROX_NONE;
     else {
       domain[index].l=domain[index].h=p.y;
@@ -391,7 +391,6 @@ ModEvent IntPairApproxVarImp::nq(Space& home, const Pair& p)
       DummyDelta d;
       return notify(home, assigned() ? ME_INTPAIRAPPROX_VAL : ME_INTPAIRAPPROX_DOM, d);
     }
-
     else
       return ME_INTPAIRAPPROX_NONE;
 }

@@ -2,26 +2,21 @@
 
 #include "_testbase.cpp"
 
-#include "../propagators/xeqapprox.h"
-#include <iostream>
-
-
-std::ostringstream res;
-
 int noSolutions;
 
-using namespace MPG::IntPair;
-using namespace MPG;
+
+#include <iostream>
+std::ostringstream res;
+
+// using namespace MPG::IntPair;
 
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairApproxVar p;
-  Test(const SizeOptions& opt) : p(*this, 1,2,4,6)
+  IntPairApproxVarArray a;
+  Test(const SizeOptions& opt) : a(*this, 1, 1,2,5,5)
   {
-    xeq(*this, p, PairApprox(2,3,4));
-    xeq(*this, p, PairApprox(1,8,10));
-    xeq(*this, p, PairApprox(0,0,10));
+    neq(*this, a[0], Pair(1,5));
   }
 
   
@@ -33,8 +28,7 @@ public:
   Test(bool share, Test& s) : Script(share,s) {
     // To update a variable var use:
     // GC_UPDATE(var)
-    GC_UPDATE(p);
-
+      GC_UPDATE(a);
   }
     
   /// Perform copying during cloning
@@ -46,7 +40,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
-    res << p;
+    res << a[0];
     noSolutions++;
   }
 };
@@ -57,15 +51,13 @@ int main(int argc, char* argv[]) {
     noSolutions=0;
     
     const int expected_no_solutions = 1;
-    std::string expected_answer = "<2,4>";
-
+    std::string expected_answer="<2,5>";
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
-
+    str::string str=res.str();
     // cout << "No solutions: " << noSolutions << endl;
-    std::string str = res.str();
-    //    std::cout << str.size() << "   " << expected_answer.size() << std::endl;
     assert(str.compare(expected_answer) == 0);
+    
     assert (expected_no_solutions == noSolutions);
 
     cout << "  Ok" << endl;

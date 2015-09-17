@@ -6,7 +6,7 @@
 #include "approx/view.hh"
 #include <iostream>
 #include "propagators/eqapprox.h"
-#include "propagators/dfaapprox.h"
+#include "propagators/nqapprox.h"
 
 using namespace Gecode;
 using namespace MPG;

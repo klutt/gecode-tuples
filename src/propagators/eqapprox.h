@@ -1,5 +1,5 @@
-#ifndef EQ_H
-#define EQ_H
+#ifndef EQAPPROX_H
+#define EQAPPROX_H
 
 using namespace MPG;
 

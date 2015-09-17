@@ -23,10 +23,10 @@ test/%: testsrc/%.cpp *.hh
 	test/$* -threads 1
 
 testapprox:	\
-	test/nqapprox
-	test/arraybranchapprox
-	test/simpleintpairapprox \
 	test/xeqapprox \
+	test/simpleintpairapprox \
+	test/nqapprox \
+	test/arraybranchapprox \
 	test/simpledfaapprox 
 	@echo "All tests passed"
 

@@ -1,5 +1,5 @@
-#ifndef INTPAIRARRAY_HH
-#define INTPAIRARRAY_HH
+#ifndef INTPAIRARRAYA_HH
+#define INTPAIRARRAYA_HH
 
 #include "var.hh"
 

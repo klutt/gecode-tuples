@@ -1,5 +1,5 @@
-#ifndef DFA_H
-#define DFA_H
+#ifndef DFAAPPROX_H
+#define DFAAPPROX_H
 
 #include <vector>
 
@@ -33,8 +33,6 @@ protected:
     IntPair::IntPairApproxView P;
     IntPair::IntPairApproxView Q;
     Int::IntView Z;
-    //    StateFunction S;
-    //    CostFunction C;
     DFA_I *D;
     
 public:
@@ -59,8 +57,7 @@ public:
     }
 
     virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
-        // std::vector<Pair> keep;
-              std::cout << "Propagating DFA" << std::endl;
+        std::cout << "Propagating DFA" << std::endl;
         Gecode::Int::ViewValues<Int::IntView> iter(Z);
 	std::vector<MPG::IntPair::PairApprox> newP;
 	std::vector<MPG::IntPair::PairApprox> newQ;
@@ -71,17 +68,14 @@ public:
 	      MPG::IntPair::PairApprox p(D->S(q.x, iter.val()),
 					 q.l + D->C(q.x, iter.val()),
 					 q.h + D->C(q.x, iter.val()));
-		std::cout << "z: " << iter.val() << "  q: " << q << "  p: " << p << std::endl;
-		//		std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
-		cout <<  "  p: " << p << endl;
-	      if(p.x==0) {
-		  //                    std::cout << "garbage state" << std::endl;
-		continue;
+	      std::cout << "z: " << iter.val() << "  q: " << q << "  p: " << p << std::endl;
+	      //		std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
+	      cout <<  "  p: " << p << endl;
+	      if(p.x>0) {
+		mergePair(newP, p);
+		mergePair(newQ, q);
+		newZ.push_back(iter.val());
 	      }
-
-	      mergePair(newP, p);
-	      mergePair(newQ, q);
-	      newZ.push_back(iter.val());
             }
 	    //            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
             if(iter.val() == Z.max()) // TODO Ugly hack
@@ -94,10 +88,9 @@ public:
 	  cout << newP[i] << " ";
 	cout << endl;
 	
-        if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) {
-          //  std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
+        if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) 
             return ES_FAILED;
-        }
+        
 
 	//        std::cout << "Removing values" << std::endl;
 
@@ -118,7 +111,6 @@ public:
                 break;
             ++iter2;
     //        std::cout << "bajs4" << std::endl;
-
         }
 
 	
@@ -152,7 +144,6 @@ public:
 
 	//        std::cout << "Finish DFA" << std::endl; */
         return ES_NOFIX;
-
     }
 
     virtual size_t dispose(Space& home) {
