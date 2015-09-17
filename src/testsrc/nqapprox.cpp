@@ -8,7 +8,8 @@ int noSolutions;
 #include <iostream>
 std::ostringstream res;
 
-// using namespace MPG::IntPair;
+using namespace MPG::IntPair;
+using namespace MPG;
 
 class Test : public Script {
 public:
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]) {
     std::string expected_answer="<2,5>";
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
-    str::string str=res.str();
+    std::string str=res.str();
     // cout << "No solutions: " << noSolutions << endl;
     assert(str.compare(expected_answer) == 0);
     

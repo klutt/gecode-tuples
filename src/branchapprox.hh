@@ -3,9 +3,9 @@
 
 #include "intpairapprox.h"
 
-using namespace Gecode;
-using namespace MPG;
-using namespace MPG::IntPair;
+//using namespace Gecode;
+//using namespace MPG;
+//using namespace MPG::IntPair;
 
 #include "branchers/nonenoneapprox.h"
 

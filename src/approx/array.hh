@@ -3,8 +3,8 @@
 
 #include "var.hh"
 
-using Gecode::VarArray;
-using Gecode::VarArgArray;
+// using Gecode::VarArray;
+// using Gecode::VarArgArray;
 
 // array traits
 namespace MPG {
@@ -39,23 +39,25 @@ public:
 }
 // variable arrays
 namespace MPG {
-class IntPairApproxVarArgs : public VarArgArray<IntPairApproxVar> {
+  class IntPairApproxVarArgs : public Gecode::VarArgArray<MPG::IntPairApproxVar> {
 public:
-    IntPairApproxVarArgs(void) {}
-    IntPairApproxVarArgs(const IntPairApproxVarArgs& a) : VarArgArray<IntPairApproxVar>(a) {}
-    IntPairApproxVarArgs(const VarArray<IntPairApproxVar>& a) : VarArgArray<IntPairApproxVar>(a) {}
-    IntPairApproxVarArgs(Space& home, int n, int xmin, int xmax, int ymin, int ymax) : VarArgArray<IntPairApproxVar>(n) {
+  IntPairApproxVarArgs(void) {}
+  IntPairApproxVarArgs(const MPG::IntPairApproxVarArgs& a) : Gecode::VarArgArray<MPG::IntPairApproxVar>(a) {}
+  IntPairApproxVarArgs(const Gecode::VarArray<MPG::IntPairApproxVar>& a) : Gecode::VarArgArray<MPG::IntPairApproxVar>(a) {}
+  IntPairApproxVarArgs(Gecode::Space& home, int n, int xmin, int xmax, int ymin, int ymax) :
+    Gecode::VarArgArray<MPG::IntPairApproxVar>(n) {
         for(int i=0; i<n; i++) {
             (*this)[i] = IntPairApproxVar(home, xmin, xmax, ymin, ymax);
         }
     }
 };
-class IntPairApproxVarArray : public VarArray<IntPairApproxVar> {
+  class IntPairApproxVarArray : public Gecode::VarArray<MPG::IntPairApproxVar> {
 public:
     IntPairApproxVarArray(void) {}
-    IntPairApproxVarArray(const IntPairApproxVarArray& a) : VarArray<IntPairApproxVar>(a) {}
-    IntPairApproxVarArray(Space& home, int n) : VarArray<IntPairApproxVar>(home, n) {}
-    IntPairApproxVarArray(Space& home, int n, int xmin, int xmax, int ymin, int ymax) : VarArray<IntPairApproxVar>(home, n) {
+  IntPairApproxVarArray(const IntPairApproxVarArray& a) : Gecode::VarArray<MPG::IntPairApproxVar>(a) {}
+  IntPairApproxVarArray(Gecode::Space& home, int n) : Gecode::VarArray<MPG::IntPairApproxVar>(home, n) {}
+  IntPairApproxVarArray(Gecode::Space& home, int n, int xmin, int xmax, int ymin, int ymax) :
+    Gecode::VarArray<MPG::IntPairApproxVar>(home, n) {
         for(int i=0; i<n; i++) {
             (*this)[i] = IntPairApproxVar(home, xmin, xmax, ymin, ymax);
         }

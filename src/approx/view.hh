@@ -4,12 +4,12 @@
 #include "var.hh"
 #include <iostream>
 
-using Gecode::VarImpView;
-using Gecode::ConstView;
+// using Gecode::VarImpView;
+// using Gecode::ConstView;
 
 namespace MPG { namespace IntPair {
 
-    class IntPairApproxView : public VarImpView<IntPairApproxVar> {
+    class IntPairApproxView : public Gecode::VarImpView<IntPairApproxVar> {
     protected:
       using VarImpView<IntPairApproxVar>::x;
     public:
@@ -36,22 +36,22 @@ namespace MPG { namespace IntPair {
 
       PairApprox getpa(int i) const { return x->getpa(i); }
       int getxindex(int i) const { return x->getxindex(i); }
-      ModEvent xeq(Space&home, const PairApprox& p) { x->xeq(home, p); }
-      ModEvent xlq(Space& home, int n) { return x->xlq(home,n);  }
-      ModEvent eq(Space& home, const Pair& p) { return x->eq(home,p);  }
-      ModEvent eq(Space& home, const IntPairApproxView& p) { return x->eq(home,*p.varimp());  }
-      ModEvent nq(Space& home, const Pair& p) { return x->nq(home,p);  }
+      Gecode::ModEvent xeq(Gecode::Space&home, const PairApprox& p) { x->xeq(home, p); }
+      Gecode::ModEvent xlq(Gecode::Space& home, int n) { return x->xlq(home,n);  }
+      Gecode::ModEvent eq(Gecode::Space& home, const Pair& p) { return x->eq(home,p);  }
+      Gecode::ModEvent eq(Gecode::Space& home, const IntPairApproxView& p) { return x->eq(home,*p.varimp());  }
+      Gecode::ModEvent nq(Gecode::Space& home, const Pair& p) { return x->nq(home,p);  }
 
-      void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+      void subscribe(Gecode::Space& home, Gecode::Propagator & prop, Gecode::PropCond pc, bool schedule = true) {
           std::cout << "Subscribing" << std::endl;
         x->subscribe(home, prop, pc, schedule);
       }
 
-      void cancel(Space& home, Propagator& prop, PropCond pc) {
+      void cancel(Gecode::Space& home, Gecode::Propagator& prop, Gecode::PropCond pc) {
         x->cancel(home, prop, pc);
       }
       /*
-    ModEvent gq(Space& home, int n) {
+    Gecode::ModEvent gq(Gecode::Space& home, int n) {
       return x->gq(home,n);
     }
     // delta information
@@ -94,10 +94,10 @@ namespace MPG { namespace IntPair {
 	} */
 
       /*
-    ModEvent lq(Space& home, int n) {
+    Gecode::ModEvent lq(Gecode::Space& home, int n) {
       return (x <= n) ? ME_INT_NONE : ME_INT_FAILED;
     }
-    ModEvent gq(Space& home, int n) {
+    Gecode::ModEvent gq(Gecode::Space& home, int n) {
       return (x >= n) ? ME_INT_NONE : ME_INT_FAILED;
     }
     // delta information
@@ -108,7 +108,7 @@ namespace MPG { namespace IntPair {
       GECODE_NEVER; return 0;
       } 
       // update during cloning
-      void update(Space& home, bool share, ConstIntPairApproxView& y) {
+      void update(Gecode::Space& home, bool share, ConstIntPairApproxView& y) {
 	ConstView<IntPairApproxView>::update(home,share,y);
 	p.x = y.p.x; p.y=y.p.y;
       }
@@ -136,14 +136,14 @@ namespace MPG { namespace Int {
   protected:
     using DerivedView<IntView>::x;
     // modification events and propagation conditions
-    static ModEvent minusme(ModEvent me) {
+    static Gecode::ModEvent minusme(Gecode::ModEvent me) {
       switch (me) {
       case ME_INT_MIN: return ME_INT_MAX;
       case ME_INT_MAX: return ME_INT_MIN;
       default: return me;
       }
     }
-    static PropCond minuspc(PropCond pc) {
+    static Gecode::PropCond minuspc(Gecode::PropCond pc) {
       switch (pc) {
       case PC_INT_MIN: return PC_INT_MAX;
       case PC_INT_MAX: return PC_INT_MIN;
@@ -162,38 +162,38 @@ namespace MPG { namespace Int {
       return -x.min();
     }
     // modification operations
-    ModEvent lq(Space& home, int n) {
+    Gecode::ModEvent lq(Gecode::Space& home, int n) {
       return minusme(x.gq(home,-n));
     }
-    ModEvent gq(Space& home, int n) {
+    Gecode::ModEvent gq(Gecode::Space& home, int n) {
       return minusme(x.lq(home,-n));
     }
     // support operations
-    static void schedule(Space& home, Propagator& p, ModEvent me) {
+    static void schedule(Gecode::Space& home, Propagator& p, Gecode::ModEvent me) {
       return IntView::schedule(home,p,minusme(me));
     }
-    static ModEvent me(const ModEventDelta& med) {
+    static Gecode::ModEvent me(const Gecode::ModEventDelta& med) {
       return minusme(IntView::me(med));
     }
-    static ModEventDelta med(ModEvent me) {
+    static Gecode::ModEventDelta med(Gecode::ModEvent me) {
       return IntView::med(minusme(me));
     }
     // subscriptions
-    void subscribe(Space& home, Propagator& p, PropCond pc, 
+    void subscribe(Gecode::Space& home, Propagator& p, Gecode::PropCond pc, 
                    bool schedule=true) {
       x.subscribe(home,p,minuspc(pc),schedule);
     }
-    void subscribe(Space& home, Advisor& a) {
+    void subscribe(Gecode::Space& home, Advisor& a) {
       x.subscribe(home,a);
     }
-    void cancel(Space& home, Propagator& p, PropCond pc) {
+    void cancel(Gecode::Space& home, Propagator& p, Gecode::PropCond pc) {
       x.cancel(home,p,minuspc(pc));
     }
-    void cancel(Space& home, Advisor& a) {
+    void cancel(Gecode::Space& home, Advisor& a) {
       x.cancel(home,a);
     }
     // delta information
-    static ModEvent modevent(const Delta& d) {
+    static Gecode::ModEvent modevent(const Delta& d) {
       return minusme(IntView::modevent(d));
     }
     int min(const Delta& d) const {
@@ -239,10 +239,10 @@ namespace MPG { namespace IntPair {
       return x.max()+c;
     }
 
-    ModEvent lq(Space& home, int n) {
+    Gecode::ModEvent lq(Gecode::Space& home, int n) {
       return x.lq(home,n-c);
     }
-    ModEvent gq(Space& home, int n) {
+    Gecode::ModEvent gq(Gecode::Space& home, int n) {
       return x.gq(home,n-c);
     }
 
@@ -254,7 +254,7 @@ namespace MPG { namespace IntPair {
     }
 
     // update during cloning
-    void update(Space& home, bool share, OffsetView& y) {
+    void update(Gecode::Space& home, bool share, OffsetView& y) {
       x.update(home,share,y.x);
       c=y.c;
     }

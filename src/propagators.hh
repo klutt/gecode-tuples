@@ -1,8 +1,8 @@
 #ifndef __PROPAGATORS__HH__
 #define __PROPAGATORS__HH__
 
-#include "exact/var.hh"
-#include <gecode/int.hh>
+// #include "exact/var.hh"
+// #include <gecode/int.hh>
 #include "exact/view.hh"
 #include <iostream>
 

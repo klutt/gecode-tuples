@@ -3,22 +3,22 @@
 
 #include "varimp.hh"
 
-using Gecode::VarImpVar;
+// using Gecode::VarImpVar;
 
 namespace MPG {
-  class IntPairApproxVar : public VarImpVar<MPG::IntPair::IntPairApproxVarImp> {
+  class IntPairApproxVar : public Gecode::VarImpVar<MPG::IntPair::IntPairApproxVarImp> {
   protected:
-    using VarImpVar<IntPair::IntPairApproxVarImp>::x;
+    using Gecode::VarImpVar<MPG::IntPair::IntPairApproxVarImp>::x;
   public:
     IntPairApproxVar(void) {}
-    IntPairApproxVar(const IntPairApproxVar& y)
-      : VarImpVar<IntPair::IntPairApproxVarImp>(y.varimp()) {}
-    IntPairApproxVar(IntPair::IntPairApproxVarImp* y)
-      : VarImpVar<IntPair::IntPairApproxVarImp>(y) {}
+    IntPairApproxVar(const MPG::IntPairApproxVar& y)
+      : Gecode::VarImpVar<MPG::IntPair::IntPairApproxVarImp>(y.varimp()) {}
+    IntPairApproxVar(MPG::IntPair::IntPairApproxVarImp* y)
+      : Gecode::VarImpVar<MPG::IntPair::IntPairApproxVarImp>(y) {}
     // variable creation
-    IntPairApproxVar(Space& home, int xmin,int ymin, int xmax, int ymax)
-      : VarImpVar<IntPair::IntPairApproxVarImp>
-      (new (home) IntPair::IntPairApproxVarImp(home,xmin, ymin, xmax, ymax)) {
+    IntPairApproxVar(Gecode::Space& home, int xmin,int ymin, int xmax, int ymax)
+      : Gecode::VarImpVar<MPG::IntPair::IntPairApproxVarImp>
+      (new (home) MPG::IntPair::IntPairApproxVarImp(home,xmin, ymin, xmax, ymax)) {
     }
 
     int size(void) const { return x->size(); }
@@ -28,7 +28,7 @@ namespace MPG {
   
   template<class Char, class Traits>
   std::basic_ostream<Char,Traits>&
-  operator <<(std::basic_ostream<Char,Traits>& os, const IntPairApproxVar& x) { MPG::IntPair::IntPairApproxVarImp *ptr = x.varimp(); os << *ptr; }
+  operator <<(std::basic_ostream<Char,Traits>& os, const MPG::IntPairApproxVar& x) { MPG::IntPair::IntPairApproxVarImp *ptr = x.varimp(); os << *ptr; }
 }    
 
 #endif

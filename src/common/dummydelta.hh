@@ -2,7 +2,7 @@
 #define DUMMYDELTA_HH
 
 namespace MPG { namespace IntPair {
-    class DummyDelta : public Delta {
+    class DummyDelta : public Gecode::Delta {
     };
 
   }}

@@ -8,14 +8,14 @@
 #include <assert.h>
 #include <gecode/int.hh>
 
-using Gecode::Space;
-using Gecode::ModEvent;
-using Gecode::Propagator;
-using Gecode::PropCond;
-using Gecode::Archive;
-using Gecode::Delta;
-using namespace Gecode;
-using namespace MPG::IntPair;
+// using Gecode::Space;
+// using Gecode::ModEvent;
+// using Gecode::Propagator;
+// using Gecode::PropCond;
+// using Gecode::Archive;
+// using Gecode::Delta;
+// using namespace Gecode;
+// using namespace MPG::IntPair;
 
 #include "../common/pair.hh"
 #include "../common/dummydelta.hh"
@@ -45,7 +45,7 @@ protected:
 
   
 public:
-    IntPairApproxVarImp(Space& home, int x_min, int x_max, int y_min, int y_max)
+  IntPairApproxVarImp(Gecode::Space& home, int x_min, int x_max, int y_min, int y_max)
         : IntPairApproxVarImpBase(home) {
         assert(x_min<=x_max && y_min<=y_max);
         for(int x=x_min; x<=x_max; x++)
@@ -121,38 +121,38 @@ public:
     enum IP_INT_REL { IP_LQ, IP_LT, IP_GQ, IP_GT, IP_EQ, IP_NQ };
 
 
-    ModEvent rel(Space &home, int dim, int n, IP_INT_REL r);
+    Gecode::ModEvent rel(Gecode::Space &home, int dim, int n, IP_INT_REL r);
 
   
-    ModEvent lq(Space& home, int dim, int n) { return rel(home, dim, n, IP_LQ); }
-    ModEvent lt(Space& home, int dim, int n) { return rel(home, dim, n, IP_LT); }
-    ModEvent gq(Space& home, int dim, int n) { return rel(home, dim, n, IP_GQ); }
-    ModEvent gt(Space& home, int dim, int n) { return rel(home, dim, n, IP_GT); }
-    ModEvent eq(Space& home, int dim, int n) { return rel(home, dim, n, IP_EQ); }
-    ModEvent nq(Space& home, int dim, int n) { return rel(home, dim, n, IP_NQ); }
+    Gecode::ModEvent lq(Gecode::Space& home, int dim, int n) { return rel(home, dim, n, IP_LQ); }
+    Gecode::ModEvent lt(Gecode::Space& home, int dim, int n) { return rel(home, dim, n, IP_LT); }
+    Gecode::ModEvent gq(Gecode::Space& home, int dim, int n) { return rel(home, dim, n, IP_GQ); }
+    Gecode::ModEvent gt(Gecode::Space& home, int dim, int n) { return rel(home, dim, n, IP_GT); }
+    Gecode::ModEvent eq(Gecode::Space& home, int dim, int n) { return rel(home, dim, n, IP_EQ); }
+    Gecode::ModEvent nq(Gecode::Space& home, int dim, int n) { return rel(home, dim, n, IP_NQ); }
 
 
-    ModEvent xlq(Space& home, int n);
-    ModEvent eq(Space& home, const Pair& p);
-    ModEvent eq(Space& home, const IntPairApproxVarImp& p);
-  ModEvent xeq(Space& home, const PairApprox& p);
-  //    ModEvent eq(Space& home, const std::vector<Pair> & v);
+    Gecode::ModEvent xlq(Gecode::Space& home, int n);
+    Gecode::ModEvent eq(Gecode::Space& home, const Pair& p);
+    Gecode::ModEvent eq(Gecode::Space& home, const IntPairApproxVarImp& p);
+  Gecode::ModEvent xeq(Gecode::Space& home, const PairApprox& p);
+  //    Gecode::ModEvent eq(Gecode::Space& home, const std::vector<Pair> & v);
 
-    ModEvent nq(Space& home, const Pair& p);
+    Gecode::ModEvent nq(Gecode::Space& home, const Pair& p);
 
     // Subscriptions and cancel
-    void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
+    void subscribe(Gecode::Space& home, Gecode::Propagator & prop, Gecode::PropCond pc, bool schedule = true) {
       //        std::cout << "Subscribing from varimp" << std::endl;
         IntPairApproxVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
     }
 
-    void cancel(Space& home, Propagator& prop, PropCond pc) {
+    void cancel(Gecode::Space& home, Gecode::Propagator& prop, Gecode::PropCond pc) {
         IntPairApproxVarImpBase::cancel(home, prop, pc, assigned());
     }
 
-    IntPairApproxVarImp(Space& home, bool share, IntPairApproxVarImp& y)
+    IntPairApproxVarImp(Gecode::Space& home, bool share, IntPairApproxVarImp& y)
         : IntPairApproxVarImpBase(home,share,y), domain(y.domain) {}
-    IntPairApproxVarImp* copy(Space& home, bool share) {
+    IntPairApproxVarImp* copy(Gecode::Space& home, bool share) {
         if (copied())
             return static_cast<IntPairApproxVarImp*>(forward());
         else
@@ -162,7 +162,7 @@ public:
 };
 
     // limits the pairapprox a where a.x=p.x to p.l and p.h if that x value exists
-    ModEvent IntPairApproxVarImp::xeq(Space& home, const PairApprox& p) {
+    Gecode::ModEvent IntPairApproxVarImp::xeq(Gecode::Space& home, const PairApprox& p) {
       int index=getxindex(p.x);
       if(index==-1)
 	return ME_INTPAIRAPPROX_NONE;
@@ -243,7 +243,7 @@ Pair IntPairApproxVarImp::getElement(int n) const {
 #endif
 
 
-ModEvent IntPairApproxVarImp::eq(Space& home, const IntPairApproxVarImp& p) {
+Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const IntPairApproxVarImp& p) {
     // Probably the most inefficient in the universe. TODO
 //    std::cout << "Eq pair pair" << std::endl;
      std::cout << "IntPairApproxVarImp::eq IPAVI" << std::endl;
@@ -273,7 +273,7 @@ ModEvent IntPairApproxVarImp::eq(Space& home, const IntPairApproxVarImp& p) {
 }
 
     
-ModEvent IntPairApproxVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
+Gecode::ModEvent IntPairApproxVarImp::rel(Gecode::Space&home, int dim, int n, IP_INT_REL r)
 {
     // This is very inefficient with the current representation.
     // It would be much better with vector<vector<int>> istead
@@ -329,7 +329,7 @@ ModEvent IntPairApproxVarImp::rel(Space&home, int dim, int n, IP_INT_REL r)
 
 
 /*
-ModEvent IntPairApproxVarImp::eq(Space& home, const std::vector<Pair> & v) {
+Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const std::vector<Pair> & v) {
     // Probably the most inefficient in the universe. TODO
 //    std::cout << "Eq vector" << std::endl;
     bool modified=false;
@@ -346,7 +346,7 @@ ModEvent IntPairApproxVarImp::eq(Space& home, const std::vector<Pair> & v) {
 
 
 
-ModEvent IntPairApproxVarImp::eq(Space& home, const Pair& p)
+Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const Pair& p)
 {
   //     std::cout << "IntPairApproxVarImp::eq Pair" << std::endl;
     // Ugly and slow as fuck! Rewrite! TODO
@@ -365,7 +365,7 @@ ModEvent IntPairApproxVarImp::eq(Space& home, const Pair& p)
     }
 }
 
-ModEvent IntPairApproxVarImp::nq(Space& home, const Pair& p)
+Gecode::ModEvent IntPairApproxVarImp::nq(Gecode::Space& home, const Pair& p)
 {
   bool modified = false;
      std::cout << "IntPairApproxVarImp::nq IPAVI" << std::endl;
@@ -397,7 +397,7 @@ ModEvent IntPairApproxVarImp::nq(Space& home, const Pair& p)
 
 
 
-ModEvent IntPairApproxVarImp::xlq(Space& home, int n) {
+Gecode::ModEvent IntPairApproxVarImp::xlq(Gecode::Space& home, int n) {
     return lq(home, 0, n);
 }
 
