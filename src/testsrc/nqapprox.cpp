@@ -15,9 +15,10 @@ class Test : public Script {
 public:
   /// The actual problem
   IntPairApproxVarArray a;
-  Test(const SizeOptions& opt) : a(*this, 1, 1,2,5,5)
+  Test(const SizeOptions& opt) : a(*this, 1,1,2,5,5)
   {
     neq(*this, a[0], Pair(1,5));
+    //    nonenone(*this, a);
   }
 
   
@@ -41,6 +42,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    cout << "a " << a[0] << endl;
     res << a[0];
     noSolutions++;
   }
@@ -56,6 +58,7 @@ int main(int argc, char* argv[]) {
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
     std::string str=res.str();
+    cout << "STR " <<str << endl;
     // cout << "No solutions: " << noSolutions << endl;
     assert(str.compare(expected_answer) == 0);
     

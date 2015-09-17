@@ -349,8 +349,8 @@ Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const std::vector<
 Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const Pair& p)
 {
   //     std::cout << "IntPairApproxVarImp::eq Pair" << std::endl;
-    // Ugly and slow as fuck! Rewrite! TODO
-    bool modified = false;
+
+  bool modified = false;
     int index = getxindex(p.x);
     if(index == -1)
       return ME_INTPAIRAPPROX_FAILED;
@@ -370,22 +370,32 @@ Gecode::ModEvent IntPairApproxVarImp::nq(Gecode::Space& home, const Pair& p)
   bool modified = false;
      std::cout << "IntPairApproxVarImp::nq IPAVI" << std::endl;
 
-  int index = getxindex(p.x);
-    if(index == -1)
+     int index = getxindex(p.x);
+     if(index == -1) {
+       std::cout << "nq x not found" << std::endl;
+       return ME_INTPAIRAPPROX_NONE;
+     }
+     else if (p.y < domain[index].l || p.y > domain[index].h) {
+       std::cout << "nq y not on boundaries" << std::endl;
       return ME_INTPAIRAPPROX_NONE;
-    else if (p.y < domain[index].l || p.y > domain[index].h)
-      return ME_INTPAIRAPPROX_NONE;
+     }
     else if (p.y == domain[index].l) {
+      std::cout << "nq increasing lower bound" << std::endl;
       domain[index].l++;
       modified = true;
     }
     else if (p.y == domain[index].h) {
+      std::cout << "nq x not found" << std::endl;
       domain[index].h--;
       modified = true;
     }
 
-    if(domain[index].l > domain[index].h)
-      return ME_INTPAIRAPPROX_FAILED;
+     if(domain[index].l > domain[index].h) {
+       domain.erase(domain.begin()+index);
+       modified=true;
+       if(domain.size()==0)
+	 return ME_INTPAIRAPPROX_FAILED;
+     }
 
     if(modified) {
       DummyDelta d;

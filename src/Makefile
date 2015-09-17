@@ -58,7 +58,6 @@ configboth:
 	cd $(GCSRC); \
 	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE_APPROX),$(TUPLED)/$(GCVISFILE_EXACT)
 
-
 exact: configure
 	cd $(GCSRC) ; make -j12; make install
 	echo run "sudo make install" in "$(GCSRC)"
