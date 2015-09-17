@@ -8,6 +8,7 @@
 #include "propagators/eqapprox.h"
 #include "propagators/xeqapprox.h"
 #include "propagators/nqapprox.h"
+#include "propagators/dfaapprox.h"
 // using namespace Gecode;
 // using namespace MPG;
 // using Gecode::Space;

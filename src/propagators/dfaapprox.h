@@ -2,20 +2,22 @@
 #define DFAAPPROX_H
 
 #include <vector>
-
+#include "../approx/var.hh"
+#include <gecode/int.hh>
+#include <gecode/kernel.hh>
 #include "dfainterface.h"
 
-using namespace MPG::IntPair;
-using namespace std;
+// using namespace MPG::IntPair;
+// using namespace std;
 
-int findPairX (std::vector<PairApprox> v, int x) {
+int findPairX (std::vector<MPG::IntPair::PairApprox> v, int x) {
   for(int i=0; i<v.size(); i++)
     if(v[i].x==x)
       return i;
   return -1;
 }
 
-void mergePair(std::vector<PairApprox> &v, PairApprox p) {
+void mergePair(std::vector<MPG::IntPair::PairApprox> &v, MPG::IntPair::PairApprox p) {
   int i=findPairX(v, p.x);
   if(i==-1)
     v.push_back(p);
@@ -28,37 +30,45 @@ void mergePair(std::vector<PairApprox> &v, PairApprox p) {
 }
   
 
-class MyDFA : public Propagator {
+class MyDFA : public Gecode::Propagator::Propagator {
 protected:
-    IntPair::IntPairApproxView P;
-    IntPair::IntPairApproxView Q;
-    Int::IntView Z;
-    DFA_I *D;
+    MPG::IntPair::IntPairApproxView P;
+    MPG::IntPair::IntPairApproxView Q;
+    Gecode::Int::IntView Z;
+    MPG::IntPair::DFA_I *D;
     
 public:
-    MyDFA(Space& home, IntPair::IntPairApproxView a, IntPair::IntPairApproxView b, Int::IntView z, DFA_I *d)
-      : Propagator(home), P(a), Q(b), Z(z), D(d)
+    MyDFA(Gecode::Space& home,
+	  MPG::IntPair::IntPairApproxView a,
+	  MPG::IntPair::IntPairApproxView b,
+	  Gecode::Int::IntView z,
+	  MPG::IntPair::DFA_I *d)
+      : Gecode::Propagator::Propagator(home), P(a), Q(b), Z(z), D(d)
     {
-        P.subscribe(home, *this, IntPair::PC_INTPAIRAPPROX_DOM);
-        Q.subscribe(home, *this, IntPair::PC_INTPAIRAPPROX_DOM);
-        Z.subscribe(home, *this, Int::PC_INT_DOM);
+        P.subscribe(home, *this, MPG::IntPair::PC_INTPAIRAPPROX_DOM);
+        Q.subscribe(home, *this, MPG::IntPair::PC_INTPAIRAPPROX_DOM);
+        Z.subscribe(home, *this, Gecode::Int::PC_INT_DOM);
     }
 
-    MyDFA(Space& home, bool share, MyDFA& prop)
-        : Propagator(home, share, prop), D(prop.D) {
+    MyDFA(Gecode::Space& home, bool share, MyDFA& prop)
+        : Gecode::Propagator::Propagator(home, share, prop), D(prop.D) {
         P.update(home, share, prop.P);
         Q.update(home, share, prop.Q);
         Z.update(home, share, prop.Z);
     }
 
-    static ExecStatus post(Space& home, IntPair::IntPairApproxView a, IntPair::IntPairApproxView b, Int::IntView z, DFA_I *d) {
+    static Gecode::ExecStatus post(Gecode::Space& home,
+				   MPG::IntPair::IntPairApproxView a,
+				   MPG::IntPair::IntPairApproxView b,
+				   Gecode::Int::IntView z,
+				   MPG::IntPair::DFA_I *d) {
         (void) new (home) MyDFA(home, a, b, z, d);
-        return ES_OK;
+        return Gecode::ES_OK;
     }
 
-    virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
+    virtual Gecode::ExecStatus propagate(Gecode::Space& home, const Gecode::ModEventDelta&) {
         std::cout << "Propagating DFA" << std::endl;
-        Gecode::Int::ViewValues<Int::IntView> iter(Z);
+        Gecode::Int::ViewValues<Gecode::Int::IntView> iter(Z);
 	std::vector<MPG::IntPair::PairApprox> newP;
 	std::vector<MPG::IntPair::PairApprox> newQ;
 	std::vector<int> newZ;
@@ -69,8 +79,8 @@ public:
 					 q.l + D->C(q.x, iter.val()),
 					 q.h + D->C(q.x, iter.val()));
 	      std::cout << "z: " << iter.val() << "  q: " << q << "  p: " << p << std::endl;
-	      //		std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
-	      cout <<  "  p: " << p << endl;
+	      std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
+	      std::cout <<  "  p: " << p << std::endl;
 	      if(p.x>0) {
 		mergePair(newP, p);
 		mergePair(newQ, q);
@@ -83,18 +93,23 @@ public:
             ++iter;
         }
 
-	cout << "newP: ";
+	std::cout << "newP: ";
 	for(int i=0; i<newP.size(); i++)
-	  cout << newP[i] << " ";
-	cout << endl;
-	
+	  std::cout << newP[i] << " ";
+	std::cout << std::endl;
+
+	std::cout << "newQ: ";
+	for(int i=0; i<newQ.size(); i++)
+	  std::cout << newQ[i] << " ";
+	std::cout << std::endl;
+
         if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) 
-            return ES_FAILED;
+            return Gecode::ES_FAILED;
         
 
 	//        std::cout << "Removing values" << std::endl;
 
-        Gecode::Int::ViewValues<Int::IntView> iter2(Z);
+        Gecode::Int::ViewValues<Gecode::Int::IntView> iter2(Z);
 
         iter2.init(Z);
         while(iter2()) {
@@ -102,8 +117,8 @@ public:
             int z = iter2.val();
 //            std::cout << "bajs2" << std::endl;
             if(std::find(newZ.begin(), newZ.end(), z) == newZ.end())
-                if(Z.nq(home, z) == Int::ME_INT_FAILED)
-                    return ES_FAILED;
+                if(Z.nq(home, z) == Gecode::Int::ME_INT_FAILED)
+                    return Gecode::ES_FAILED;
  //           std::cout << "bajs3" << std::endl;
     //        std::cout << "size " << Z.size() << std::endl;
 
@@ -118,60 +133,80 @@ public:
 
 
 	for(int i=0; i<newQ.size(); i++)
-	      if(Q.xeq(home, newQ[i]) == ME_INTPAIRAPPROX_FAILED)
-		return ES_FAILED;
+	  if(Q.xeq(home, newQ[i]) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
+		return Gecode::ES_FAILED;
 
+	std::vector<int> newQx;
+	for(int i=0; i<newQ.size(); i++)
+	  newQx.push_back(newQ[i].x);
+	
+	if(Q.xeq(home, newQx) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
+	    return Gecode::ES_FAILED;
+
+	
 	for(int i=0; i<newP.size(); i++)
-	      if(P.xeq(home, newP[i]) == ME_INTPAIRAPPROX_FAILED)
-		return ES_FAILED;
+	  if(P.xeq(home, newP[i]) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
+		return Gecode::ES_FAILED;
 
+
+	std::vector<int> newPx;
+	for(int i=0; i<newP.size(); i++)
+	  newPx.push_back(newP[i].x);
+	
+	if(P.xeq(home, newPx) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
+	    return Gecode::ES_FAILED;
+	  
 	/*
         for(int i=0; i<Q.size(); i++) {
-            IntPair::Pair q = Q.getElement(i);
+            MPG::IntPair::Pair q = Q.getElement(i);
             if(std::find(newQ.begin(), newQ.end(), q) == newQ.end())
-                if(Q.nq(home, q) == IntPair::ME_INTPAIRAPPROX_FAILED)
-                    return ES_FAILED;
+                if(Q.nq(home, q) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
+                    return Gecode::ES_FAILED;
         }
 	//        std::cout << "Q done ";
 
         for(int i=0; i<P.size(); i++) {
-            IntPair::Pair p = P.getElement(i);
+            MPG::IntPair::Pair p = P.getElement(i);
             if(std::find(newP.begin(), newP.end(), p) == newP.end())
-                if(P.nq(home, p) == IntPair::ME_INTPAIRAPPROX_FAILED)
-                    return ES_FAILED;
+                if(P.nq(home, p) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
+                    return Gecode::ES_FAILED;
         }
 	//        std::cout << "P done " << std::endl;
 
 	//        std::cout << "Finish DFA" << std::endl; */
-        return ES_NOFIX;
+        return Gecode::ES_NOFIX;
     }
 
-    virtual size_t dispose(Space& home) {
-        P.cancel(home, *this, IntPair::PC_INTPAIRAPPROX_DOM);
-        Q.cancel(home, *this, IntPair::PC_INTPAIRAPPROX_DOM);
-        Z.cancel(home, *this, Int::PC_INT_DOM);
-        (void) Propagator::dispose(home);
+    virtual size_t dispose(Gecode::Space& home) {
+        P.cancel(home, *this, MPG::IntPair::PC_INTPAIRAPPROX_DOM);
+        Q.cancel(home, *this, MPG::IntPair::PC_INTPAIRAPPROX_DOM);
+        Z.cancel(home, *this, Gecode::Int::PC_INT_DOM);
+        (void) Gecode::Propagator::Propagator::dispose(home);
         return sizeof(*this);
     }
 
-    virtual Propagator* copy(Space& home, bool share) {
+    virtual Propagator* copy(Gecode::Space& home, bool share) {
         return new (home) MyDFA(home, share, *this);
     }
 
-    virtual PropCost cost(const Space&, const ModEventDelta&) const {
+    virtual Gecode::PropCost cost(const Gecode::Space&, const Gecode::ModEventDelta&) const {
         // Probably way wrong, but not very important. TODO
-        return PropCost::linear(PropCost::HI, P.size());
+      return Gecode::PropCost::linear(Gecode::PropCost::HI, P.size());
     }
 
 };
 
 //
-void mydfa(Space& home, IntPairApproxVar P, IntPairApproxVar Q, IntVar Z, DFA_I *D) {
+void mydfa(Gecode::Space& home,
+	   MPG::IntPairApproxVar P,
+	   MPG::IntPairApproxVar Q,
+	   Gecode::IntVar Z,
+	   MPG::IntPair::DFA_I *D) {
   //    std::cout << "Init DFA prop" << std::endl;
-    IntPair::IntPairApproxView vp(P);
-    IntPair::IntPairApproxView vq(Q);
-    Int::IntView vz(Z);
-    if (MyDFA::post(home, vp, vq, vz, D) != ES_OK)
+    MPG::IntPair::IntPairApproxView vp(P);
+    MPG::IntPair::IntPairApproxView vq(Q);
+    Gecode::Int::IntView vz(Z);
+    if (MyDFA::post(home, vp, vq, vz, D) != Gecode::ES_OK)
         home.fail();
 }
 

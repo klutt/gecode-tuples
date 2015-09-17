@@ -67,10 +67,14 @@ public:
     const PosVal& pv = static_cast<const PosVal&>(c);
     int pos=pv.pos;
     MPG::IntPair::Pair val(pv.val);
-    if (a == 0)
+    if (a == 0) {
+      std::cout << "nonenoneapprox       eq" << std::endl;
       return Gecode::me_failed(x[pos].eq(home,val)) ? Gecode::ES_FAILED : Gecode::ES_OK;
-    else
+    }
+    else {
+      std::cout << "nonenoneapprox       nq" << std::endl;
       return Gecode::me_failed(x[pos].nq(home,val)) ? Gecode::ES_FAILED : Gecode::ES_OK;
+    }
   }
   // print
   virtual void print(const Gecode::Space& home, const Gecode::Choice& c,

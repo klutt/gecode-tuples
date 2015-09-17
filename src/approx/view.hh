@@ -36,7 +36,8 @@ namespace MPG { namespace IntPair {
 
       PairApprox getpa(int i) const { return x->getpa(i); }
       int getxindex(int i) const { return x->getxindex(i); }
-      Gecode::ModEvent xeq(Gecode::Space&home, const PairApprox& p) { x->xeq(home, p); }
+      Gecode::ModEvent xeq(Gecode::Space& home, const std::vector<int>& v) { return x->xeq(home, v); }
+      Gecode::ModEvent xeq(Gecode::Space&home, const PairApprox& p) { return x->xeq(home, p); }
       Gecode::ModEvent xlq(Gecode::Space& home, int n) { return x->xlq(home,n);  }
       Gecode::ModEvent eq(Gecode::Space& home, const Pair& p) { return x->eq(home,p);  }
       Gecode::ModEvent eq(Gecode::Space& home, const IntPairApproxView& p) { return x->eq(home,*p.varimp());  }

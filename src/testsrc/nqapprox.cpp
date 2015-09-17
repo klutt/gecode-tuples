@@ -18,7 +18,7 @@ public:
   Test(const SizeOptions& opt) : a(*this, 1,1,2,5,5)
   {
     neq(*this, a[0], Pair(1,5));
-    //    nonenone(*this, a);
+    nonenone(*this, a);
   }
 
   

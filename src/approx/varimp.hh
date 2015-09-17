@@ -108,7 +108,7 @@ public:
   int domsize(void) const { return domain.size(); }
 
   int getx(int i) const { return domain[i].x; }
-
+  
   int getl(int i) const { return domain[i].l;}
   int geth(int i) const { return domain[i].h;}
   PairApprox getpa(int i) const { return domain[i]; }
@@ -137,6 +137,7 @@ public:
     Gecode::ModEvent eq(Gecode::Space& home, const IntPairApproxVarImp& p);
   Gecode::ModEvent xeq(Gecode::Space& home, const PairApprox& p);
   //    Gecode::ModEvent eq(Gecode::Space& home, const std::vector<Pair> & v);
+  Gecode::ModEvent xeq(Gecode::Space& home, const std::vector<int>& v);
 
     Gecode::ModEvent nq(Gecode::Space& home, const Pair& p);
 
@@ -160,6 +161,31 @@ public:
     }
 
 };
+
+#ifndef MOD_CLEANUP
+#define MOD_CLEANUP { \
+  if (domain.size()==0)\
+    return ME_INTPAIRAPPROX_FAILED;\
+  else if (!modified)       \
+    return ME_INTPAIRAPPROX_NONE;\
+  DummyDelta d;\
+  return notify(home, assigned() ? ME_INTPAIRAPPROX_VAL : ME_INTPAIRAPPROX_DOM, d);\
+  }
+#endif
+
+    // Removes elements whose x values does not exist in v
+    Gecode::ModEvent IntPairApproxVarImp::xeq(Gecode::Space& home, const std::vector<int>& v) {
+      bool modified = false;
+      for(int i=0; i<domain.size(); i++){
+	auto it = find(v.begin(), v.end(), domain[i].x);
+	if (it == v.end()) {
+	  modified = true;
+	  domain.erase(domain.begin()+i); i--;
+	}
+      }
+
+      MOD_CLEANUP
+    }
 
     // limits the pairapprox a where a.x=p.x to p.l and p.h if that x value exists
     Gecode::ModEvent IntPairApproxVarImp::xeq(Gecode::Space& home, const PairApprox& p) {
@@ -231,16 +257,6 @@ Pair IntPairApproxVarImp::getElement(int n) const {
       
     }
 
-#ifndef MOD_CLEANUP
-#define MOD_CLEANUP { \
-  if (domain.size()==0)\
-    return ME_INTPAIRAPPROX_FAILED;\
-  else if (!modified)       \
-    return ME_INTPAIRAPPROX_NONE;\
-  DummyDelta d;\
-  return notify(home, assigned() ? ME_INTPAIRAPPROX_VAL : ME_INTPAIRAPPROX_DOM, d);\
-  }
-#endif
 
 
 Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const IntPairApproxVarImp& p) {
@@ -348,18 +364,26 @@ Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const std::vector<
 
 Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const Pair& p)
 {
-  //     std::cout << "IntPairApproxVarImp::eq Pair" << std::endl;
+  std::cout << "IntPairApproxVarImp::eq Pair" << *this << "     " << p << std::endl;
 
   bool modified = false;
     int index = getxindex(p.x);
-    if(index == -1)
+    if(index == -1) {
+      std::cout << "IntPairApproxVarImp::eq Pair     x not found" << std::endl;
       return ME_INTPAIRAPPROX_FAILED;
-    else if(p.y < domain[index].l || p.y > domain[index].h) 
+    }
+    else if(p.y < domain[index].l || p.y > domain[index].h) {
+      std::cout << "IntPairApproxVarImp::eq Pair     y out of range" << std::endl;
       return ME_INTPAIRAPPROX_FAILED;
-    else if(p.y == domain[index].l && p.y == domain[index].h)
+    }
+    else if(p.y > domain[index].l && p.y < domain[index].h) {
+      std::cout << "IntPairApproxVarImp::eq Pair     y not on bound, nothing to do" << std::endl;
       return ME_INTPAIRAPPROX_NONE;
+    }
     else {
-      domain[index].l=domain[index].h=p.y;
+      std::cout << "IntPairApproxVarImp::eq Pair     changing" << std::endl;
+      domain[0] = MPG::IntPair::PairApprox(p.x, p.y, p.y);
+      domain.erase(domain.begin()+1, domain.end());
       DummyDelta d;							
       return notify(home, assigned() ? ME_INTPAIRAPPROX_VAL : ME_INTPAIRAPPROX_DOM, d);
     }

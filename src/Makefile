@@ -27,7 +27,9 @@ testapprox:	\
 	test/simpleintpairapprox \
 	test/nqapprox \
 	test/arraybranchapprox \
-	test/simpledfaapprox 
+	test/simpledfaapprox \
+	test/3statedfanocostapprox \
+	test/3statedfawithcostapprox 
 	@echo "All tests passed"
 
 

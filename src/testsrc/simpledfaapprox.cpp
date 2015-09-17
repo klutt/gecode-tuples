@@ -6,6 +6,7 @@
 int noSolutions;
 
 using namespace MPG::IntPair;
+using namespace MPG;
 
 class Dfa_t : public DFA_I {
 int S(int s, int t) { if(s==1 && t==1) return 1; return 0; }
@@ -50,6 +51,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    cout << "Solution: P: " << a[0] << "  Q: " << a[1] << "  Z " << z << endl;
     noSolutions++;
   }
 };
