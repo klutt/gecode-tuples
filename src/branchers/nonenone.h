@@ -3,7 +3,7 @@
 
 class NoneNone : public Brancher {
 protected:
-  ViewArray<IntPair::IntPairView> x;
+  ViewArray<MPG::IntPair::IntPairView> x;
   // choice definition
   class PosVal : public Choice {
   public:
@@ -19,9 +19,9 @@ protected:
     }
   };
 public:
-  NoneNone(Home home, ViewArray<IntPair::IntPairView>& x0)
+  NoneNone(Home home, ViewArray<MPG::IntPair::IntPairView>& x0)
     : Brancher(home), x(x0) {}
-  static void post(Home home, ViewArray<IntPair::IntPairView>& x) {
+  static void post(Home home, ViewArray<MPG::IntPair::IntPairView>& x) {
     (void) new (home) NoneNone(home,x);
   }
   virtual size_t dispose(Space& home) {
@@ -81,9 +81,9 @@ public:
       o << "x[" << pos << "] != " << val;
   }
 };
-void nonenone(Home home, const IntPairVarArgs& x) {
+void nonenone(Home home, const MPG::IntPairVarArgs& x) {
   if (home.failed()) return;
-  ViewArray<IntPair::IntPairView> y(home,x);
+  ViewArray<MPG::IntPair::IntPairView> y(home,x);
   NoneNone::post(home,y);
 }
 

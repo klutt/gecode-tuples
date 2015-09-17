@@ -4,6 +4,9 @@
 
 int noSolutions;
 
+#include <iostream>
+std::ostringstream res;
+
 using namespace MPG::IntPair;
 
 class Test : public Script {
@@ -34,6 +37,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    
     noSolutions++;
   }
 };
@@ -49,6 +53,8 @@ int main(int argc, char* argv[]) {
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
 
     // cout << "No solutions: " << noSolutions << endl;
+    // assert(str.compare(expected_answer) == 0);
+    
     assert (expected_no_solutions == noSolutions);
 
     cout << "  Ok" << endl;

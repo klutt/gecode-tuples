@@ -6,6 +6,7 @@
 int noSolutions;
 
 using namespace MPG::IntPair;
+using namespace MPG;
 
 class Dfa_t : public DFA_I {
 int S(int s, int t) { if(s==1 && t==1) return 1; return 0; }

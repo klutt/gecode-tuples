@@ -6,6 +6,7 @@
 int noSolutions;
 
 using namespace MPG::IntPair;
+using namespace MPG;
 
 class Test : public Script {
 public:

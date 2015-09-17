@@ -5,13 +5,13 @@
 
 class Distinct : public Propagator {
 protected:
-  ViewArray<IntPair::IntPairView> va;
+  ViewArray<MPG::IntPair::IntPairView> va;
 
 public:
-  Distinct(Space& home, ViewArray<IntPair::IntPairView> a)
+  Distinct(Space& home, ViewArray<MPG::IntPair::IntPairView> a)
     : Propagator(home), va(a)
   {
-    va.subscribe(home, *this, IntPair::PC_INTPAIR_VAL);
+    va.subscribe(home, *this, MPG::IntPair::PC_INTPAIR_VAL);
   }
 
   Distinct(Space& home, bool share, Distinct& prop)
@@ -19,7 +19,7 @@ public:
     va.update(home, share, prop.va);
   }
 
-  static ExecStatus post(Space& home, ViewArray<IntPair::IntPairView> a) {
+  static ExecStatus post(Space& home, ViewArray<MPG::IntPair::IntPairView> a) {
     (void) new (home) Distinct(home, a);
     return ES_OK;
   }
@@ -31,7 +31,7 @@ public:
             for(int j=0; j<va.size(); j++) {
                 if(j==i)
                     continue;
-                else if(va[j].nq(home, va[i].val()) == IntPair::ME_INTPAIR_FAILED)
+                else if(va[j].nq(home, va[i].val()) == MPG::IntPair::ME_INTPAIR_FAILED)
                     return ES_FAILED;
                 }
     }
@@ -39,7 +39,7 @@ public:
   }
 
   virtual size_t dispose(Space& home) {
-    va.cancel(home, *this, IntPair::PC_INTPAIR_VAL);
+    va.cancel(home, *this, MPG::IntPair::PC_INTPAIR_VAL);
     (void) Propagator::dispose(home);
     return sizeof(*this);
   }
@@ -54,9 +54,9 @@ public:
 
   };
 
-void distinct(Space& home, const IntPairVarArgs& a) {
+void distinct(Space& home, const MPG::IntPairVarArgs& a) {
     std::cout << "Init distinct prop" << std::endl;
-  ViewArray<IntPair::IntPairView> va(home, a);
+  ViewArray<MPG::IntPair::IntPairView> va(home, a);
   if (Distinct::post(home, va) != ES_OK)
     home.fail();
 }

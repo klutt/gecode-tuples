@@ -22,10 +22,13 @@ test/%: testsrc/%.cpp *.hh
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 	test/$* -threads 1
 
-testapprox:	test/xeqapprox \
-		test/simpledfaapprox \
-		test/simpleintpairapprox
-		@echo "All tests passed"
+testapprox:	\
+	test/nqapprox
+	test/arraybranchapprox
+	test/simpleintpairapprox \
+	test/xeqapprox \
+	test/simpledfaapprox 
+	@echo "All tests passed"
 
 
 test:	test/3statedfawithcostint \
@@ -38,6 +41,7 @@ test:	test/3statedfawithcostint \
 	test/simpleintpair \
 	test/simpledfa \
 	test/3statedfanocost 
+	@echo "All tests passed"
 
 configure:
 	echo $(INSTD)
@@ -49,6 +53,11 @@ configapprox:
 	cd $(GCSRC); \
 	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE_APPROX)
 
+configboth:
+	echo $(INSTD)
+	cd $(GCSRC); \
+	./configure --disable-qt --prefix=$(INSTD) $(GCDISABLE) --with-vis=$(TUPLED)/$(GCVISFILE_APPROX),$(TUPLED)/$(GCVISFILE_EXACT)
+
 
 exact: configure
 	cd $(GCSRC) ; make -j12; make install
@@ -58,7 +67,12 @@ approx: configapprox
 	cd $(GCSRC) ; make -j12; make install
 	echo run "sudo make install" in "$(GCSRC)"
 
+both:	configboth
+	cd $(GCSRC) ; make -j12; make install
+	echo run "sudo make install" in "$(GCSRC)"
+
+
 clean:
-	rm -f *.o *~ a.out trivial test/*
+	rm -f *.o *~ testsrc/*~ test/*
 
 

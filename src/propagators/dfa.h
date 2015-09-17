@@ -9,19 +9,19 @@ using namespace MPG::IntPair;
 
 class MyDFA : public Propagator {
 protected:
-    IntPair::IntPairView P;
-    IntPair::IntPairView Q;
+    MPG::IntPair::IntPairView P;
+    MPG::IntPair::IntPairView Q;
     Int::IntView Z;
     //    StateFunction S;
     //    CostFunction C;
     DFA_I *D;
     
 public:
-    MyDFA(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, DFA_I *d)
+    MyDFA(Space& home, MPG::IntPair::IntPairView a, MPG::IntPair::IntPairView b, Int::IntView z, DFA_I *d)
       : Propagator(home), P(a), Q(b), Z(z), D(d)
     {
-        P.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
-        Q.subscribe(home, *this, IntPair::PC_INTPAIR_DOM);
+        P.subscribe(home, *this, MPG::IntPair::PC_INTPAIR_DOM);
+        Q.subscribe(home, *this, MPG::IntPair::PC_INTPAIR_DOM);
         Z.subscribe(home, *this, Int::PC_INT_DOM);
     }
 
@@ -32,7 +32,7 @@ public:
         Z.update(home, share, prop.Z);
     }
 
-    static ExecStatus post(Space& home, IntPair::IntPairView a, IntPair::IntPairView b, Int::IntView z, DFA_I *d) {
+    static ExecStatus post(Space& home, MPG::IntPair::IntPairView a, MPG::IntPair::IntPairView b, Int::IntView z, DFA_I *d) {
         (void) new (home) MyDFA(home, a, b, z, d);
         return ES_OK;
     }
@@ -93,17 +93,17 @@ public:
         }
 	//        std::cout << "Z done ";
         for(int i=0; i<Q.size(); i++) {
-            IntPair::Pair q = Q.getElement(i);
+            MPG::IntPair::Pair q = Q.getElement(i);
             if(std::find(newQ.begin(), newQ.end(), q) == newQ.end())
-                if(Q.nq(home, q) == IntPair::ME_INTPAIR_FAILED)
+                if(Q.nq(home, q) == MPG::IntPair::ME_INTPAIR_FAILED)
                     return ES_FAILED;
         }
 	//        std::cout << "Q done ";
 
         for(int i=0; i<P.size(); i++) {
-            IntPair::Pair p = P.getElement(i);
+            MPG::IntPair::Pair p = P.getElement(i);
             if(std::find(newP.begin(), newP.end(), p) == newP.end())
-                if(P.nq(home, p) == IntPair::ME_INTPAIR_FAILED)
+                if(P.nq(home, p) == MPG::IntPair::ME_INTPAIR_FAILED)
                     return ES_FAILED;
         }
 	//        std::cout << "P done " << std::endl;
@@ -114,8 +114,8 @@ public:
     }
 
     virtual size_t dispose(Space& home) {
-        P.cancel(home, *this, IntPair::PC_INTPAIR_DOM);
-        Q.cancel(home, *this, IntPair::PC_INTPAIR_DOM);
+        P.cancel(home, *this, MPG::IntPair::PC_INTPAIR_DOM);
+        Q.cancel(home, *this, MPG::IntPair::PC_INTPAIR_DOM);
         Z.cancel(home, *this, Int::PC_INT_DOM);
         (void) Propagator::dispose(home);
         return sizeof(*this);
@@ -133,10 +133,10 @@ public:
 };
 
 //
-void mydfa(Space& home, IntPairVar P, IntPairVar Q, IntVar Z, DFA_I *D) {
+void mydfa(Space& home, MPG::IntPairVar P, MPG::IntPairVar Q, IntVar Z, DFA_I *D) {
   //    std::cout << "Init DFA prop" << std::endl;
-    IntPair::IntPairView vp(P);
-    IntPair::IntPairView vq(Q);
+    MPG::IntPair::IntPairView vp(P);
+    MPG::IntPair::IntPairView vq(Q);
     Int::IntView vz(Z);
     if (MyDFA::post(home, vp, vq, vz, D) != ES_OK)
         home.fail();

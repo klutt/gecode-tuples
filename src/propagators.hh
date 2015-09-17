@@ -6,9 +6,9 @@
 #include "exact/view.hh"
 #include <iostream>
 
-using namespace Gecode;
-using namespace MPG;
-using Gecode::Space;
+// using namespace Gecode;
+// using namespace MPG;
+// using Gecode::Space;
 
 #include "propagators/eq.h"
 #include "propagators/rel.h"
