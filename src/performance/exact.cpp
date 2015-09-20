@@ -15,20 +15,22 @@ using namespace MPG;
 
 Dfa *df;
 
-int seed, nostates, notokens, maxcost, maxcosttotal;
+int seed, nostates, notokens, maxcost, maxcosttotal, nosteps;
 
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairVarArray a;
-  IntVar z;
+  IntPairVarArray p;
+  IntVarArray z;
 
   
-  Test(const SizeOptions& opt) : a(*this, 2,1,nostates,0,maxcosttotal), z(*this, 1,notokens)
+  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal),
+				 z(*this, nosteps,1,notokens)
   {
-    mydfa(*this, a[0],a[1],z,df);
-    nonenone(*this, a);
-    branch(*this, z, INT_VAL_MIN());
+    for(int i=0; i<nosteps; i++)
+      mydfa(*this, p[i+1],p[i],z[i],df);
+    nonenone(*this, p);
+    branch(*this, z, INT_VAR_NONE(), INT_VAL_MIN());
   }
 
   
@@ -40,7 +42,7 @@ public:
   Test(bool share, Test& s) : Script(share,s) {
     // To update a variable var use:
     // GC_UPDATE(var)
-    GC_UPDATE(a);
+    GC_UPDATE(p);
     GC_UPDATE(z);
   }
     
@@ -53,8 +55,14 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
-    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
-    cout << a[1] << " "  << a[0] << " " << z << endl;
+    //    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
+    //  cout << a[1] << " "  << a[0] << " " << z << endl;
+    for(int i=0; i<nosteps; i++)
+      assert(solutionOk(df, p[i+1].val().x, p[i+1].val().y, p[i].val().x, p[i].val().y, z[i].val()));
+    for(int i=0; i<nosteps; i++)
+      cout << z[i].val() << " " << p[i].val().x << " " << p[i].val().y << " ";
+    cout << p[nosteps].val().x << " " << p[nosteps].val().y << endl;
+    
     noSolutions++;
   }
 };
@@ -64,7 +72,7 @@ int main(int argc, char* argv[]) {
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
 
-    if(argc != 6) {
+    if(argc != 7) {
       std::cout << "Usage: " << argv[0] << " <seed> <no states> <no tokens> <max cost per path> <max total cost>" << std::endl;
       return -1;
     }
@@ -74,14 +82,14 @@ int main(int argc, char* argv[]) {
     notokens = atoi(argv[3]);
     maxcost = atoi(argv[4]);
     maxcosttotal = atoi(argv[5]);
-    
-    if(seed == 0 || nostates == 0 || notokens == 0 || maxcost == 0 || maxcosttotal==0) {
+    nosteps= atoi(argv[6]);
+    if(seed == 0 || nostates == 0 || notokens == 0 || maxcost == 0 || maxcosttotal==0 || nosteps == 0) {
       std::cout << "Wrong parameters" << std::endl;
       return -1;
     }
       
     df = new Dfa(seed, nostates, notokens, maxcost);
-    df->print();
+    //    df->print();
     
     //    opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);

@@ -9,7 +9,7 @@ int noSolutions;
 using namespace MPG::IntPair;
 using namespace MPG;
 
-#include "dfaimp.h"
+#include "../common/dfaimp.h"
 
 Dfa *df;
 

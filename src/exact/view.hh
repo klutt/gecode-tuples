@@ -38,7 +38,7 @@ namespace MPG { namespace IntPair {
       ModEvent nq(Space& home, const Pair& p) { return x->nq(home,p);  }
 
       void subscribe(Space& home, Propagator & prop, PropCond pc, bool schedule = true) {
-          std::cout << "Subscribing" << std::endl;
+	//          std::cout << "Subscribing" << std::endl;
         x->subscribe(home, prop, pc, schedule);
       }
 

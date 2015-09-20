@@ -62,6 +62,24 @@ triple:	tripletest/exact \
 	tripletest/approx \
 	tripletest/int
 
+performance/exact: performance/exact.cpp
+	/usr/bin/g++ -g -c performance/exact.cpp -o performance/exact.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -g -o performance/exact performance/exact.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+
+performance/approx: performance/approx.cpp
+	/usr/bin/g++ -g -c performance/approx.cpp -o performance/approx.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -g -o performance/approx performance/approx.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+
+
+performance/int: performance/int.cpp
+	/usr/bin/g++ -g -c performance/int.cpp -o performance/int.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -g -o performance/int performance/int.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+
+performance: \
+	performance/exact \
+	performance/approx \
+	performance/int
+
 configure:
 	echo $(INSTD)
 	cd $(GCSRC); \
@@ -91,6 +109,8 @@ both:	configboth
 
 
 clean:
-	rm -f *.o *~ testsrc/*~ test/* tripletest/approx tripletest/int tripletest/exact tripletest/*.o tripletest/*~
+	rm -f *.o *~ testsrc/*~ test/* exact/*~ approx/*~ \
+	performance/approx performance/int performance/exact performance/*.o performance/*~ \
+	tripletest/approx tripletest/int tripletest/exact tripletest/*.o tripletest/*~ 
 
 
