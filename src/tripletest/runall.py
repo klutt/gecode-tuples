@@ -18,6 +18,7 @@ intp = getOutput('int')
 exactp = getOutput('exact')
 approxp = getOutput('approx')
 
+print "Max solutions: " + str(max(len(intp), len(exactp), len(approxp)))
 if all(x in exactp for x in approxp) and all(x in intp for x in exactp):
     print "   Ok"
 else:

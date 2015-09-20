@@ -74,38 +74,42 @@ public:
 
         Gecode::Int::ViewValues<Int::IntView> iter2(Z);
 
+        std::vector<int> removeZ;
         iter2.init(Z);
         while(iter2()) {
-//            std::cout << "bajs" << std::endl;
             int z = iter2.val();
-//            std::cout << "bajs2" << std::endl;
             if(std::find(newZ.begin(), newZ.end(), z) == newZ.end())
-                if(Z.nq(home, z) == Int::ME_INT_FAILED)
-                    return ES_FAILED;
- //           std::cout << "bajs3" << std::endl;
-    //        std::cout << "size " << Z.size() << std::endl;
-
+                removeZ.push_back(z);
             if(z == Z.max() || Z.assigned()) // TODO Ugly hack
                 break;
             ++iter2;
-    //        std::cout << "bajs4" << std::endl;
-
         }
+        for(int i=0; i<removeZ.size(); i++)
+            if(Z.nq(home, removeZ[i]) == Int::ME_INT_FAILED)
+                return ES_FAILED;
 	//        std::cout << "Z done ";
+
+        std::vector<Pair> removeQ;
         for(int i=0; i<Q.size(); i++) {
             MPG::IntPair::Pair q = Q.getElement(i);
             if(std::find(newQ.begin(), newQ.end(), q) == newQ.end())
-                if(Q.nq(home, q) == MPG::IntPair::ME_INTPAIR_FAILED)
-                    return ES_FAILED;
+                removeQ.push_back(q);
         }
-	//        std::cout << "Q done ";
+        for(int i=0; i<removeQ.size(); i++)
+            if(Q.nq(home, removeQ[i]) == MPG::IntPair::ME_INTPAIR_FAILED)
+                return ES_FAILED;
+    //        st   d::cout << "Q done ";
 
+        std::vector<Pair> removeP;
         for(int i=0; i<P.size(); i++) {
             MPG::IntPair::Pair p = P.getElement(i);
             if(std::find(newP.begin(), newP.end(), p) == newP.end())
-                if(P.nq(home, p) == MPG::IntPair::ME_INTPAIR_FAILED)
-                    return ES_FAILED;
+                removeP.push_back(p);
         }
+        for(int i=0; i<removeP.size(); i++)
+            if(P.nq(home, removeP[i]) == MPG::IntPair::ME_INTPAIR_FAILED)
+                return ES_FAILED;
+
 	//        std::cout << "P done " << std::endl;
 
 	//        std::cout << "Finish DFA" << std::endl;

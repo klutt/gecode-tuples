@@ -91,6 +91,6 @@ both:	configboth
 
 
 clean:
-	rm -f *.o *~ testsrc/*~ test/* tripletest/approx tripletest/int tripletest/exact tripletest/*.0 tripletest/*~
+	rm -f *.o *~ testsrc/*~ test/* tripletest/approx tripletest/int tripletest/exact tripletest/*.o tripletest/*~
 
 

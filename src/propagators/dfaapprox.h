@@ -111,25 +111,24 @@ public:
 
         Gecode::Int::ViewValues<Gecode::Int::IntView> iter2(Z);
 
+        std::vector<int> removeZ;
         iter2.init(Z);
         while(iter2()) {
-//            std::cout << "bajs" << std::endl;
             int z = iter2.val();
-//            std::cout << "bajs2" << std::endl;
             if(std::find(newZ.begin(), newZ.end(), z) == newZ.end())
-                if(Z.nq(home, z) == Gecode::Int::ME_INT_FAILED)
-                    return Gecode::ES_FAILED;
- //           std::cout << "bajs3" << std::endl;
-    //        std::cout << "size " << Z.size() << std::endl;
-
+                removeZ.push_back(z);
             if(z == Z.max() || Z.assigned()) // TODO Ugly hack
                 break;
             ++iter2;
-    //        std::cout << "bajs4" << std::endl;
         }
+        for(int i=0; i<removeZ.size(); i++)
+            if(Z.nq(home, removeZ[i]) == Gecode::Int::ME_INT_FAILED)
+                return Gecode::ES_FAILED;
+    //        std::cout << "Z done ";
 
-	
-	//        std::cout << "Z done ";
+
+
+
 
 
 	for(int i=0; i<newQ.size(); i++)
