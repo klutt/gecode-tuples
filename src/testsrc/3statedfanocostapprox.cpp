@@ -11,12 +11,14 @@ using namespace MPG;
 
 typedef vector<vector<int> > matrix;
 
+#include "../common/solutionok.h"  
+
 class Dfa_t : public MPG::IntPair::DFA_I{
   // Remember: 0 is garbage state
 private:
   matrix state;
   matrix cost;
-  
+
 public:
   Dfa_t() {
     state = matrix{{0,0,0,0},
@@ -30,13 +32,14 @@ public:
   int C(int s, int t) { return 0; } // { return cost[s][t]; }
 };
 
+Dfa_t *df;
+
 
 class Test : public Script {
 public:
   /// The actual problem
   IntPairApproxVarArray a;
   IntVar z;
-  Dfa_t *df;
 
   
   Test(const SizeOptions& opt) : a(*this, 2,1,3,1,1), z(*this, 1,3)
@@ -69,6 +72,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
     noSolutions++;
   }
 };

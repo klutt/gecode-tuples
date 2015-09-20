@@ -64,7 +64,7 @@ public:
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
     assert(solutionOk(df, a.val(), b.val(), c.val(), d.val(), z.val()));
-    cout << "<" << a << "," << b << "> <"  << c << "," << d << "> " << z << endl;
+    cout << "<" << c << "," << d << "> <"  << a << "," << b << "> " << z << endl;
     noSolutions++;
   }
 };

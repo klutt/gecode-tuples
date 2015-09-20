@@ -33,13 +33,13 @@ public:
   int C(int s, int t) { return cost[s][t]; }
 };
 
+Dfa_t *df;
 
 class Test : public Script {
 public:
   /// The actual problem
   IntPairVarArray a;
   IntVar z;
-  Dfa_t *df;
 
   
   Test(const SizeOptions& opt) : a(*this, 2,1,3,1,4), z(*this, 1,3)
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
 
-    
+    df = new Dfa_t;
     const int expected_no_solutions = 18;
     
     opt.parse(argc,argv);

@@ -3,33 +3,33 @@
 
 
 #include <vector>
-
+#include <gecode/int.hh>
 #include "dfainterface.h"
 
 // This is the IntVar version of dfa propagator. It is used for performance comparision.
 
 
-class MyDFAint : public Propagator {
+class MyDFAint : public Gecode::Propagator::Propagator {
 protected:
-    Int::IntView Px;
-    Int::IntView Qx;
-    Int::IntView Py;
-    Int::IntView Qy;
-    Int::IntView Z;
+  Gecode::Int::IntView Px;
+    Gecode::Int::IntView Qx;
+    Gecode::Int::IntView Py;
+    Gecode::Int::IntView Qy;
+    Gecode::Int::IntView Z;
     MPG::IntPair::DFA_I *D;
     
  public:
-    MyDFAint(Space& home, Int::IntView px, Int::IntView py, Int::IntView qx, Int::IntView qy, Int::IntView z, DFA_I *d)
+ MyDFAint(Gecode::Space& home, Gecode::Int::IntView px, Gecode::Int::IntView py, Gecode::Int::IntView qx, Gecode::Int::IntView qy, Gecode::Int::IntView z, MPG::IntPair::DFA_I *d)
       : Propagator(home), Px(px), Py(py), Qx(qx), Qy(qy), Z(z), D(d)
     {
-        Px.subscribe(home, *this, Int::PC_INT_DOM);
-        Qx.subscribe(home, *this, Int::PC_INT_DOM);
-        Py.subscribe(home, *this, Int::PC_INT_DOM);
-        Qy.subscribe(home, *this, Int::PC_INT_DOM);
-        Z.subscribe(home, *this, Int::PC_INT_DOM);
+        Px.subscribe(home, *this, Gecode::Int::PC_INT_DOM);
+        Qx.subscribe(home, *this, Gecode::Int::PC_INT_DOM);
+        Py.subscribe(home, *this, Gecode::Int::PC_INT_DOM);
+        Qy.subscribe(home, *this, Gecode::Int::PC_INT_DOM);
+        Z.subscribe(home, *this, Gecode::Int::PC_INT_DOM);
     }
 
-    MyDFAint(Space& home, bool share, MyDFAint& prop)
+    MyDFAint(Gecode::Space& home, bool share, MyDFAint& prop)
       : Propagator(home, share, prop), D(prop.D) {
         Px.update(home, share, prop.Px);
         Qx.update(home, share, prop.Qx);
@@ -38,17 +38,17 @@ protected:
         Z.update(home, share, prop.Z);
     }
 
-    static ExecStatus post(Space& home, Int::IntView px, Int::IntView py, Int::IntView qx, Int::IntView qy, Int::IntView z, DFA_I *d) {
+    static Gecode::ExecStatus post(Gecode::Space& home, Gecode::Int::IntView px, Gecode::Int::IntView py, Gecode::Int::IntView qx, Gecode::Int::IntView qy, Gecode::Int::IntView z, MPG::IntPair::DFA_I *d) {
         (void) new (home) MyDFAint(home, px, py, qx, qy, z, d);
-        return ES_OK;
+        return Gecode::ES_OK;
     }
 
-    virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
+    virtual Gecode::ExecStatus propagate(Gecode::Space& home, const Gecode::ModEventDelta&) {
             std::vector<int> newpx, newpy, newqx, newqy, newz;
-            Gecode::Int::ViewValues<Int::IntView> iz(Z);
-      
+            Gecode::Int::ViewValues<Gecode::Int::IntView> iz(Z);
+	    std::cout << "Init DFAint" << std::endl;
       while(iz()) {
-            Gecode::Int::ViewValues<Int::IntView> iqx(Qx);
+            Gecode::Int::ViewValues<Gecode::Int::IntView> iqx(Qx);
 	    //	std::cout << " z " << iz.val() << " zmax: " << Z.max() << std::endl;
 	while(iqx()) {
 	  //	  std::cout << " qx " << iqx.val() << " Qxmax " << Qx.max() << std::endl;
@@ -58,7 +58,7 @@ protected:
 	    newqx.push_back(iqx.val());
 	    newpx.push_back(state);
 	    newz.push_back(iz.val());
-	    Gecode::Int::ViewValues<Int::IntView> iqy(Qy);
+	    Gecode::Int::ViewValues<Gecode::Int::IntView> iqy(Qy);
 	    while(iqy()) {
 	      int cost = iqy.val() + D->C(iqx.val(), iz.val());
 	      if(Py.in(cost)) {
@@ -82,7 +82,7 @@ protected:
       //      std::cout << "mydfaint done searching" << std::endl;
 
       if(newz.size()==0 || newpx.size()==0 || newqx.size()==0 || newpy.size()==0 || newqy.size()==0) {
-	return ES_FAILED;
+	return Gecode::ES_FAILED;
       }
       
       //      std::cout << " mydfaint not failed " << std::endl;
@@ -98,13 +98,13 @@ protected:
       //	_printvec(newqy)
       //	_printvec(newz)
 #define _prune(var, newvar) {					\
-	Gecode::Int::ViewValues<Int::IntView> iter(var);	\
+	Gecode::Int::ViewValues<Gecode::Int::IntView> iter(var);	\
 	iter.init(var);						\
 	while(iter()) {						\
 	  int v = iter.val();					       \
 	  if(std::find(newvar.begin(), newvar.end(), v) == newvar.end()) \
-	    if(var.nq(home, v) == Int::ME_INT_FAILED)			\
-	      return ES_FAILED;						\
+	    if(var.nq(home, v) == Gecode::Int::ME_INT_FAILED)			\
+	      return Gecode::ES_FAILED;						\
 	  if(v == var.max() || var.assigned()) \
 	    break;							\
 	  ++iter;							\
@@ -117,41 +117,41 @@ protected:
 		_prune(Py, newpy)
 		_prune(Qx, newqx)
 		_prune(Qy, newqy)
-      return ES_NOFIX;
+      return Gecode::ES_NOFIX;
       
       
     }
 
-    virtual size_t dispose(Space& home) {
-        Px.cancel(home, *this, Int::PC_INT_DOM);
-        Qx.cancel(home, *this, Int::PC_INT_DOM);
-        Py.cancel(home, *this, Int::PC_INT_DOM);
-        Qy.cancel(home, *this, Int::PC_INT_DOM);
-        Z.cancel(home, *this, Int::PC_INT_DOM);
+    virtual size_t dispose(Gecode::Space& home) {
+        Px.cancel(home, *this, Gecode::Int::PC_INT_DOM);
+        Qx.cancel(home, *this, Gecode::Int::PC_INT_DOM);
+        Py.cancel(home, *this, Gecode::Int::PC_INT_DOM);
+        Qy.cancel(home, *this, Gecode::Int::PC_INT_DOM);
+        Z.cancel(home, *this, Gecode::Int::PC_INT_DOM);
         (void) Propagator::dispose(home);
         return sizeof(*this);
     }
 
-    virtual Propagator* copy(Space& home, bool share) {
+    virtual Propagator* copy(Gecode::Space& home, bool share) {
         return new (home) MyDFAint(home, share, *this);
     }
 
-    virtual PropCost cost(const Space&, const ModEventDelta&) const {
+    virtual Gecode::PropCost cost(const Gecode::Space&, const Gecode::ModEventDelta&) const {
         // Probably way wrong, but not very important. TODO
-        return PropCost::linear(PropCost::HI, Px.size());
+        return Gecode::PropCost::linear(Gecode::PropCost::HI, Px.size());
     }
 
 };
 
 //
-void myintdfa(Space& home, IntVar Px, IntVar Py, IntVar Qx, IntVar Qy, IntVar Z, DFA_I *D) {
+void myintdfa(Gecode::Space& home, Gecode::IntVar Px, Gecode::IntVar Py, Gecode::IntVar Qx, Gecode::IntVar Qy, Gecode::IntVar Z, MPG::IntPair::DFA_I *D) {
     std::cout << "Init DFAint prop" << std::endl;
-    Int::IntView vpx(Px);
-    Int::IntView vqx(Qx);
-    Int::IntView vpy(Py);
-    Int::IntView vqy(Qy);
-    Int::IntView vz(Z);
-    if (MyDFAint::post(home, vpx, vpy, vqx, vqy, vz, D) != ES_OK)
+    Gecode::Int::IntView vpx(Px);
+    Gecode::Int::IntView vqx(Qx);
+    Gecode::Int::IntView vpy(Py);
+    Gecode::Int::IntView vqy(Qy);
+    Gecode::Int::IntView vz(Z);
+    if (MyDFAint::post(home, vpx, vpy, vqx, vqy, vz, D) != Gecode::ES_OK)
         home.fail();
 }
 

@@ -67,7 +67,7 @@ public:
     }
 
     virtual Gecode::ExecStatus propagate(Gecode::Space& home, const Gecode::ModEventDelta&) {
-        std::cout << "Propagating DFA" << std::endl;
+      //        std::cout << "Propagating DFA" << std::endl;
         Gecode::Int::ViewValues<Gecode::Int::IntView> iter(Z);
 	std::vector<MPG::IntPair::PairApprox> newP;
 	std::vector<MPG::IntPair::PairApprox> newQ;
@@ -78,9 +78,9 @@ public:
 	      MPG::IntPair::PairApprox p(D->S(q.x, iter.val()),
 					 q.l + D->C(q.x, iter.val()),
 					 q.h + D->C(q.x, iter.val()));
-	      std::cout << "z: " << iter.val() << "  q: " << q << "  p: " << p << std::endl;
-	      std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
-	      std::cout <<  "  p: " << p << std::endl;
+	      //      std::cout << "z: " << iter.val() << "  q: " << q << "  p: " << p << std::endl;
+	      //	      std::cout << "Z: " << Z << "  Q: " << Q << "  P: " << P << std::endl;
+	      //	      std::cout <<  "  p: " << p << std::endl;
 	      if(p.x>0) {
 		mergePair(newP, p);
 		mergePair(newQ, q);
@@ -93,15 +93,15 @@ public:
             ++iter;
         }
 
-	std::cout << "newP: ";
-	for(int i=0; i<newP.size(); i++)
-	  std::cout << newP[i] << " ";
-	std::cout << std::endl;
+	//	std::cout << "newP: ";
+	//	for(int i=0; i<newP.size(); i++)
+	//	  std::cout << newP[i] << " ";
+	//	std::cout << std::endl;
 
-	std::cout << "newQ: ";
-	for(int i=0; i<newQ.size(); i++)
-	  std::cout << newQ[i] << " ";
-	std::cout << std::endl;
+	//	std::cout << "newQ: ";
+	//	for(int i=0; i<newQ.size(); i++)
+	//	  std::cout << newQ[i] << " ";
+	//	std::cout << std::endl;
 
         if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) 
             return Gecode::ES_FAILED;
