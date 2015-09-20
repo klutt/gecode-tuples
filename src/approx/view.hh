@@ -44,7 +44,7 @@ namespace MPG { namespace IntPair {
       Gecode::ModEvent nq(Gecode::Space& home, const Pair& p) { return x->nq(home,p);  }
 
       void subscribe(Gecode::Space& home, Gecode::Propagator & prop, Gecode::PropCond pc, bool schedule = true) {
-          std::cout << "Subscribing" << std::endl;
+	//          std::cout << "Subscribing" << std::endl;
         x->subscribe(home, prop, pc, schedule);
       }
 

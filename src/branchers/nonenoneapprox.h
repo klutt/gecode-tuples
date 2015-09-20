@@ -44,7 +44,7 @@ public:
   }
   // choice
   virtual Gecode::Choice* choice(Gecode::Space& home) {
-    std::cout << "nonenoneapprox::choice" << std::endl;
+    //    std::cout << "nonenoneapprox::choice" << std::endl;
     for (int i=0; true; i++)
       if (!x[i].assigned())
         return new PosVal(*this,i,x[i].first());
@@ -54,7 +54,7 @@ public:
   virtual Gecode::Choice* choice(const Gecode::Space&, Gecode::Archive& e) {
     int pos;
     MPG::IntPair::Pair val;
-    std::cout << "nonenoneapprox::choice with archive" << std::endl;
+    //    std::cout << "nonenoneapprox::choice with archive" << std::endl;
     e >> pos >> val;
     return new PosVal(*this, pos, val);
   }
@@ -62,17 +62,17 @@ public:
   virtual Gecode::ExecStatus commit(Gecode::Space& home,
 				    const Gecode::Choice& c,
                             unsigned int a) {
-        std::cout << "nonenoneapprox::commit" << std::endl;
+    //        std::cout << "nonenoneapprox::commit" << std::endl;
 
     const PosVal& pv = static_cast<const PosVal&>(c);
     int pos=pv.pos;
     MPG::IntPair::Pair val(pv.val);
     if (a == 0) {
-      std::cout << "nonenoneapprox       eq" << std::endl;
+      //      std::cout << "nonenoneapprox       eq" << std::endl;
       return Gecode::me_failed(x[pos].eq(home,val)) ? Gecode::ES_FAILED : Gecode::ES_OK;
     }
     else {
-      std::cout << "nonenoneapprox       nq" << std::endl;
+      //      std::cout << "nonenoneapprox       nq" << std::endl;
       return Gecode::me_failed(x[pos].nq(home,val)) ? Gecode::ES_FAILED : Gecode::ES_OK;
     }
   }

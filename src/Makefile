@@ -45,6 +45,23 @@ test:	test/3statedfawithcostint \
 	test/3statedfanocost 
 	@echo "All tests passed"
 
+tripletest/exact: tripletest/exact.cpp
+	/usr/bin/g++ -g -c tripletest/exact.cpp -o tripletest/exact.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -g -o tripletest/exact tripletest/exact.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+
+tripletest/approx: tripletest/approx.cpp
+	/usr/bin/g++ -g -c tripletest/approx.cpp -o tripletest/approx.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -g -o tripletest/approx tripletest/approx.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+
+
+tripletest/int: tripletest/int.cpp
+	/usr/bin/g++ -g -c tripletest/int.cpp -o tripletest/int.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -g -o tripletest/int tripletest/int.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+
+triple:	tripletest/exact \
+	tripletest/approx \
+	tripletest/int
+
 configure:
 	echo $(INSTD)
 	cd $(GCSRC); \
@@ -74,6 +91,6 @@ both:	configboth
 
 
 clean:
-	rm -f *.o *~ testsrc/*~ test/*
+	rm -f *.o *~ testsrc/*~ test/* tripletest/approx tripletest/int tripletest/exact tripletest/*.0 tripletest/*~
 
 

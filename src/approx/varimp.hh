@@ -91,7 +91,7 @@ public:
     for(int i=0; i<domain.size(); i++)
       if(domain[i].x==x)
 	ret = i;
-    std::cout << "getxindex returning " << ret << " while searching for " << x << std::endl;
+    //    std::cout << "getxindex returning " << ret << " while searching for " << x << std::endl;
     return ret;
   }
  
@@ -262,23 +262,23 @@ Pair IntPairApproxVarImp::getElement(int n) const {
 Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const IntPairApproxVarImp& p) {
     // Probably the most inefficient in the universe. TODO
 //    std::cout << "Eq pair pair" << std::endl;
-     std::cout << "IntPairApproxVarImp::eq IPAVI" << std::endl;
+//     std::cout << "IntPairApproxVarImp::eq IPAVI" << std::endl;
     bool modified=false;
 //    std::cout << "Erase " << domain.size() << " " << p.domain.size() << std::endl;
-    std::cout << "Modifying "  << *this << " with argument " << p << std::endl;
+    //  std::cout << "Modifying "  << *this << " with argument " << p << std::endl;
     for(int i=0; i<domain.size(); i++) {
       int index=p.getxindex(domain[i].x);
       if(index==-1) {
-	std::cout << "Erasing " << p << std::endl;
+	//	std::cout << "Erasing " << p << std::endl;
 	domain.erase(domain.begin()+i); i--; modified=true; break;
       }
       else {
 	if(domain[i].l < p.domain[index].l) {
-	  std::cout << "Changing lower bound to " << domain[i].l <<  std::endl;
+	  //std::cout << "Changing lower bound to " << domain[i].l <<  std::endl;
 	  domain[i].l=p.domain[index].l; modified = true;
 	}
 	if(domain[i].h > p.domain[index].h) {
-	  std::cout << "Changing upper bound to "<< domain[i].h  << std::endl;
+	  //	  std::cout << "Changing upper bound to "<< domain[i].h  << std::endl;
 	  domain[i].h=p.domain[index].h; modified = true;
 	}
       } 
@@ -294,7 +294,7 @@ Gecode::ModEvent IntPairApproxVarImp::rel(Gecode::Space&home, int dim, int n, IP
     // This is very inefficient with the current representation.
     // It would be much better with vector<vector<int>> istead
     // of vector<Pair>
-     std::cout << "IntPairApproxVarImp::rel " << std::endl;
+  //     std::cout << "IntPairApproxVarImp::rel " << std::endl;
     bool modified=false;
 
     for(int i=0; i<domain.size(); i++) {
@@ -364,24 +364,24 @@ Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const std::vector<
 
 Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const Pair& p)
 {
-  std::cout << "IntPairApproxVarImp::eq Pair" << *this << "     " << p << std::endl;
+  // std::cout << "IntPairApproxVarImp::eq Pair" << *this << "     " << p << std::endl;
 
   bool modified = false;
     int index = getxindex(p.x);
     if(index == -1) {
-      std::cout << "IntPairApproxVarImp::eq Pair     x not found" << std::endl;
+      //  std::cout << "IntPairApproxVarImp::eq Pair     x not found" << std::endl;
       return ME_INTPAIRAPPROX_FAILED;
     }
     else if(p.y < domain[index].l || p.y > domain[index].h) {
-      std::cout << "IntPairApproxVarImp::eq Pair     y out of range" << std::endl;
+      // std::cout << "IntPairApproxVarImp::eq Pair     y out of range" << std::endl;
       return ME_INTPAIRAPPROX_FAILED;
     }
     else if(p.y > domain[index].l && p.y < domain[index].h) {
-      std::cout << "IntPairApproxVarImp::eq Pair     y not on bound, nothing to do" << std::endl;
+      // std::cout << "IntPairApproxVarImp::eq Pair     y not on bound, nothing to do" << std::endl;
       return ME_INTPAIRAPPROX_NONE;
     }
     else {
-      std::cout << "IntPairApproxVarImp::eq Pair     changing" << std::endl;
+      //  std::cout << "IntPairApproxVarImp::eq Pair     changing" << std::endl;
       domain[0] = MPG::IntPair::PairApprox(p.x, p.y, p.y);
       domain.erase(domain.begin()+1, domain.end());
       DummyDelta d;							
@@ -392,24 +392,24 @@ Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const Pair& p)
 Gecode::ModEvent IntPairApproxVarImp::nq(Gecode::Space& home, const Pair& p)
 {
   bool modified = false;
-     std::cout << "IntPairApproxVarImp::nq IPAVI" << std::endl;
+  //     std::cout << "IntPairApproxVarImp::nq IPAVI" << std::endl;
 
      int index = getxindex(p.x);
      if(index == -1) {
-       std::cout << "nq x not found" << std::endl;
+       //   std::cout << "nq x not found" << std::endl;
        return ME_INTPAIRAPPROX_NONE;
      }
      else if (p.y < domain[index].l || p.y > domain[index].h) {
-       std::cout << "nq y not on boundaries" << std::endl;
+       //       std::cout << "nq y not on boundaries" << std::endl;
       return ME_INTPAIRAPPROX_NONE;
      }
     else if (p.y == domain[index].l) {
-      std::cout << "nq increasing lower bound" << std::endl;
+      //      std::cout << "nq increasing lower bound" << std::endl;
       domain[index].l++;
       modified = true;
     }
     else if (p.y == domain[index].h) {
-      std::cout << "nq x not found" << std::endl;
+      //      std::cout << "nq x not found" << std::endl;
       domain[index].h--;
       modified = true;
     }
