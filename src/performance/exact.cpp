@@ -22,11 +22,13 @@ public:
   /// The actual problem
   IntPairVarArray p;
   IntVarArray z;
-
+  IntPairVar init;
   
   Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal),
-				 z(*this, nosteps,1,notokens)
+				 z(*this, nosteps,1,notokens),
+				 init(*this, 1,1,0,0)
   {
+    eq(*this, p[0], init);
     for(int i=0; i<nosteps; i++)
       mydfa(*this, p[i+1],p[i],z[i],df);
     nonenone(*this, p);
@@ -44,6 +46,7 @@ public:
     // GC_UPDATE(var)
     GC_UPDATE(p);
     GC_UPDATE(z);
+    GC_UPDATE(init);
   }
     
   /// Perform copying during cloning

@@ -63,17 +63,17 @@ triple:	tripletest/exact \
 	tripletest/int
 
 performance/exact: performance/exact.cpp
-	/usr/bin/g++ -g -c performance/exact.cpp -o performance/exact.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -g -o performance/exact performance/exact.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	/usr/bin/g++ -pg -g -c performance/exact.cpp -o performance/exact.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -pg -g -o performance/exact performance/exact.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 performance/approx: performance/approx.cpp
-	/usr/bin/g++ -g -c performance/approx.cpp -o performance/approx.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -g -o performance/approx performance/approx.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	/usr/bin/g++ -pg -g -c performance/approx.cpp -o performance/approx.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -pg -g -o performance/approx performance/approx.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 
 performance/int: performance/int.cpp
-	/usr/bin/g++ -g -c performance/int.cpp -o performance/int.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -g -o performance/int performance/int.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	/usr/bin/g++ -pg -g -c performance/int.cpp -o performance/int.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -pg -g -o performance/int performance/int.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 performance: \
 	performance/exact \

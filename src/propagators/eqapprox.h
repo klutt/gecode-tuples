@@ -28,7 +28,7 @@ public:
   }
 
   virtual Gecode::ExecStatus propagate(Gecode::Space& home, const Gecode::ModEventDelta&) {
-      std::cout << "Propagating Eq " << std::endl;
+    //      std::cout << "Propagating Eq " << std::endl;
     if (p1.eq(home, p2) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)
       return Gecode::ES_FAILED;
     if (p2.eq(home, p1) == MPG::IntPair::ME_INTPAIRAPPROX_FAILED)

@@ -42,16 +42,20 @@ public:
         (void) new (home) MyDFAint(home, px, py, qx, qy, z, d);
         return Gecode::ES_OK;
     }
+
     int _prunevar(Gecode::Space &home, Gecode::Int::IntView &var, std::vector<int> &newvar) {
         Gecode::Int::ViewValues<Gecode::Int::IntView> iter(var);
         iter.init(var);
         std::vector<int> remove;
+	remove.reserve(newvar.size());
+        std::vector<int>::iterator newvar_i = newvar.begin();
+	std::sort(newvar.begin(), newvar.end());
         while(iter()) {
             int v = iter.val();
-            if(std::find(newvar.begin(), newvar.end(), v) == newvar.end())
-                remove.push_back(v);
             if(v == var.max() || var.assigned())
                 break;
+            if(! std::binary_search (newvar.begin(), newvar.end(), v, [](int a, int b){return a<b;}))
+                remove.push_back(v);
             ++iter;
         }
 
@@ -65,7 +69,11 @@ public:
 
     virtual Gecode::ExecStatus propagate(Gecode::Space& home, const Gecode::ModEventDelta&) {
         std::vector<int> newpx, newpy, newqx, newqy, newz;
-        const int huge = 1000000000;
+	newpx.reserve(Px.size());
+	newpy.reserve(Py.size());
+	newqx.reserve(Qx.size());
+	newqy.reserve(Qy.size());
+	newz.reserve(Z.size());
         Gecode::Int::ViewValues<Gecode::Int::IntView> iz(Z);
         while(iz()) {
             Gecode::Int::ViewValues<Gecode::Int::IntView> iqx(Qx);

@@ -52,17 +52,19 @@
 This is the abstract
 \end{abstract}
 
+\setcounter{tocdepth}{2}
 \tableofcontents
-\section{Acknowledgements}
-Thanks to Jean-Noël Monette and Pierre Flener for being helpful supervisors. \\
-Thanks to Joseph Scott for helping me with a bug. \\
+
+\section*{Acknowledgements}
+Thanks to Jean-No\"{e}l Monette and Pierre Flener for being helpful supervisors. \\
+Thanks to Joseph Scott for helping me configuring Gecode. \\
 Thanks to Johan Gustafsson for general help with C++. \\
-\section{Introduction}
+\section{Background}
 \subsection{Constraint Programming}
 
 Constraint programming (CP) is a method to solve problems by first modeling the problem with different types of variables and then adding constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. A very typical problem suitable for constraint programming is sudoku. The most intuitive model is a $9\times9$ matrix of integer variables. The general constraints for all standard sudokus is that every cell has a domain of $\{1..9\}$, and that all cells in a row, column and box must be different. For a specific sudoku constraints are added to require specific cells to have specific values.
 
-The available data types limits the options to model a specific problem. With more data types a specific problem can be modeled in different ways. There is a famous problem called Queens. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables were available we would have to model the problem with 64 boolean variables. If we instead use integer variables we can use the fact that all rows will have exactly one queen when we model the problem. This could be solved with booleans by redundant constraints, but it is more efficient to implement the constraints directly in the model.
+The available variable types limits the options to model a specific problem. With more variable types a specific problem can be modeled in different ways. There is a famous problem called Eight Queens\footnote{\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}}. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables were available we would have to model the problem with 64 boolean variables. If we instead use integer variables we can use the fact that all rows will have exactly one queen when we model the problem. This could be solved with booleans by redundant constraints, but it is more efficient to implement the constraints directly in the model.
 
 \subsection{Terminology}
 \begin{itemize}
@@ -81,17 +83,18 @@ The available data types limits the options to model a specific problem. With mo
 \end{itemize}
 
 \subsection{Gecode}
-Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including data types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 was used.
+Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used.
 
-For more information, consult the homepage. \url{http://www.gecode.org}
+For more information, have a look at the homepage. \url{http://www.gecode.org}
 
-\section{Background}
 \subsection{The need for Tuple Variables}
 When using a CP solver, one wants to avoid brute force searching. This is done by intelligently choosing model and constraints. By doing this the variable domains can be pruned to smaller sizes. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$. If we instead have the same variables but add the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. In this example the problem was modeled with two integer variables, but if the problem instead would be modeled with one tuple variable pruning would be possible. Then we would have a tuple variable $t$ with domain $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,2\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,3\rangle,\langle3,4\rangle\}$ and pruning with the same constraint would yield $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,4\rangle\}$. This shrinks the size of the search tree from 9 to 7. 
 
 If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constraint $x=y$ the benefits are more obvious. Using integer variables no values can be pruned. If tuple variables were used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful.
 
 The main benefit of a tuple is the possibility to link variables together. The most obvious case is when dealing with coordinates, but it can be generalized to any case where it is interesting to see if a combination of two variables are part of a solution.
+
+\section{Introduction}
 
 \section{Tuple Variable}
 
@@ -169,55 +172,40 @@ A brancher must implement the following methods:
 \subsection{Implementation of Exact IntPair}
 The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
 
-The specification is as follows.
-\begin{lstlisting}[frame=single]
-[General]
-Name:        IntPair
-Namespace:   Gecode::IntPair
-
-[ModEvent]
-Name:        FAILED=FAILED
-[ModEvent]
-Name:        NONE=NONE
-[ModEvent]
-Name:        VAL=ASSIGNED
-
-[PropCond]
-Name:        NONE=NONE
-[PropCond]
-Name:        VAL=ASSIGNED
-ScheduledBy: VAL
-[PropCond]
-Name:        BND
-ScheduledBy: VAL, BND, XBND, YBND, XMIN, YMIN, XMAX, YMAX
-[PropCond]
-Name:        XBND
-ScheduledBy: VAL, BND, XMIN, XMAX
-[PropCond]
-Name:        YBND
-ScheduledBy: VAL, BND, YMIN, YMAX
-[PropCond]
-Name:        XMIN
-ScheduledBy: VAL, BND, XMIN, XBND
-[PropCond]
-Name:        XMAX
-ScheduledBy: VAL, BND, XMAX, XBND
-[PropCond]
-Name:        YMIN
-ScheduledBy: VAL, BND, YMIN, YBND
-[PropCond]
-Name:        YMAX
-ScheduledBy: VAL, BND, YMAX, YBND
-[End]
-\end{lstlisting}
-
 \subsection{Restrictions}
 To keep things simple only two-dimensional integer tuples are considered, so called Pairs.
 
-\subsection{Implementation of Rectangle IntPair}
-This version of IntPair approximates the domain by just storing four pairs. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version. Another benefit for future work is that an approximation is possible to extend to float numbers.
+\subsection{Implementation of Approximate IntPair}
+This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version. 
 
 \subsection{Performance Test}
+To test the performance the same problem is solved in three different ways. Two of them is IntPair, one exact and one with one dimension approximated. The last one is solved with the integer variable that comes with Gecode, and is just for reference. The problem is a DFA with costs. The executables accepts six arguments: 
+\begin{itemize}
+\item{seed} The seed for the random generator to generate the same DFA for all executables.
+\item{states} Number of states.
+\item{tokens} Size of the alphabet.
+\item{cost} Max cost per transition in the DFA. This is decreased by one, so setting this to 1 means no cost.
+\item{max cost} Maximum cumulative cost for the variables.
+\item{steps} Number of steps in the DFA.
+\end{itemize}
+\subsubsection{First initial performance test}
+An initial naive test with states=10, tokens=4, cost=3, max cost=10, steps=10 gave the following result:
+\newline
+\begin{tabular}{l r}
+int & 1m15.252s \\
+approx & 2m16.260s \\ 
+exact & 0m14.474s \\
+\end{tabular}
+\newline
+Another test with states=15, tokens=2, cost=20, max cost=200, steps=13 gave:
+\newline
+\begin{tabular}{l r}
+int & 0m53.991s \\
+approx & 0m7.351s \\ 
+exact & 0m40.735s \\
+\end{tabular}
+\newline
+This is very interesting. In the first test the exact version of IntPair is the clear winner, and in the second test it is the approximate version that wins. The difference is definitely significant with 14 vs 75 and 7 vs 54 seconds. What makes this even more interesting is that while the built in IntVar is highly optimised, both implementations of IntPair is the opposite. The whole variable implementation with modification events and the brancher uses poor algorithms and are just enough to get the tests to compile and run. The only code written for the built IntVar is the propagator, and even that one is way better written than the propagators for IntPair. While the IntPair propagators are very naive, the Int propagator uses optimisations like preallocating space for the vectors and uses binary search instead of linear search.
 
 \section{Related Work}
 \subsection{Implementation of bit-vector variables in a CP solver}
@@ -235,14 +223,6 @@ This would require a complete rewrite of the variable implementation.
 
 \section{Git repository}
 \url{http://github.com/patwotrik/gecode-tuples}
-
-\section{Links}
-\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}
-
-\section{Legal}
-This document is licensed under GPL v3 and may be redistributed as GPL v3 or later. 
-
-
 
 \begin{thebibliography}{99}
 \bibitem{Calculus}

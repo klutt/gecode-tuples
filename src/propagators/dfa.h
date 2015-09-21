@@ -18,7 +18,7 @@ protected:
     
 public:
     MyDFA(Space& home, MPG::IntPair::IntPairView a, MPG::IntPair::IntPairView b, Int::IntView z, DFA_I *d)
-      : Propagator(home), P(a), Q(b), Z(z), D(d)
+        : Propagator(home), P(a), Q(b), Z(z), D(d)
     {
         P.subscribe(home, *this, MPG::IntPair::PC_INTPAIR_DOM);
         Q.subscribe(home, *this, MPG::IntPair::PC_INTPAIR_DOM);
@@ -39,18 +39,18 @@ public:
 
     virtual ExecStatus propagate(Space& home, const ModEventDelta&) {
         // std::vector<Pair> keep;
-      //        std::cout << "Propagating DFA" << std::endl;
+        //        std::cout << "Propagating DFA" << std::endl;
         Gecode::Int::ViewValues<Int::IntView> iter(Z);
-	std::vector<MPG::IntPair::Pair> newP;
-	std::vector<MPG::IntPair::Pair> newQ;
-	std::vector<int> newZ;
+        std::vector<MPG::IntPair::Pair> newP;
+        std::vector<MPG::IntPair::Pair> newQ;
+        std::vector<int> newZ;
         while(iter()) {
             for(int i=0; i<Q.size(); i++) {
                 MPG::IntPair::Pair q = Q.getElement(i);
                 MPG::IntPair::Pair p = MPG::IntPair::Pair(D->S(q.x, iter.val()), q.y + D->C(q.x, iter.val()));
-		//  std::cout << "z: " << iter.val() << "  q.x: " << q.x << "  p.x: " << p.x << std::endl;
+                //  std::cout << "z: " << iter.val() << "  q.x: " << q.x << "  p.x: " << p.x << std::endl;
                 if(p.x==0) {
-		  //                    std::cout << "garbage state" << std::endl;
+                    //                    std::cout << "garbage state" << std::endl;
                     continue;
                 }
                 if(P.contains(p)) {
@@ -59,18 +59,18 @@ public:
                     newZ.push_back(iter.val());
                 }
             }
-	    //            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
+            //            std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
             if(iter.val() == Z.max()) // TODO Ugly hack
                 break;
             ++iter;
         }
 
         if(newZ.size()==0 || newP.size()==0 || newQ.size()==0) {
-          //  std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
+            //  std::cout << "newz: " << newZ.size() << "  newp: " << newP.size() << "  newq: " << newQ.size() << std::endl;
             return ES_FAILED;
         }
 
-	//        std::cout << "Removing values" << std::endl;
+        //        std::cout << "Removing values" << std::endl;
 
         Gecode::Int::ViewValues<Int::IntView> iter2(Z);
 
@@ -87,7 +87,7 @@ public:
         for(int i=0; i<removeZ.size(); i++)
             if(Z.nq(home, removeZ[i]) == Int::ME_INT_FAILED)
                 return ES_FAILED;
-	//        std::cout << "Z done ";
+        //        std::cout << "Z done ";
 
         std::vector<Pair> removeQ;
         for(int i=0; i<Q.size(); i++) {
@@ -98,7 +98,7 @@ public:
         for(int i=0; i<removeQ.size(); i++)
             if(Q.nq(home, removeQ[i]) == MPG::IntPair::ME_INTPAIR_FAILED)
                 return ES_FAILED;
-    //        st   d::cout << "Q done ";
+        //        st   d::cout << "Q done ";
 
         std::vector<Pair> removeP;
         for(int i=0; i<P.size(); i++) {
@@ -110,9 +110,9 @@ public:
             if(P.nq(home, removeP[i]) == MPG::IntPair::ME_INTPAIR_FAILED)
                 return ES_FAILED;
 
-	//        std::cout << "P done " << std::endl;
+        //        std::cout << "P done " << std::endl;
 
-	//        std::cout << "Finish DFA" << std::endl;
+        //        std::cout << "Finish DFA" << std::endl;
         return ES_NOFIX;
 
     }
@@ -138,7 +138,7 @@ public:
 
 //
 void mydfa(Space& home, MPG::IntPairVar P, MPG::IntPairVar Q, IntVar Z, DFA_I *D) {
-  //    std::cout << "Init DFA prop" << std::endl;
+    //    std::cout << "Init DFA prop" << std::endl;
     MPG::IntPair::IntPairView vp(P);
     MPG::IntPair::IntPairView vq(Q);
     Int::IntView vz(Z);

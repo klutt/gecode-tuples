@@ -29,6 +29,8 @@ public:
 				 cv(*this ,nosteps+1,0, maxcosttotal),
 				 zv(*this, nosteps,1,notokens)
   {
+    rel(*this, sv[0], IRT_EQ, 1); // Starting state
+    rel(*this, cv[0], IRT_EQ, 0); // Cost = 0 at start
     for(int i=0; i<nosteps; i++) 
       myintdfa(*this, sv[i+1] ,cv[i+1], sv[i], cv[i] ,zv[i],df);
     branch(*this, sv, INT_VAR_NONE(), INT_VAL_MIN());
