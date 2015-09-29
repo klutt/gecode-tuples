@@ -62,25 +62,15 @@ Thanks to Johan Gustafsson for general help with C++. \\
 \section{Background}
 \subsection{Constraint Programming}
 
-Constraint programming (CP) is a method to solve problems by first modeling the problem with different types of variables and then adding constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. A very typical problem suitable for constraint programming is sudoku. The most intuitive model is a $9\times9$ matrix of integer variables. The general constraints for all standard sudokus is that every cell has a domain of $\{1..9\}$, and that all cells in a row, column and box must be different. For a specific sudoku constraints are added to require specific cells to have specific values.
+Constraint programming (CP) is a method to solve problems by modeling the problem with variables and constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. 
 
-The available variable types limits the options to model a specific problem. With more variable types a specific problem can be modeled in different ways. There is a famous problem called Eight Queens\footnote{\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}}. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables were available we would have to model the problem with 64 boolean variables. If we instead use integer variables we can use the fact that all rows will have exactly one queen when we model the problem. This could be solved with booleans by redundant constraints, but it is more efficient to implement the constraints directly in the model.
+A very typical problem suitable for constraint programming is a sudoku. The most intuitive model is a $9\times9$ matrix of integer variables. The constraints that all variables have a domain of $\{1..9\}$, and that all variables in a row, column and box must be different. For a specific sudoku constraints are added to require specific variables to have predetermined values.
 
-\subsection{Terminology}
-\begin{itemize}
-\item{Constraint} - A condition that may be hard or soft. Hard constraints must be satisfied, but soft conditions are optional. The latter are used for optimisation problems.
-\item{Propagator} - In its simplest form it just tells if there exists a solution in current domain according to the specific constraint the propagator handles, but in reality it also performs pruning.
-\item{Pruning} - Removing values from the domain of a variable with a propagator.
-\item{Searching} - The brute force searching one want to avoid. It's basically done by assigning a variable to a value in it's domain and rerun all propagators.
-\item{Brancher} - When no propagator can prune anything searching is needed. This is done with a brancher, which splits the domain in two or more parts, creating a search tree.
-\item{Variable} - In CP a variable has a domain of values. The goal is to reduce the domain to size one.
-\item{Domain} - The set of possible values for a variable. The domain can be exact or approximate. All values that should be in an exact domain representation should also be in any approximation.
-\item{Assigned Variable} - A variable with domain size exactly one is called assigned.
-\item{Failed Variable} - A variable with domain size zero is called failed.
-\item{Solution} - A state where all variables are assigned and all hard constraints are satisfied.
-\item{Fixpoint} - A propagator is at a fixpoint when it can't prune the domain more by running again before the variables has been modified.
-\item{Subsumed} - A subsumed propagator is done. No matter what happens to the variables it can not prune more values.
-\end{itemize}
+In constraint programming, different variable types may be used. Gecode comes with boolean, integer, set and float variables. The available variable types limits the options to model a specific problem. With more variable types a specific problem can be modeled in different ways. There is a problem called Eight queens\footnote{\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}}. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables are available, the problem would have to modeled with 64 boolean variables. With integer variables it would be sufficient with only 8 variables. In the boolean case each variable $b[i][j]$ would tell if a tile has a queen or not, while in the integer case each variable $x[i]$ would tell on which row the queen in column $i$ should be placed on. By analyzing the Eight queen problem it is easy to realize that a solution must have one queen per column.
+
+In principal the CP-solver loops propagating and branching until the problem is solved. The propagators has two main tasks. The most important task is to determine if a solution has been found or not. A solution is a state where all variables are assigned, which means their domain has been pruned (shrinked) to exactly one, and all propagators reports that the values assigned to the variables satisfies the constraints. The second task is not mandatory, but crucial for performance. A propagator can prune values from a variable's domain. For example, if a variable $x$ has a domain of $\{1..9\}$ and the constraint $x\le 4$ is used, a propagator could instantaneously remove the values $\{5..9\}$ from the domain.
+
+When no propagator can prune any values a brancher takes over. The brancher typically splits the variable it is connected to into two parts, one with an assigned value and one with the rest of the domain, thus creating a search tree. After this branching the propagators are called again. The branchers determines the structure of the tree, and the search engine determines how the tree will be traversed. 
 
 \subsection{Gecode}
 Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used.
@@ -88,19 +78,22 @@ Gecode is an open source CP solver programmed in C++ and is licensed under the M
 For more information, have a look at the homepage. \url{http://www.gecode.org}
 
 \subsection{The need for Tuple Variables}
-When using a CP solver, one wants to avoid brute force searching. This is done by intelligently choosing model and constraints. By doing this the variable domains can be pruned to smaller sizes. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$. If we instead have the same variables but add the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. In this example the problem was modeled with two integer variables, but if the problem instead would be modeled with one tuple variable pruning would be possible. Then we would have a tuple variable $t$ with domain $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,2\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,3\rangle,\langle3,4\rangle\}$ and pruning with the same constraint would yield $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,4\rangle\}$. This shrinks the size of the search tree from 9 to 7. 
+When using a CP solver, is is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends on the model and the propagators. With good models and propagators the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$. If we instead have the same variables but add the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. 
 
-If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constraint $x=y$ the benefits are more obvious. Using integer variables no values can be pruned. If tuple variables were used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful.
+In this example the problem was modeled with two integer variables. An tuple is an ordered list of elements with fixed length. If the problem would be modeled with one tuple variable instead of two integers pruning would be possible. Then we would have a tuple variable $t$ with domain $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,2\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,3\rangle,\langle3,4\rangle\}$ and pruning with the same constraint would yield $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,4\rangle\}$. This shrinks the size of the search tree from 9 to 7. 
 
-The main benefit of a tuple is the possibility to link variables together. The most obvious case is when dealing with coordinates, but it can be generalized to any case where it is interesting to see if a combination of two variables are part of a solution.
+If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constraint $x=y$ the benefits are more obvious. Using integer variables no values can be pruned. If tuple variables are used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them.
+
+The main benefit of a tuple is the possibility to link variables together. The most obvious case is when dealing with coordinates since a coordinate by definition is a tuple, but it can be generalized to any case where it is interesting to see if a combination of two values are part of a solution.
 
 \section{Introduction}
+In this thesis only two dimensional tuples, so called 2-tuples are considered. The main reason is to keep it simple, but it is also likely that 2-tuples would be the most common to use to use. 
 
-\section{Tuple Variable}
+\section{Tuple Variables}
 
-\subsection{Creating a New Variable}
+\subsection{Creating a New Variable in Gecode}
 \subsubsection{Specification File}
-Creating the specification file is the first thing that needs to be done when designing a new variable. Caution should be taken, because this step may be very hard to modify later. A simple specification file could look like this.
+Creating the specification file is the first thing that needs to be done when designing a new variable.  A simple specification file could look like this:
 
 \begin{lstlisting}[frame=single]
 [General]
@@ -120,13 +113,13 @@ ScheduledBy: VAL
 [End]
 \end{lstlisting}
 
-As can be seen, there are three sections. The specification file must start with the [General] section and end with [End]. There are also sections for modification events and propagation conditions. When the specification file is written a configuration script is used to generate base classes from the specification file.
+There are three different sections in the file. The specification file must start with the [General] section and end with [End]. There are also sections for modification events and propagation conditions. The specification file is used by a configuration script to generate base classes.
 
-The [General] section is pretty straight forward. This is where the name and namespace of the variable is specified. Both name and namespace are arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
+The [General] section is trivial. This is where the name and namespace of the variable are specified. Both name and namespace are arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
 
-The [ModEvent] section describes the modification events. For all variables, modification events for NONE, FAILED and ASSIGNED are required. More modification events may be added to avoid unnecessary executions of propagators. 
+The [ModEvent] section specifies the modification events. The modification events describes how the variables changes. When a propagator wants to prune the domain for a variable it tells the variable to do that, using the class methods that the variable implementation provides. If no values are pruned, the variable returns the modification event NONE, and if all values are pruned it returns FAILED. When the domain of a variable gets pruned to one ASSIGNED is returned. For all variables, modification events for NONE, FAILED and ASSIGNED are required. More modification events may be added to avoid unnecessary executions of propagators. For example, the modification event BND can be used when only the boundaries of a domain has changed.
 
-The [PropCond] section describes how the propagators are scheduled. For all variables, propagator conditions for NONE and ASSIGNED are required.
+The [PropCond] section describes how the propagators are scheduled, depending on how the variables have changed. For all variables, propagator conditions for NONE and ASSIGNED are required.
 
 \subsubsection{Variable Implementation}
 The variable implementation class would with the specification file in the previous section be called IntTupleImp and inherit from the class IntTupleVarBase generated from the specification file. It has to implement a function called assigned that returns true if the variable is assigned.
@@ -169,14 +162,17 @@ A brancher must implement the following methods:
 \item{ngl}
 \end{itemize}
 
-\subsection{Implementation of Exact IntPair}
-The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
-
 \subsection{Restrictions}
 To keep things simple only two-dimensional integer tuples are considered, so called Pairs.
 
+\subsection{Implementation of Exact IntPair}
+The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
+
 \subsection{Implementation of Approximate IntPair}
 This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version. 
+
+\subsection{Correctness verification}
+The correctness is verified in several steps. For all problems an assertion is made to ensure that the solution printed actually is a solution before the solution is printed. 
 
 \subsection{Performance Test}
 To test the performance the same problem is solved in three different ways. Two of them is IntPair, one exact and one with one dimension approximated. The last one is solved with the integer variable that comes with Gecode, and is just for reference. The problem is a DFA with costs. The executables accepts six arguments: 
@@ -219,10 +215,9 @@ All big software libraries have coding standards. There is plenty of work to rew
 \subsection{Extend the tuples to arbitrary dimensions and not just pairs}
 This would require a complete rewrite of the variable implementation.
 \subsection{Extend the tuples to floats}
-\subsection{Reach better performance for a specific problem with an array of pair variables than with two arrays of integer variables}
 
 \section{Git repository}
-\url{http://github.com/patwotrik/gecode-tuples}
+\url{http://github.com/klutt/gecode-tuples}
 
 \begin{thebibliography}{99}
 \bibitem{Calculus}
