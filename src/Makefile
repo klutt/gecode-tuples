@@ -14,11 +14,12 @@ LIBS=-L$(INSTD)/lib
 INCLUDES=-I$(INSTD)/include
 
 #FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
+CFLAGS=-g -fdiagnostics-color=always -std=c++11 -fmax-errors=5
 FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -lgecodegist
 
 
 test/%: testsrc/%.cpp *.hh
-	/usr/bin/g++ -g -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
+	/usr/bin/g++ -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) $(CFLAGS)
 	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 	test/$* -threads 1
 
@@ -33,9 +34,8 @@ testapprox:	\
 	@echo "All tests passed"
 
 
-test:	test/3statedfawithcostint \
+testexact: \
 	test/3statedfawithcost \
-	test/3statedfanocostint \
 	test/queens01test \
 	test/testtemplate \
 	test/zerosolutions \
@@ -45,40 +45,38 @@ test:	test/3statedfawithcostint \
 	test/3statedfanocost 
 	@echo "All tests passed"
 
-tripletest/exact: tripletest/exact.cpp
-	/usr/bin/g++ -g -c tripletest/exact.cpp -o tripletest/exact.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -g -o tripletest/exact tripletest/exact.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+testint: \
+	test/3statedfawithcostint \
+	test/3statedfanocostint 
+	@echo "All tests passed"
 
-tripletest/approx: tripletest/approx.cpp
-	/usr/bin/g++ -g -c tripletest/approx.cpp -o tripletest/approx.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -g -o tripletest/approx tripletest/approx.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-
-
-tripletest/int: tripletest/int.cpp
-	/usr/bin/g++ -g -c tripletest/int.cpp -o tripletest/int.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -g -o tripletest/int tripletest/int.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+tripletest/%:	tripletestsrc/%.cpp *.hh
+	/usr/bin/g++ -c tripletestsrc/$*.cpp -o tripletest/$*.o $(INCLUDES) $(CFLAGS)
+	/usr/bin/g++ -g -o tripletest/$* tripletest/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	cp tripletestsrc/testrun.py tripletestsrc/comparesolutions.py tripletest
 
 triple:	tripletest/exact \
 	tripletest/approx \
 	tripletest/int
+	cd tripletest; \
+	python testrun.py
+	@echo "All tests passed"
 
-performance/exact: performance/exact.cpp
-	/usr/bin/g++ -pg -g -c performance/exact.cpp -o performance/exact.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -pg -g -o performance/exact performance/exact.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+performance/%:	performancesrc/%.cpp *.hh
+	/usr/bin/g++ -c performancesrc/$*.cpp -o performance/$*.o $(INCLUDES) $(CFLAGS)
+	/usr/bin/g++ -g -o performance/$* performance/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	cp performancesrc/performancetestrun.py performancesrc/comparesolutions.py performance
 
-performance/approx: performance/approx.cpp
-	/usr/bin/g++ -pg -g -c performance/approx.cpp -o performance/approx.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -pg -g -o performance/approx performance/approx.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-
-
-performance/int: performance/int.cpp
-	/usr/bin/g++ -pg -g -c performance/int.cpp -o performance/int.o $(INCLUDES) -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-	/usr/bin/g++ -pg -g -o performance/int performance/int.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
 
 performance: \
 	performance/exact \
 	performance/approx \
 	performance/int
+	cd performance; \
+	python performancetestrun.py
+	@echo "All tests passed"
+
+test:	testint testapprox testexact triple performance
 
 configure:
 	echo $(INSTD)
@@ -110,7 +108,7 @@ both:	configboth
 
 clean:
 	rm -f *.o *~ testsrc/*~ test/* exact/*~ approx/*~ \
-	performance/approx performance/int performance/exact performance/*.o performance/*~ \
-	tripletest/approx tripletest/int tripletest/exact tripletest/*.o tripletest/*~ 
+	performance/* performancesrc/*~ \
+	tripletest/* tripletestsrc/*~ 
 
 

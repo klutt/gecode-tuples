@@ -26,6 +26,10 @@
 *.exe
 *.out
 *.app
+*approx
+*int
+*exact
+*.pyc
 
 # TexStudio temps
 doc/*.aux
@@ -36,7 +40,10 @@ doc/*.toc
 
 # Temps
 *~
+[#]*[#]
+.\#*
 
 # Other
 external/gecodelib
 external/gecode-4.3.2/*
+

@@ -35,12 +35,12 @@ public:
   int C(int s, int t) { return cost[s][t]; }
 };
 
+Dfa_t *df;
 
 class Test : public Script {
 public:
   /// The actual problem
   IntVar px, py, qx, qy, z;
-  Dfa_t *df;
 
   
   Test(const SizeOptions& opt) : px(*this, 1,3),
@@ -49,7 +49,6 @@ public:
 				 qy(*this, 1,4),
 				 z(*this, 1,3)
   {
-    df = new Dfa_t();
     myintdfa(*this, px, py, qx, qy, z,df);
 
     branch(*this, px, INT_VAL_MIN());
@@ -88,6 +87,8 @@ public:
     
     //    cout << " Solution  "<< " px: " << px << " py: " << py
     //	 << " qx: " << qx << " qy: " << qy << " z: " << z << endl;
+    assert(solutionOk(df, px.val(), py.val(), qx.val(), qy.val(), z.val()));
+    
     noSolutions++;
   }
 };
@@ -98,6 +99,7 @@ int main(int argc, char* argv[]) {
     noSolutions=0;
 
     
+    df = new Dfa_t();
     const int expected_no_solutions = 18;
     
     opt.parse(argc,argv);

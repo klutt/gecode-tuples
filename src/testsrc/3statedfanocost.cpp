@@ -29,18 +29,17 @@ public:
   int C(int s, int t) { return 0; } // { return cost[s][t]; }
 };
 
+Dfa_t *df;
 
 class Test : public Script {
 public:
   /// The actual problem
   IntPairVarArray a;
   IntVar z;
-  Dfa_t *df;
 
   
   Test(const SizeOptions& opt) : a(*this, 2,1,3,1,1), z(*this, 1,3)
   {
-    df = new Dfa_t();
     mydfa(*this, a[0],a[1],z,df);
     nonenone(*this, a);
     branch(*this, z, INT_VAL_MIN());
@@ -68,6 +67,7 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
     noSolutions++;
   }
 };
@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
 
+    df = new Dfa_t();
     
     const int expected_no_solutions = 6;
     

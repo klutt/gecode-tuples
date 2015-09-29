@@ -44,7 +44,6 @@ public:
   
   Test(const SizeOptions& opt) : a(*this, 2,1,3,1,4), z(*this, 1,3)
   {
-    df = new Dfa_t();
     mydfa(*this, a[0],a[1],z,df);
     nonenone(*this, a);
     branch(*this, z, INT_VAL_MIN());
@@ -73,6 +72,7 @@ public:
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...  
     //    os << "a[0]: " << a[0] << "   a[1]: " << a[1] <<  "   z: " << z << endl;
+    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
     noSolutions++;
   }
 };
@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
 
     df = new Dfa_t;
     const int expected_no_solutions = 18;
+    df = new Dfa_t();
     
     opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);

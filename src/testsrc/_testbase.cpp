@@ -49,6 +49,7 @@
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
 #include <cstring>
+#include "../common/solutionok.h"
 
 using namespace std;
 using namespace Gecode;

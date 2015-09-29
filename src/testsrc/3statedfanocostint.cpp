@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "_testbase.cpp"
+#include "../common/solutionok.h"
 
 int noSolutions;
 
@@ -28,12 +29,12 @@ public:
   int C(int s, int t) { return 0; } // { return cost[s][t]; }
 };
 
+Dfa_t *df;
 
 class Test : public Script {
 public:
   /// The actual problem
   IntVar px, py, qx, qy, z;
-  Dfa_t *df;
 
   
   Test(const SizeOptions& opt) : px(*this, 1,3),
@@ -42,7 +43,6 @@ public:
 				 qy(*this, 1,1),
 				 z(*this, 1,4)
   {
-    df = new Dfa_t();
     myintdfa(*this, px, py, qx, qy, z,df);
 
     branch(*this, px, INT_VAL_MIN());
@@ -81,6 +81,7 @@ public:
     
     //    cout << " Solution  "<< " px: " << px << " py: " << py
     //	 << " qx: " << qx << " qy: " << qy << " z: " << z << endl;
+    assert(solutionOk(df, px.val(), py.val(), qx.val(), qy.val(), z.val()));
     noSolutions++;
   }
 };
@@ -90,6 +91,7 @@ int main(int argc, char* argv[]) {
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
 
+    df = new Dfa_t();
     
     const int expected_no_solutions = 6;
     
