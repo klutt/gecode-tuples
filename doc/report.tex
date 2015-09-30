@@ -36,7 +36,7 @@
 
 \title{\textbf{Implementing Tuple Variables in Gecode \\
 	Bachelor Thesis \\
-    Uppsala University -- Autumn 2014 \\
+    Uppsala University  \\
   }
 }
 
@@ -126,26 +126,28 @@ The variable implementation class would with the specification file in the previ
 \subsubsection{Variable Class}
 The variable class is the class that is used when modeling the actual problem and inherits from the variable implementation. It is a read only user interface, and a programmer that does not program any custom branchers or propagators will not use anything else than this. This class would be called IntTupleVar.
 \subsubsection{Deltas}
+Deltas are used for passing information about changes to improve efficiency. In this thesis an empty class is used. The only reason it is defined at all is that some virtual functions takes Deltas as arguments.
+
 \subsubsection{Views}
-The variable implementation class does implement methods for modification of the variable, but the variable class does not give access to these. Instead these are called from a view, which is a read and write interface to the implementation class.
+The variable implementation class implements methods for modification of the variable, but the variable class does not give access to these. Instead these are called from a view, which is a read and write interface to the implementation class.
 
 \subsubsection{Propagators}
-A propagator implements constraints and prunes variables. They interact with the views and not variable class and have four possible return values.
+A propagator implements constraints and prunes variables. They interact with the views and have four possible return values.
 \begin{itemize}
-\item{ES\_FAILED} - There are no values in the domain that satisfies the constraint. The variable is failed.
-\item{ES\_FIX} - The propagator is at a fixpoint. It is impossible for the propagator to prune more values before the domain has changed for any of the variables the propagator depend on by either a brancher or another propagator.
+\item{ES\_FAILED} - There are no values in the domains that satisfies the constraint. 
+\item{ES\_FIX} - The propagator is at a fixpoint. It is impossible for the propagator to prune more values before the domain has changed for any of the variables the propagator depends on, by either a brancher or another propagator.
 \item{ES\_NOFIX} - The propagator may be at a fixpoint, but it is not guaranteed. Running it once more may or may not prune some values. Unless it is at a fixpoint for sure, this should be used.
 \item{ES\_SUBSUMED} - The propagator is done. Regardless of any changes made to the variable this particular propagator will not be able to do anything more.
 \end{itemize}
 The propagator must implement ES\_FAILED and at least one of the others. ES\_NOFIX is safe to return in the sense that it does not promise anything. Furthermore, the propagator needs the following methods:
 \begin{itemize}
 \item{post} - The method for posting a constraint, which basically is saying that a certain constraint should be used.
-\item{disposal} - This works as a destructor. The only reason to not have a regular destructor is that destructors in C++ can't take arguments.
+\item{dispose} - This works as a destructor. The only reason to not have a regular destructor is that destructors in C++ can't take arguments.
 \item{copy} - A method to copy the propagator.
 \item{cost} - Estimates the cost to run the propagator. This does not affect the correctness, but may improve efficiency by making it easier for the Gecode engine to schedule cheap propagators before expensive ones.
 \item{propagate} - The method which does the actual work. It prunes domains and determines the status to return.
 \end{itemize}
-A propagator must also subscribe to variables, that is, telling Gecode when the propagator should be awaken. For instance, a propagator that says that x should be less than y should subscribe to the maximum value of x and minimum value of y.
+A propagator must also subscribe to views, that is, telling Gecode when the propagator should be awaken. For instance, a propagator for the constraint $x\le y$ should subscribe to the maximum value of x and minimum value of y.
 
 \paragraph{Consistency}
 A propagator can work with different consistencies. Bound consistency means that the propagator ensures that the bounds (min and max value for an integer variable) satisfies the constraint. If if $dom(x)={1,5,7,8}$ and $dom(y)={1,3,7}$ and the constraint $x=y$ is applied, the propagator would yield $dom(x)={1,5,7}$ and $dom(y)={1,3,7}$ with bounds consistency, since there are solutions to $x=1$, $x=7$, $y=1$ and $y=7$. $x=5$ and $y=3$ is not considered. Pruning the whole domain does in general cost more execution time.
@@ -187,21 +189,25 @@ To test the performance the same problem is solved in three different ways. Two 
 \subsubsection{First initial performance test}
 An initial naive test with states=10, tokens=4, cost=3, max cost=10, steps=10 gave the following result:
 \newline
-\begin{tabular}{l r}
-int & 1m15.252s \\
-approx & 2m16.260s \\ 
-exact & 0m14.474s \\
+\newline
+\begin{tabular}{l r r}
+int & 1m15.252s & 1 161 925 nodes\\
+approx & 2m16.260s & 1 932 309 nodes\\ 
+exact & 0m14.474s & 69 715 nodes \\
 \end{tabular}
+\newline
 \newline
 Another test with states=15, tokens=2, cost=20, max cost=200, steps=13 gave:
 \newline
-\begin{tabular}{l r}
-int & 0m53.991s \\
-approx & 0m7.351s \\ 
-exact & 0m40.735s \\
+\newline
+\begin{tabular}{l r r}
+int & 0m53.991s &  171 357 nodes\\
+approx & 0m7.351s & 108 077 nodes\\ 
+exact & 0m40.735s & 8 157 nodes\\
 \end{tabular}
 \newline
-This is very interesting. In the first test the exact version of IntPair is the clear winner, and in the second test it is the approximate version that wins. The difference is definitely significant with 14 vs 75 and 7 vs 54 seconds. What makes this even more interesting is that while the built in IntVar is highly optimised, both implementations of IntPair is the opposite. The whole variable implementation with modification events and the brancher uses poor algorithms and are just enough to get the tests to compile and run. The only code written for the built IntVar is the propagator, and even that one is way better written than the propagators for IntPair. While the IntPair propagators are very naive, the Int propagator uses optimisations like preallocating space for the vectors and uses binary search instead of linear search.
+\newline
+This is very interesting. In the first test the exact version of IntPair is the clear winner, and in the second test it is the approximate version that wins. The difference is definitely significant with 14 vs 75 and 7 vs 54 seconds. What makes this even more interesting is that while the built in IntVar is highly optimised, both implementations of IntPair is the opposite. The whole variable implementation with modification events and the brancher uses poor algorithms and are just enough to get the tests to compile and run. The only code written for the builtin IntVar test is the propagator, and even that one is better written than the propagators for IntPair. While the IntPair propagators are very naive, the Int propagator uses optimisations like preallocating space for the vectors and uses binary search instead of linear search. The reason for this is to show that even with a very naive and inefficient implementation of a tuple variable, it can still be much better. The results are undoubtedly a good indication for that tuples have potential, and not a consequence of more efficient code. In the repository the commit where these tests were performed is marked with the tag FPT.
 
 \section{Related Work}
 \subsection{Implementation of bit-vector variables in a CP solver}
