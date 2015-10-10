@@ -5,7 +5,7 @@ from sys import argv
 import subprocess
 
 def getOutput(command, arg):
-    _command = './' + command + ' ' + 'dummy dummy' + ' '.join(arg[1:]) + ' | grep -E "^([0-9] ){10}"'
+    _command = './' + command + ' ' + 'dummy dummy ' + ' '.join(arg[1:]) + ' | grep -E "^([0-9] ){10}"'
 #    print _command
     data = subprocess.Popen(_command, shell=True, stdout=subprocess.PIPE)
     ret = data.stdout.read().split('\n')

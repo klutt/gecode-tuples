@@ -18,5 +18,6 @@
 #include "propagators/eqreif.h"
 #include "propagators/dfa.h"
 #include "propagators/dfaint.h"
+#include "propagators/dfaintopt.h"
 
 #endif

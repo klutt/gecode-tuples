@@ -27,8 +27,8 @@ public:
   Test(const SizeOptions& opt) : a(*this, 2,1,nostates,0,maxcosttotal), z(*this, 1,notokens)
   {
     mydfa(*this, a[0],a[1],z,df);
-    nonenone(*this, a);
     branch(*this, z, INT_VAL_MIN());
+    nonenone(*this, a);
   }
 
   

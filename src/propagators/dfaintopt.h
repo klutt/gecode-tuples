@@ -72,8 +72,10 @@ public:
 	newpx.reserve(Px.size());
 	newqx.reserve(Qx.size());
 	newz.reserve(Z.size());
-	
-	Gecode::Iter::Ranges::NaryUnion u;
+
+	Gecode::Region region(home);
+	Gecode::Iter::Ranges::Empty empty;
+	Gecode::Iter::Ranges::NaryUnion u(region, empty);
 	
         Gecode::Int::ViewValues<Gecode::Int::IntView> iz(Z);
         while(iz()) {

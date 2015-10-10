@@ -31,11 +31,11 @@ public:
 				 z(*this, 1,notokens)
   {
     myintdfa(*this, a ,b, c, d ,z,df);
+    branch(*this, z, INT_VAL_MIN());
     branch(*this, a, INT_VAL_MIN());
     branch(*this, b, INT_VAL_MIN());
     branch(*this, c, INT_VAL_MIN());
     branch(*this, d, INT_VAL_MIN());
-    branch(*this, z, INT_VAL_MIN());
   }
 
   

@@ -1,10 +1,8 @@
 #include <gecode/kernel.hh>
-#include "../intpair.h"
 #include <vector>
-#include <stdlib.h>
-#include "../common/solutionok.h"
-
+#include "../propagators/dfaintopt.h"
 #include "../testsrc/_testbase.cpp"
+#include "../common/solutionok.h"
 
 int noSolutions;
 
@@ -15,20 +13,29 @@ using namespace MPG;
 
 Dfa *df;
 
+
 int seed, nostates, notokens, maxcost, maxcosttotal;
+
 
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairVarArray a;
+  IntVar a,b,c,d;
   IntVar z;
 
   
-  Test(const SizeOptions& opt) : a(*this, 2,1,nostates,0,maxcosttotal), z(*this, 1,notokens)
+  Test(const SizeOptions& opt) : a(*this, 1,nostates),
+				 b(*this ,0, maxcosttotal),
+				 c(*this, 1,nostates),
+				 d(*this, 0, maxcosttotal),
+				 z(*this, 1,notokens)
   {
-    mydfa(*this, a[0],a[1],z,df);
+    optintdfa(*this, a ,b, c, d ,z,df);
     branch(*this, z, INT_VAL_MIN());
-    nonenone(*this, a);
+    branch(*this, a, INT_VAL_MIN());
+    branch(*this, b, INT_VAL_MIN());
+    branch(*this, c, INT_VAL_MIN());
+    branch(*this, d, INT_VAL_MIN());
   }
 
   
@@ -41,6 +48,9 @@ public:
     // To update a variable var use:
     // GC_UPDATE(var)
     GC_UPDATE(a);
+    GC_UPDATE(b);
+    GC_UPDATE(c);
+    GC_UPDATE(d);
     GC_UPDATE(z);
   }
     
@@ -53,8 +63,8 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
-    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
-    cout << a[1] << " "  << a[0] << " " << z << endl;
+    assert(solutionOk(df, a.val(), b.val(), c.val(), d.val(), z.val()));
+    cout << "<" << c << "," << d << "> <"  << a << "," << b << "> " << z << endl;
     noSolutions++;
   }
 };
@@ -74,14 +84,16 @@ int main(int argc, char* argv[]) {
     notokens = atoi(argv[3]);
     maxcost = atoi(argv[4]);
     maxcosttotal = atoi(argv[5]);
-    
+
     if(seed == 0 || nostates == 0 || notokens == 0 || maxcost == 0 || maxcosttotal==0) {
       std::cout << "Wrong parameters" << std::endl;
       return -1;
     }
-      
+
     df = new Dfa(seed, nostates, notokens, maxcost);
     df->print();
+    
+
     
     //    opt.parse(argc,argv);
     ScriptOutput::run<Test,DFS,SizeOptions>(opt);
