@@ -14,13 +14,13 @@ LIBS=-L$(INSTD)/lib
 INCLUDES=-I$(INSTD)/include
 
 #FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
-CFLAGS=-g -fdiagnostics-color=always -std=c++11 -fmax-errors=5
-FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -lgecodegist
+CFLAGS=-g -fdiagnostics-color=always -std=c++11 -fmax-errors=5 
+FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -lgecodegist -fdiagnostics-color=always
 
 
 test/%: testsrc/%.cpp *.hh
-	/usr/bin/g++ -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) $(CFLAGS)
-	/usr/bin/g++ -g -o test/$* test/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
+	$(CXX) -c testsrc/$*.cpp -o test/$*.o $(INCLUDES) $(CFLAGS)
+	$(CXX) -g -o test/$* test/$*.o $(FLAGS) $(LIBS) 
 	test/$* -threads 1
 
 testapprox:	\
@@ -47,36 +47,50 @@ testexact: \
 
 testint: \
 	test/3statedfawithcostint \
+	test/3statedfawithcostintopt \
 	test/3statedfanocostint 
 	@echo "All tests passed"
 
 tripletest/%:	tripletestsrc/%.cpp *.hh
-	/usr/bin/g++ -c tripletestsrc/$*.cpp -o tripletest/$*.o $(INCLUDES) $(CFLAGS)
-	/usr/bin/g++ -g -o tripletest/$* tripletest/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-	cp tripletestsrc/testrun.py tripletestsrc/comparesolutions.py tripletest
+	$(CXX) -c tripletestsrc/$*.cpp -o tripletest/$*.o $(INCLUDES) $(CFLAGS)
+	$(CXX) -g -o tripletest/$* tripletest/$*.o $(FLAGS) $(LIBS)
 
 triple:	tripletest/exact \
 	tripletest/approx \
+	tripletest/intopt \
 	tripletest/int
+	cp tripletestsrc/testrun.py tripletestsrc/comparesolutions.py tripletest
 	cd tripletest; \
 	python testrun.py
 	@echo "All tests passed"
 
-performance/%:	performancesrc/%.cpp *.hh
-	/usr/bin/g++ -c performancesrc/$*.cpp -o performance/$*.o $(INCLUDES) $(CFLAGS)
-	/usr/bin/g++ -g -o performance/$* performance/$*.o $(FLAGS) $(LIBS) -fdiagnostics-color=always
-	cp performancesrc/performancetestrun.py performancesrc/comparesolutions.py performance
+multisteptest/%:	multisteptestsrc/%.cpp *.hh multisteptestsrc/_main.cpp
+	$(CXX) -c multisteptestsrc/$*.cpp -o multisteptest/$*.o $(INCLUDES) $(CFLAGS)
+	$(CXX) -g -o multisteptest/$* multisteptest/$*.o $(FLAGS) $(LIBS) 
 
+multisteptest: \
+	multisteptest/exact \
+	multisteptest/approx \
+	multisteptest/int \
+	multisteptest/intopt
+	cp multisteptestsrc/mstestrun.py multisteptestsrc/comparesolutions.py multisteptest
+	cd multisteptest; \
+	python mstestrun.py
+	@echo "All tests passed"
+
+test:	testint testapprox testexact triple multisteptest
+
+performance/%:	performancesrc/%.cpp *.hh performancesrc/_main.cpp
+	$(CXX) -c performancesrc/$*.cpp -o performance/$*.o $(INCLUDES) $(CFLAGS)
+	$(CXX) -g -o performance/$* performance/$*.o $(FLAGS) $(LIBS)
+	cp tripletestsrc/testrun.py tripletestsrc/comparesolutions.py tripletest
 
 performance: \
 	performance/exact \
 	performance/approx \
-	performance/int
-	cd performance; \
-	python performancetestrun.py
-	@echo "All tests passed"
-
-test:	testint testapprox testexact triple performance
+	performance/int \
+	performance/intopt
+	cp performancesrc/run.sh performance/
 
 configure:
 	echo $(INSTD)
@@ -108,7 +122,8 @@ both:	configboth
 
 clean:
 	rm -f *.o *~ testsrc/*~ test/* exact/*~ approx/*~ \
-	performance/* performancesrc/*~ \
-	tripletest/* tripletestsrc/*~ 
+	multisteptest/* multisteptestsrc/*~ \
+	tripletest/* tripletestsrc/*~ \
+	performance/* performancesrc/*~
 
 
