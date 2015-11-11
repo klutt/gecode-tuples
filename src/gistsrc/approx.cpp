@@ -32,8 +32,7 @@ public:
     for(int i=0; i<nosteps; i++)
       mydfa(*this, p[i+1],p[i],z[i],df);
     branch(*this, z, INT_VAR_NONE(), INT_VAL_MIN());
-    //    nonenone(*this, p);
-
+    nonenone(*this, p);
   }
 
   
@@ -59,12 +58,13 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
+    //    for(int i=0; i<nosteps; i++)
+    //        assert(solutionOk(df, p[i+1].val().x, p[i+1].val().y, p[i].val().x, p[i].val().y, z[i].val()));
+    for(int i=0; i<nosteps+1; i++)
+      os << "p[" << i << "]: " << p[i] << std::endl;
     for(int i=0; i<nosteps; i++)
-        assert(solutionOk(df, p[i+1].val().x, p[i+1].val().y, p[i].val().x, p[i].val().y, z[i].val()));
-
-    for(int i=0; i<nosteps; i++)
-      cout << z[i].val() << " " << p[i].val().x << " " << p[i].val().y << " ";
-    cout << p[nosteps].val().x << " " << p[nosteps].val().y << endl;
+      os  << "z[" << i << "]: " << z[i] << std::endl;
+    
     //  cout << a[1] << " "  << a[0] << " " << z << endl;
     noSolutions++;
   }

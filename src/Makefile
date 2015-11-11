@@ -78,7 +78,17 @@ multisteptest: \
 	python mstestrun.py
 	@echo "All tests passed"
 
-test:	testint testapprox testexact triple multisteptest
+
+gist/%:	gistsrc/%.cpp *.hh gistsrc/_main.cpp
+	$(CXX) -c gistsrc/$*.cpp -o gist/$*.o $(INCLUDES) $(CFLAGS)
+	$(CXX) -g -o gist/$* gist/$*.o $(FLAGS) $(LIBS) -lgecodegist
+
+gist: \
+	gist/exact \
+	gist/approx \
+
+
+test:	testint testapprox testexact triple gist
 
 performance/%:	performancesrc/%.cpp *.hh performancesrc/_main.cpp
 	$(CXX) -c performancesrc/$*.cpp -o performance/$*.o $(INCLUDES) $(CFLAGS)
@@ -121,8 +131,9 @@ both:	configboth
 
 
 clean:
-	rm -f *.o *~ testsrc/*~ test/* exact/*~ approx/*~ \
-	multisteptest/* multisteptestsrc/*~ \
+	rm -f *.o *~ testsrc/*~ test/* exact/*~ approx/*~ gist/* \
+	gist/* gistsrc/*~ \
+	multisteptest/* multitestsrc/*~ \
 	tripletest/* tripletestsrc/*~ \
 	performance/* performancesrc/*~
 

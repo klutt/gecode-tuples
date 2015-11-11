@@ -31,8 +31,8 @@ public:
     eq(*this, p[0], init);
     for(int i=0; i<nosteps; i++)
       mydfa(*this, p[i+1],p[i],z[i],df);
-    nonenone(*this, p);
     branch(*this, z, INT_VAR_NONE(), INT_VAL_MIN());
+    //    nonenone(*this, p);
   }
 
   

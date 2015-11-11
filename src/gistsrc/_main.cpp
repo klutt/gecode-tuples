@@ -1,8 +1,8 @@
-
+#include "gecode/gist.hh"
 
 int main(int argc, char* argv[]) {
   SizeOptions opt("Queens");
-  opt.solutions(0); // Calculate all solutions
+  //  opt.solutions(0); // Calculate all solutions
   noSolutions=0;
 
   if(argc < 9) {
@@ -24,16 +24,18 @@ int main(int argc, char* argv[]) {
 
   df = new Dfa(seed, nostates, notokens, maxcost);
   //    df->print();
-  opt.mode(Gecode::SM_STAT);
-  opt.parse(argc,argv);
-  ScriptOutput::run<Test,DFS,SizeOptions>(opt);
-  /*
-  Test *T = new Test(opt);
-  Gist::Options o;
-  Gist::Print<Test> p("print");
-  o.inspect.click(&p);
-  Gist::dfs(T,o); */
+   opt.mode(Gecode::SM_GIST);
+    opt.parse(argc,argv);
+    //  ScriptOutput::run<Test,DFS,SizeOptions>(opt);
 
-  //  cout << "No solutions: " << noSolutions << endl;
+    
+    Test *T = new Test(opt);
+    Gist::Print<Test> p("Print solution");
+    Gist::Options o;
+    o.inspect.click(&p);
+    Gist::dfs(T, o);
+    
+    
+  cout << "No solutions: " << noSolutions << endl;
   return 0;
 }

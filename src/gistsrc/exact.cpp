@@ -1,9 +1,11 @@
 #include <gecode/kernel.hh>
-#include "../intpairapprox.h"
+#include "../intpair.h"
 #include <vector>
+#include <gecode/gist.hh>
+
 #include <stdlib.h>
 #include "../common/solutionok.h"
-#include <gecode/gist.hh>
+
 #include "../testsrc/_testbase.cpp"
 
 int noSolutions;
@@ -20,9 +22,9 @@ int seed, nostates, notokens, maxcost, maxcosttotal, nosteps;
 class Test : public Script {
 public:
   /// The actual problem
-  IntPairApproxVarArray p;
+  IntPairVarArray p;
   IntVarArray z;
-  IntPairApproxVar init;
+  IntPairVar init;
   
   Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal),
 				 z(*this, nosteps,1,notokens),
@@ -31,9 +33,8 @@ public:
     eq(*this, p[0], init);
     for(int i=0; i<nosteps; i++)
       mydfa(*this, p[i+1],p[i],z[i],df);
+    nonenone(*this, p);
     branch(*this, z, INT_VAR_NONE(), INT_VAL_MIN());
-    //    nonenone(*this, p);
-
   }
 
   
@@ -59,16 +60,18 @@ public:
   /// Print solution (originally, now it's just for updating number of solutions)
   virtual void print(std::ostream& os) const {
     // Strange place to put this, but since this functions is called once for every solution ...
-    for(int i=0; i<nosteps; i++)
-        assert(solutionOk(df, p[i+1].val().x, p[i+1].val().y, p[i].val().x, p[i].val().y, z[i].val()));
-
-    for(int i=0; i<nosteps; i++)
-      cout << z[i].val() << " " << p[i].val().x << " " << p[i].val().y << " ";
-    cout << p[nosteps].val().x << " " << p[nosteps].val().y << endl;
+    //    assert(solutionOk(df, a[0].val().x, a[0].val().y, a[1].val().x, a[1].val().y, z.val()));
     //  cout << a[1] << " "  << a[0] << " " << z << endl;
+    //    for(int i=0; i<nosteps; i++)
+    //      assert(solutionOk(df, p[i+1].val().x, p[i+1].val().y, p[i].val().x, p[i].val().y, z[i].val()));
+    for(int i=0; i<nosteps+1; i++)
+      os << "p[" << i << "]: " << p[i] << std::endl;
+    for(int i=0; i<nosteps; i++)
+	os  << "z[" << i << "]: " << z[i] << std::endl;
+    
     noSolutions++;
   }
 };
 
-#include "_main.cpp"
 
+#include "_main.cpp"
