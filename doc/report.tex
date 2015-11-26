@@ -49,7 +49,7 @@
 \maketitle
 
 \begin{abstract}
-This is the abstract
+Constraint programming is a programing paradigm focusing on high performance computing. There exists several different frameworks for constraint programming. Gecode is one of them, and is the one chosen for this project. In the present version of Gecode the available variable types are booleans, integers, floats and integer sets. In this thesis a new variable type - tuples - is implemented and analyzed. It is shown that for some problems, this variable type can improve performance significantly.
 \end{abstract}
 
 \setcounter{tocdepth}{2}
@@ -59,6 +59,10 @@ This is the abstract
 Thanks to Jean-No\"{e}l Monette and Pierre Flener for being helpful supervisors. \\
 Thanks to Joseph Scott for helping me configuring Gecode. \\
 Thanks to Johan Gustafsson for general help with C++. \\
+
+\section{Introduction}
+Intro...
+
 \section{Background}
 \subsection{Constraint Programming}
 
@@ -86,9 +90,7 @@ If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constra
 
 The main benefit of a tuple is the possibility to link variables together. The most obvious case is when dealing with coordinates since a coordinate by definition is a tuple, but it can be generalized to any case where it is interesting to see if a combination of two values are part of a solution.
 
-\section{Introduction}
-In this thesis only two dimensional tuples, so called 2-tuples are considered. The main reason is to keep it simple, but it is also likely that 2-tuples would be the most common to use to use. 
-
+\newpage
 \section{Tuple Variables}
 
 \subsection{Creating a New Variable in Gecode}
@@ -179,14 +181,14 @@ The correctness is verified in several steps. For all problems an assertion is m
 \subsection{Performance Test}
 To test the performance the same problem is solved in three different ways. Two of them is IntPair, one exact and one with one dimension approximated. The last one is solved with the integer variable that comes with Gecode, and is just for reference. The problem is a DFA with costs. The executables accepts six arguments: 
 \begin{itemize}
-\item{seed} The seed for the random generator to generate the same DFA for all executables.
-\item{states} Number of states.
-\item{tokens} Size of the alphabet.
-\item{cost} Max cost per transition in the DFA. This is decreased by one, so setting this to 1 means no cost.
-\item{max cost} Maximum cumulative cost for the variables.
-\item{steps} Number of steps in the DFA.
+\item{seed} - The seed for the random generator to generate the same DFA for all executables.
+\item{states} - Number of states.
+\item{tokens} - Size of the alphabet.
+\item{cost} - Max cost per transition in the DFA. This is decreased by one, so setting this to 1 means no cost.
+\item{max cost} - Maximum cumulative cost for the variables.
+\item{steps} - Number of steps in the DFA.
 \end{itemize}
-\subsubsection{First initial performance test}
+\subsubsection{First Initial Performance Test}
 An initial naive test with states=10, tokens=4, cost=3, max cost=10, steps=10 gave the following result:
 \newline
 \newline
@@ -209,6 +211,179 @@ exact & 0m40.735s & 8 157 nodes\\
 \newline
 This is very interesting. In the first test the exact version of IntPair is the clear winner, and in the second test it is the approximate version that wins. The difference is definitely significant with 14 vs 75 and 7 vs 54 seconds. What makes this even more interesting is that while the built in IntVar is highly optimised, both implementations of IntPair is the opposite. The whole variable implementation with modification events and the brancher uses poor algorithms and are just enough to get the tests to compile and run. The only code written for the builtin IntVar test is the propagator, and even that one is better written than the propagators for IntPair. While the IntPair propagators are very naive, the Int propagator uses optimisations like preallocating space for the vectors and uses binary search instead of linear search. The reason for this is to show that even with a very naive and inefficient implementation of a tuple variable, it can still be much better. The results are undoubtedly a good indication for that tuples have potential, and not a consequence of more efficient code. In the repository the commit where these tests were performed is marked with the tag FPT.
 
+\subsection{A More Rigorous Performance Test}
+For this performance test some changes have been made. The integer propagator has been optimised by replacing some of the vectors with the iterators that comes with Gecode. Furthermore, the branching is different. Now all executables branches on the token first, instead of the states. The columns are name, time in ms, number of nodes and memory usage in kB.
+
+\begin{table}
+States 15 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 822 & 20 879 & 15 332 \\
+exact & 938 & 20 879 & 15 784 \\
+intopt & 4 697 & 146 895 & 11 576 \\
+int & 13 502 & 272 063 & 11 808 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 15 Tokens 6 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 2 734 & 68 523 & 24 468 \\
+exact & 3 305 & 68 523 & 26 432 \\
+intopt & 16 092 & 482 543 & 11 536 \\
+int & 48 974 & 893 687 & 11 852 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 15 Tokens 7 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 6 512 & 169 435 & 43 552 \\
+exact & 7 890 & 169 435 & 48 436 \\
+intopt & 33 471 & 1 193 363 & 11 540 \\
+int & 94 656 & 2 209 935 & 11 592 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 15 Tokens 8 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 16 171 & 396 625 & 89 620 \\
+exact & 19 296 & 396 625 & 99 476 \\
+intopt & 89 288 & 2 791 621 & 11 540 \\
+int & 278 314 & 5 170 617 & 11 520 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 924 & 20 189 & 15 656 \\
+exact & 1 114 & 20 189 & 15 688 \\
+intopt & 5 390 & 143 413 & 11 492 \\
+int & 15 459 & 264 427 & 11 920 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 30 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 1 400 & 23 833 & 16 444 \\
+exact & 1 722 & 23 833 & 16 720 \\
+intopt & 6 638 & 167 251 & 11 540 \\
+int & 18 819 & 310 233 & 11 508 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 40 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 1 788 & 24 467 & 17 052 \\
+exact & 2 113 & 24 467 & 17 140 \\
+intopt & 7 269 & 172 417 & 11 616 \\
+int & 22 506 & 319 207 & 11 940 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 50 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
+\begin{tabular}{l r r r}
+approx & 2 124 & 26 959 & 17 928 \\
+exact & 2 824 & 26 959 & 17 864 \\
+intopt & 8 294 & 189 809 & 11 620 \\
+int & 25 228 & 351 485 & 11 492 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 2 Maxtotalcost 7 Steps 7 \\
+\begin{tabular}{l r r r}
+approx & 4 454 & 93 227 & 31 260 \\
+exact & 3 787 & 93 227 & 30 472 \\
+intopt & 29 841 & 755 629 & 11 588 \\
+int & 75 422 & 1 407 969 & 11 792 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 4 Maxtotalcost 21 Steps 7 \\
+\begin{tabular}{l r r r}
+approx & 4 360 & 93 227 & 30 980 \\
+exact & 5 754 & 93 227 & 32 216 \\
+intopt & 32 078 & 755 629 & 11 576 \\
+int & 120 871 & 1 408 223 & 11 872 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 6 Maxtotalcost 35 Steps 7 \\
+\begin{tabular}{l r r r}
+approx & 4 433 & 93 227 & 30 984 \\
+exact & 8 017 & 93 227 & 33 920 \\
+intopt & 34 375 & 755 629 & 11 520 \\
+int & 162 428 & 1 408 225 & 11 560 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 8 Maxtotalcost 49 Steps 7 \\
+\begin{tabular}{l r r r}
+approx & 4 761 & 93 227 & 30 980 \\
+exact & 11 252 & 93 227 & 35 356 \\
+intopt & 34 747 & 755 629 & 11 584 \\
+int & 201 479 & 1 408 225 & 11 544 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 15 Maxtotalcost 119 Steps 7 \\
+\begin{tabular}{l r r r}
+approx & 4 996 & 93 227 & 31 076 \\
+exact & 19 604 & 93 227 & 36 600 \\
+intopt & 38 510 & 755 629 & 11 572 \\
+int & 366 591 & 1 408 225 & 11 888 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 4 Maxtotalcost 21 Steps 7 \\
+\begin{tabular}{l r r r}
+approx & 4 694 & 93 227 & 31 236 \\
+exact & 5 594 & 93 227 & 32 472 \\
+intopt & 33 072 & 755 629 & 11 524 \\
+int & 122 911 & 1 408 223 & 11 940 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 4 Maxtotalcost 30 Steps 8 \\
+\begin{tabular}{l r r r}
+approx & 21 419 & 431 051 & 108 652 \\
+exact & 25 822 & 431 051 & 113 684 \\
+intopt & 178 268 & 3 924 361 & 11 492 \\
+int & 754 456 & 7 372 777 & 11 864 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 4 Maxtotalcost 36 Steps 9 \\
+\begin{tabular}{l r r r}
+approx & 101 929 & 1 992 011 & 490 820 \\
+exact & 123 114 & 1 992 011 & 514 332 \\
+intopt & 996 341 & 20 128 261 & 11 572 \\
+int & 4 543 939 & 38 056 369 & 11 848 \\
+\end{tabular}
+\end{table}
+
+\begin{table}
+States 20 Tokens 5 Maxcost 4 Maxtotalcost 42 Steps 10 \\
+\begin{tabular}{l r r r}
+approx & 482 644 & 9 207 489 & 2 371 316 \\
+exact & 566 024 & 9 207 489 & 2 479 084 \\
+intopt & 5 383 065 & 102 243 101 & 11 532 \\
+int & timeout \\
+\end{tabular}
+\end{table}
+In this table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be equivalent to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is equal to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$.
 \section{Related Work}
 \subsection{Implementation of bit-vector variables in a CP solver}
 \subsection{A propagator design framework for constraints over sequences}
@@ -216,11 +391,13 @@ This is very interesting. In the first test the exact version of IntPair is the 
 \section{Conclusions and future work}
 
 \subsection{Rewrite the implementation in such a way that it may be accepted in a new Gecode release}
-All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standard.
+All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays.
+
 \subsection{Test different implementations with different domain representations}
+In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain.
+
 \subsection{Extend the tuples to arbitrary dimensions and not just pairs}
 This would require a complete rewrite of the variable implementation.
-\subsection{Extend the tuples to floats}
 
 \section{Git repository}
 \url{http://github.com/klutt/gecode-tuples}
