@@ -383,13 +383,13 @@ intopt & 5 383 065 & 102 243 101 & 11 532 \\
 int & timeout \\
 \end{tabular}
 \end{table}
-In this table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be equivalent to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is equal to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$.
+In table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be equivalent to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is equal to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$.
 \section{Related Work}
 \subsection{Implementation of bit-vector variables in a CP solver}
 \subsection{A propagator design framework for constraints over sequences}
 
 \section{Conclusions and future work}
-
+The tests shows that tuples show potential. Both of them perform better than the integer variant in both number of nodes and total execution time. The only flaw with this experiment is that the integer solution may not be optimized enough. There is still some room for further improvement, like implementing back propagation. But the integer variant only has one unoptimized part, which is the propagator. The IntPair variants have two. Both the propagator and the variable implementation is far from optimized. Furthermore, even if the integer variant may have potential for further optimization, it does have some of it and IntPair does not. 
 \subsection{Rewrite the implementation in such a way that it may be accepted in a new Gecode release}
 All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays.
 
