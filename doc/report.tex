@@ -8,6 +8,7 @@
 \usepackage{algpseudocode}
 \usepackage{listings}
 \usepackage{hyperref}
+\usepackage{courier}
 
 \newcommand{\AnyCond}[1]{\text{Any}(#1)}
 \newcommand{\BoundedCond}[1]{\text{Bounded}(#1)}
@@ -91,7 +92,6 @@ If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constra
 The main benefit of a tuple is the possibility to link variables together. The most obvious case is when dealing with coordinates since a coordinate by definition is a tuple, but it can be generalized to any case where it is interesting to see if a combination of two values are part of a solution.
 
 \newpage
-\section{Tuple Variables}
 
 \subsection{Creating a New Variable in Gecode}
 \subsubsection{Specification File}
@@ -114,8 +114,7 @@ Name:        VAL=ASSIGNED
 ScheduledBy: VAL
 [End]
 \end{lstlisting}
-
-There are three different sections in the file. The specification file must start with the [General] section and end with [End]. There are also sections for modification events and propagation conditions. The specification file is used by a configuration script to generate base classes.
+There are three different sections in the file. The specification file must start with the [General] section and end with [End]. There are also sections for modification events and propagation conditions. The specification file is used by a configuration script to generate base class, from which the variable implementation class will inherit.
 
 The [General] section is trivial. This is where the name and namespace of the variable are specified. Both name and namespace are arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
 
@@ -138,8 +137,8 @@ A propagator implements constraints and prunes variables. They interact with the
 \begin{itemize}
 \item{ES\_FAILED} - There are no values in the domains that satisfies the constraint. 
 \item{ES\_FIX} - The propagator is at a fixpoint. It is impossible for the propagator to prune more values before the domain has changed for any of the variables the propagator depends on, by either a brancher or another propagator.
-\item{ES\_NOFIX} - The propagator may be at a fixpoint, but it is not guaranteed. Running it once more may or may not prune some values. Unless it is at a fixpoint for sure, this should be used.
-\item{ES\_SUBSUMED} - The propagator is done. Regardless of any changes made to the variable this particular propagator will not be able to do anything more.
+\item{ES\_NOFIX} - The propagator may be at a fixpoint, but it is not guaranteed. Running it once more may or may not prune some values. 
+\item{ES\_SUBSUMED} - The propagator is done. Regardless of any changes made to the variables this particular propagator will not be able to do anything more.
 \end{itemize}
 The propagator must implement ES\_FAILED and at least one of the others. ES\_NOFIX is safe to return in the sense that it does not promise anything. Furthermore, the propagator needs the following methods:
 \begin{itemize}
@@ -166,20 +165,22 @@ A brancher must implement the following methods:
 \item{ngl}
 \end{itemize}
 
-\subsection{Restrictions}
-To keep things simple only two-dimensional integer tuples are considered, so called Pairs.
+\section{Body}
+To keep things simple only two-dimensional integer tuples are considered, so called Pairs. The specification file is kept almost as minimal as described in the introduction. None of the propagators utilizes the boundaries anyway, and there is only one propagator working for each execution. The only thing added to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, and the domains are stored as vectors from the standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called dispose. This method should explicitly call \texttt{vector::$\sim$vector()}.
 
 \subsection{Implementation of Exact IntPair}
-The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain.
+The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain. The domain is stored as \texttt{std::vector<struct \{int x, int y\}>}. 
 
 \subsection{Implementation of Approximate IntPair}
-This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. The benefit is vastly less use of memory, but the drawback is that it can't be pruned as efficient as the exact version. 
+This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. The benefit is less use of memory and possibly faster calculations for some problems, but the drawback is that it can't be pruned as efficient as the exact version because it can only achieve bounds consistency. The domain is stored as \texttt{std::vector<struct\{int x, int y\_low, int y\_high\}>}
 
 \subsection{Correctness verification}
-The correctness is verified in several steps. For all problems an assertion is made to ensure that the solution printed actually is a solution before the solution is printed. 
+The correctness is verified in several steps. For all problems an \texttt{assert} is used to ensure that the solution printed actually is a solution before the solution is printed. This ensures that no false solutions occur. There are a number of trivial tests in \texttt{testsrc/} with pre-calculated number of solutions. If the number of solutions are correct and all solutions fullfill the requirements the algorithms works correctly.
+
+For bigger problems it is very hard to pre-calculate the number of solutions. Instead the tests relies on probability. The two IntPairs and one integer implementation are compared to ensure that they put out the same number of solutions, and the same solutions. It is very unlikely that they all are wrong in the exactly same way. These tests are found in \texttt{tripletestsrc/} and \texttt{multisteptestsrc/}
 
 \subsection{Performance Test}
-To test the performance the same problem is solved in three different ways. Two of them is IntPair, one exact and one with one dimension approximated. The last one is solved with the integer variable that comes with Gecode, and is just for reference. The problem is a DFA with costs. The executables accepts six arguments: 
+To test the performance the same problem is solved in three different ways. Two of them is IntPair, one exact and one with one dimension approximated. The last one is solved with the integer variable that comes with Gecode, and is just for reference. The purpose of this thesis is to show that tuples can be very useful. For that reason the reference propagator have been optimized, while the Pairs have been left with a very naive implementation. The problem is a DFA with costs. The executables accepts six arguments: 
 \begin{itemize}
 \item{seed} - The seed for the random generator to generate the same DFA for all executables.
 \item{states} - Number of states.
@@ -188,31 +189,6 @@ To test the performance the same problem is solved in three different ways. Two 
 \item{max cost} - Maximum cumulative cost for the variables.
 \item{steps} - Number of steps in the DFA.
 \end{itemize}
-\subsubsection{First Initial Performance Test}
-An initial naive test with states=10, tokens=4, cost=3, max cost=10, steps=10 gave the following result:
-\newline
-\newline
-\begin{tabular}{l r r}
-int & 1m15.252s & 1 161 925 nodes\\
-approx & 2m16.260s & 1 932 309 nodes\\ 
-exact & 0m14.474s & 69 715 nodes \\
-\end{tabular}
-\newline
-\newline
-Another test with states=15, tokens=2, cost=20, max cost=200, steps=13 gave:
-\newline
-\newline
-\begin{tabular}{l r r}
-int & 0m53.991s &  171 357 nodes\\
-approx & 0m7.351s & 108 077 nodes\\ 
-exact & 0m40.735s & 8 157 nodes\\
-\end{tabular}
-\newline
-\newline
-This is very interesting. In the first test the exact version of IntPair is the clear winner, and in the second test it is the approximate version that wins. The difference is definitely significant with 14 vs 75 and 7 vs 54 seconds. What makes this even more interesting is that while the built in IntVar is highly optimised, both implementations of IntPair is the opposite. The whole variable implementation with modification events and the brancher uses poor algorithms and are just enough to get the tests to compile and run. The only code written for the builtin IntVar test is the propagator, and even that one is better written than the propagators for IntPair. While the IntPair propagators are very naive, the Int propagator uses optimisations like preallocating space for the vectors and uses binary search instead of linear search. The reason for this is to show that even with a very naive and inefficient implementation of a tuple variable, it can still be much better. The results are undoubtedly a good indication for that tuples have potential, and not a consequence of more efficient code. In the repository the commit where these tests were performed is marked with the tag FPT.
-
-\subsection{A More Rigorous Performance Test}
-For this performance test some changes have been made. The integer propagator has been optimised by replacing some of the vectors with the iterators that comes with Gecode. Furthermore, the branching is different. Now all executables branches on the token first, instead of the states. The columns are name, time in ms, number of nodes and memory usage in kB.
 
 \begin{table}
 States 15 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
@@ -389,7 +365,8 @@ In table we can see advantages for IntPair. In all tests it wins over the regula
 \subsection{A propagator design framework for constraints over sequences}
 
 \section{Conclusions and future work}
-The tests shows that tuples show potential. Both of them perform better than the integer variant in both number of nodes and total execution time. The only flaw with this experiment is that the integer solution may not be optimized enough. There is still some room for further improvement, like implementing back propagation. But the integer variant only has one unoptimized part, which is the propagator. The IntPair variants have two. Both the propagator and the variable implementation is far from optimized. Furthermore, even if the integer variant may have potential for further optimization, it does have some of it and IntPair does not. 
+The tests shows that tuples show potential. Both of them perform better than the integer variant in both number of nodes and total execution time. The only flaw with this experiment is that the integer solution may not be optimized enough. There is still some room for further improvement, like implementing back propagation, but the integer variant only has one unoptimized part, which is the propagator. The IntPair variants have two. Both the propagator and the variable implementation is far from optimized. 
+
 \subsection{Rewrite the implementation in such a way that it may be accepted in a new Gecode release}
 All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays.
 
