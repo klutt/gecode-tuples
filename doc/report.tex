@@ -10,6 +10,17 @@
 \usepackage{hyperref}
 \usepackage{courier}
 
+
+\usepackage{siunitx}
+\sisetup{per=slash, load=abbr}
+
+\usepackage{tikz}
+\usetikzlibrary{calc,angles,positioning,intersections}
+\usepackage{pgfplots}
+\pgfplotsset{width=7cm,compat=1.3}
+
+
+
 \newcommand{\AnyCond}[1]{\text{Any}(#1)}
 \newcommand{\BoundedCond}[1]{\text{Bounded}(#1)}
 \newcommand{\Constraint}[1]{\textsc{#1}}
@@ -189,177 +200,77 @@ To test the performance the same problem is solved in three different ways. Two 
 \item{max cost} - Maximum cumulative cost for the variables.
 \item{steps} - Number of steps in the DFA.
 \end{itemize}
+In all examples, the maximum total cost is set to max total cost per transition times number of steps.
 
-\begin{table}
-States 15 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 822 & 20 879 & 15 332 \\
-exact & 938 & 20 879 & 15 784 \\
-intopt & 4 697 & 146 895 & 11 576 \\
-int & 13 502 & 272 063 & 11 808 \\
-\end{tabular}
-\end{table}
+\begin{figure}
+\begin{tikzpicture} [scale=1.8]
+	\pgfplotsset{
+	    scale only axis,
+		legend style={at={(0,0.8)}, anchor=west},
+	    xmin=5, xmax=8
+	}
+	\begin{axis}[
+	  axis y line*=left,
+	  ymin=0, ymax=3000000,
+	  xlabel=tokens,
+	  ylabel=nodes,	]
+		\addplot[smooth,mark=x,red]
+		  coordinates{
+		    (5,20879)
+		    (6,68523)
+		    (7,169435)
+		    (8,396625)
+		}; \label{IntPair Nodes}
+		\addplot[smooth,mark=x,purple]
+		  coordinates{
+		    (5,146895)
+		    (6,482543)
+		    (7,1193363)
+		    (8,2791621)
+		}; \label{Integer Nodes}
+	\end{axis}
+	
+	\begin{axis}[
+	  axis y line*=right,
+	  axis x line=none,
+	  ymin=0, ymax=120000,
+	  ylabel=runtime (ms) ] 
+		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
+		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+		\addplot[smooth,mark=*,blue]
+		  coordinates{
+		    (5,992)
+		    (6,3491)
+		    (7,9352)
+		    (8,23866)
+		}; \label{IntPairExact Run}
+		
+		\addplot[smooth,mark=*,green]
+		  coordinates{
+		    (5,827)
+		    (6,2767)
+		    (7,8186)
+		    (8,20679)
+		}; \label{IntPairApprox Run}
+		
+		\addplot[smooth,mark=*,black]
+		  coordinates{
+		    (5,4770)
+		    (6,17716)
+		    (7,40416)
+		    (8,116126)
+		}; \label{IntegerRun}
+	
+		\addlegendentry{IntPairExact Run}
+		\addlegendentry{IntPairApprox Run}
+		\addlegendentry{Integer Run}
+	\end{axis}
+\end{tikzpicture}
+\caption{{States=15, Maxcost=3, Steps=6}}
+\end{figure}
 
-\begin{table}
-States 15 Tokens 6 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 2 734 & 68 523 & 24 468 \\
-exact & 3 305 & 68 523 & 26 432 \\
-intopt & 16 092 & 482 543 & 11 536 \\
-int & 48 974 & 893 687 & 11 852 \\
-\end{tabular}
-\end{table}
+In table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. Note that the tuples have a higher memory usage per node. This does not necessarily mean that the total memory usage is higher. 
 
-\begin{table}
-States 15 Tokens 7 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 6 512 & 169 435 & 43 552 \\
-exact & 7 890 & 169 435 & 48 436 \\
-intopt & 33 471 & 1 193 363 & 11 540 \\
-int & 94 656 & 2 209 935 & 11 592 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 15 Tokens 8 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 16 171 & 396 625 & 89 620 \\
-exact & 19 296 & 396 625 & 99 476 \\
-intopt & 89 288 & 2 791 621 & 11 540 \\
-int & 278 314 & 5 170 617 & 11 520 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 924 & 20 189 & 15 656 \\
-exact & 1 114 & 20 189 & 15 688 \\
-intopt & 5 390 & 143 413 & 11 492 \\
-int & 15 459 & 264 427 & 11 920 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 30 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 1 400 & 23 833 & 16 444 \\
-exact & 1 722 & 23 833 & 16 720 \\
-intopt & 6 638 & 167 251 & 11 540 \\
-int & 18 819 & 310 233 & 11 508 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 40 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 1 788 & 24 467 & 17 052 \\
-exact & 2 113 & 24 467 & 17 140 \\
-intopt & 7 269 & 172 417 & 11 616 \\
-int & 22 506 & 319 207 & 11 940 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 50 Tokens 5 Maxcost 3 Maxtotalcost 12 Steps 6 \\
-\begin{tabular}{l r r r}
-approx & 2 124 & 26 959 & 17 928 \\
-exact & 2 824 & 26 959 & 17 864 \\
-intopt & 8 294 & 189 809 & 11 620 \\
-int & 25 228 & 351 485 & 11 492 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 2 Maxtotalcost 7 Steps 7 \\
-\begin{tabular}{l r r r}
-approx & 4 454 & 93 227 & 31 260 \\
-exact & 3 787 & 93 227 & 30 472 \\
-intopt & 29 841 & 755 629 & 11 588 \\
-int & 75 422 & 1 407 969 & 11 792 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 4 Maxtotalcost 21 Steps 7 \\
-\begin{tabular}{l r r r}
-approx & 4 360 & 93 227 & 30 980 \\
-exact & 5 754 & 93 227 & 32 216 \\
-intopt & 32 078 & 755 629 & 11 576 \\
-int & 120 871 & 1 408 223 & 11 872 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 6 Maxtotalcost 35 Steps 7 \\
-\begin{tabular}{l r r r}
-approx & 4 433 & 93 227 & 30 984 \\
-exact & 8 017 & 93 227 & 33 920 \\
-intopt & 34 375 & 755 629 & 11 520 \\
-int & 162 428 & 1 408 225 & 11 560 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 8 Maxtotalcost 49 Steps 7 \\
-\begin{tabular}{l r r r}
-approx & 4 761 & 93 227 & 30 980 \\
-exact & 11 252 & 93 227 & 35 356 \\
-intopt & 34 747 & 755 629 & 11 584 \\
-int & 201 479 & 1 408 225 & 11 544 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 15 Maxtotalcost 119 Steps 7 \\
-\begin{tabular}{l r r r}
-approx & 4 996 & 93 227 & 31 076 \\
-exact & 19 604 & 93 227 & 36 600 \\
-intopt & 38 510 & 755 629 & 11 572 \\
-int & 366 591 & 1 408 225 & 11 888 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 4 Maxtotalcost 21 Steps 7 \\
-\begin{tabular}{l r r r}
-approx & 4 694 & 93 227 & 31 236 \\
-exact & 5 594 & 93 227 & 32 472 \\
-intopt & 33 072 & 755 629 & 11 524 \\
-int & 122 911 & 1 408 223 & 11 940 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 4 Maxtotalcost 30 Steps 8 \\
-\begin{tabular}{l r r r}
-approx & 21 419 & 431 051 & 108 652 \\
-exact & 25 822 & 431 051 & 113 684 \\
-intopt & 178 268 & 3 924 361 & 11 492 \\
-int & 754 456 & 7 372 777 & 11 864 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 4 Maxtotalcost 36 Steps 9 \\
-\begin{tabular}{l r r r}
-approx & 101 929 & 1 992 011 & 490 820 \\
-exact & 123 114 & 1 992 011 & 514 332 \\
-intopt & 996 341 & 20 128 261 & 11 572 \\
-int & 4 543 939 & 38 056 369 & 11 848 \\
-\end{tabular}
-\end{table}
-
-\begin{table}
-States 20 Tokens 5 Maxcost 4 Maxtotalcost 42 Steps 10 \\
-\begin{tabular}{l r r r}
-approx & 482 644 & 9 207 489 & 2 371 316 \\
-exact & 566 024 & 9 207 489 & 2 479 084 \\
-intopt & 5 383 065 & 102 243 101 & 11 532 \\
-int & timeout \\
-\end{tabular}
-\end{table}
-In table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be equivalent to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is equal to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$.
 \section{Related Work}
 \subsection{Implementation of bit-vector variables in a CP solver}
 \subsection{A propagator design framework for constraints over sequences}
