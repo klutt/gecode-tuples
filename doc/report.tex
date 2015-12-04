@@ -206,7 +206,7 @@ In all examples, the maximum total cost is set to max total cost per transition 
 \begin{tikzpicture} [scale=1.8]
 	\pgfplotsset{
 	    scale only axis,
-		legend style={at={(0,0.8)}, anchor=west},
+		legend style={at={(0,0.8)}, anchor=west, font=\tiny},
 	    xmin=5, xmax=8
 	}
 	\begin{axis}[
@@ -220,14 +220,14 @@ In all examples, the maximum total cost is set to max total cost per transition 
 		    (6,68523)
 		    (7,169435)
 		    (8,396625)
-		}; \label{IntPair Nodes}
-		\addplot[smooth,mark=x,purple]
+		}; \label{pn_plot} \addlegendentry{IntPair Nodes}
+		\addplot[smooth,mark=x,blue]
 		  coordinates{
 		    (5,146895)
 		    (6,482543)
 		    (7,1193363)
 		    (8,2791621)
-		}; \label{Integer Nodes}
+		}; \label{in_plot} \addlegendentry{Integer Nodes}
 	\end{axis}
 	
 	\begin{axis}[
@@ -235,8 +235,10 @@ In all examples, the maximum total cost is set to max total cost per transition 
 	  axis x line=none,
 	  ymin=0, ymax=120000,
 	  ylabel=runtime (ms) ] 
-		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
-		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=pn_plot}\addlegendentry{IntPair Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=in_plot}\addlegendentry{Integer Nodes}
+	  
+	  
 		\addplot[smooth,mark=*,blue]
 		  coordinates{
 		    (5,992)
@@ -273,7 +275,7 @@ In all examples, the maximum total cost is set to max total cost per transition 
 \begin{tikzpicture} [scale=1.8]
 	\pgfplotsset{
 	    scale only axis,
-		legend style={at={(0,0.8)}, anchor=west},
+		legend style={at={(0,0.4)}, anchor=west, font=\tiny},
 	    xmin=20, xmax=50
 	}
 	\begin{axis}[
@@ -287,14 +289,14 @@ In all examples, the maximum total cost is set to max total cost per transition 
 		  (30,23833)
 		  (40,24467)
 		  (50,26959)
-		}; \label{IntPair Nodes}
-		\addplot[smooth,mark=x,purple]
+		}; \label{pn_plot} \addlegendentry{IntPair Nodes}
+		\addplot[smooth,mark=x,blue]
 		  coordinates{
 		  (20,143413)
 		  (30,167251)
 		  (40,172417)
 		  (50,189809)
-		}; \label{Integer Nodes}
+		}; \label{in_plot} \addlegendentry{Integer Nodes}
 	\end{axis}
 	
 	\begin{axis}[
@@ -302,8 +304,8 @@ In all examples, the maximum total cost is set to max total cost per transition 
 	  axis x line=none,
 	  ymin=0, ymax=11000,
 	  ylabel=runtime (ms) ] 
-		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
-		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=pn_plot}\addlegendentry{IntPair Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=in_plot}\addlegendentry{Integer Nodes}
 		\addplot[smooth,mark=*,blue]
 		  coordinates{
 		  (20,1541)
@@ -340,7 +342,7 @@ In all examples, the maximum total cost is set to max total cost per transition 
 \begin{tikzpicture} [scale=1.8]
 	\pgfplotsset{
 	    scale only axis,
-		legend style={at={(0,0.8)}, anchor=west},
+		legend style={at={(0,0.55)}, anchor=west, font=\tiny},
 	    xmin=2, xmax=15
 	}
 	\begin{axis}[
@@ -355,24 +357,24 @@ In all examples, the maximum total cost is set to max total cost per transition 
 		  (6,93227)
 		  (8,93227)
 		  (15,93227)
-		}; \label{IntPair Nodes}
-		\addplot[smooth,mark=x,purple]
+		}; \label{pn_plot} \addlegendentry{IntPair Nodes}
+		\addplot[smooth,mark=x,blue]
 		  coordinates{
 		  (2,755629)
 		  (4,755629)
 		  (6,755629)
 		  (8,755629)
 		  (15,755629)
-		}; \label{Integer Nodes}
+		}; \label{in_plot} \addlegendentry{Integer Nodes}
 	\end{axis}
 	
 	\begin{axis}[
 	  axis y line*=right,
 	  axis x line=none,
-	  ymin=0, ymax=70000,
+	  ymin=0, ymax=47000,
 	  ylabel=runtime (ms) ] 
-		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
-		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=pn_plot}\addlegendentry{IntPair Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=in_plot}\addlegendentry{Integer Nodes}
 		\addplot[smooth,mark=*,blue]
 		  coordinates{
 		  (2,4669)
@@ -412,7 +414,7 @@ In all examples, the maximum total cost is set to max total cost per transition 
 \begin{tikzpicture} [scale=1.8]
 	\pgfplotsset{
 	    scale only axis,
-		legend style={at={(0,0.8)}, anchor=west},
+		legend style={at={(0,0.8)}, anchor=west, font=\tiny},
 	    xmin=7, xmax=10
 	}
 	\begin{axis}[
@@ -426,14 +428,14 @@ In all examples, the maximum total cost is set to max total cost per transition 
 		  (8,431051)
 		  (9,1992011)
 		  (10,9207489)
-		}; \label{IntPair Nodes}
-		\addplot[smooth,mark=x,purple]
+		}; \label{pn_plot} \addlegendentry{IntPair Nodes}
+		\addplot[smooth,mark=x,blue]
 		  coordinates{
 		  (7,755629)
 		  (8,3924361)
 		  (9,20128261)
 		  (10,102243101)
-		}; \label{Integer Nodes}
+		}; \label{in_plot} \addlegendentry{Integer Nodes}
 	\end{axis}
 	
 	\begin{axis}[
@@ -441,8 +443,8 @@ In all examples, the maximum total cost is set to max total cost per transition 
 	  axis x line=none,
 	  ymin=0, ymax=8000000,
 	  ylabel=runtime (ms) ] 
-		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
-		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=pn_plot}\addlegendentry{IntPair Nodes}
+	  				\addlegendimage{/pgfplots/refstyle=in_plot}\addlegendentry{Integer Nodes}
 		\addplot[smooth,mark=*,blue]
 		  coordinates{
 		  (7,6535)
