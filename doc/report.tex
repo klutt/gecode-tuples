@@ -269,7 +269,214 @@ In all examples, the maximum total cost is set to max total cost per transition 
 \caption{{States=15, Maxcost=3, Steps=6}}
 \end{figure}
 
-In table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. Note that the tuples have a higher memory usage per node. This does not necessarily mean that the total memory usage is higher. 
+\begin{figure}
+\begin{tikzpicture} [scale=1.8]
+	\pgfplotsset{
+	    scale only axis,
+		legend style={at={(0,0.8)}, anchor=west},
+	    xmin=20, xmax=50
+	}
+	\begin{axis}[
+	  axis y line*=left,
+	  ymin=0, ymax=200000,
+	  xlabel=states,
+	  ylabel=nodes,	]
+		\addplot[smooth,mark=x,red]
+		  coordinates{
+		  (20,20189)
+		  (30,23833)
+		  (40,24467)
+		  (50,26959)
+		}; \label{IntPair Nodes}
+		\addplot[smooth,mark=x,purple]
+		  coordinates{
+		  (20,143413)
+		  (30,167251)
+		  (40,172417)
+		  (50,189809)
+		}; \label{Integer Nodes}
+	\end{axis}
+	
+	\begin{axis}[
+	  axis y line*=right,
+	  axis x line=none,
+	  ymin=0, ymax=11000,
+	  ylabel=runtime (ms) ] 
+		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
+		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+		\addplot[smooth,mark=*,blue]
+		  coordinates{
+		  (20,1541)
+		  (30,2217)
+		  (40,2593)
+		  (50,3938)
+		}; \label{IntPairExact Run}
+		
+		\addplot[smooth,mark=*,green]
+		  coordinates{
+		  (20,1303)
+		  (30,1540)
+		  (40,2238)
+		  (50,2653)
+		}; \label{IntPairApprox Run}
+		
+		\addplot[smooth,mark=*,black]
+		  coordinates{
+		  (20,6148)
+		  (30,7530)
+		  (40,8447)
+		  (50,10086)
+		}; \label{IntegerRun}
+	
+		\addlegendentry{IntPairExact Run}
+		\addlegendentry{IntPairApprox Run}
+		\addlegendentry{Integer Run}
+	\end{axis}
+\end{tikzpicture}
+\caption{{Token=5, Maxcost=3, Steps=6}}
+\end{figure}
+
+\begin{figure}
+\begin{tikzpicture} [scale=1.8]
+	\pgfplotsset{
+	    scale only axis,
+		legend style={at={(0,0.8)}, anchor=west},
+	    xmin=2, xmax=15
+	}
+	\begin{axis}[
+	  axis y line*=left,
+	  ymin=0, ymax=800000,
+	  xlabel=max cost,
+	  ylabel=nodes,	]
+		\addplot[smooth,mark=x,red]
+		  coordinates{
+		  (2,93227)
+		  (4,93227)
+		  (6,93227)
+		  (8,93227)
+		  (15,93227)
+		}; \label{IntPair Nodes}
+		\addplot[smooth,mark=x,purple]
+		  coordinates{
+		  (2,755629)
+		  (4,755629)
+		  (6,755629)
+		  (8,755629)
+		  (15,755629)
+		}; \label{Integer Nodes}
+	\end{axis}
+	
+	\begin{axis}[
+	  axis y line*=right,
+	  axis x line=none,
+	  ymin=0, ymax=70000,
+	  ylabel=runtime (ms) ] 
+		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
+		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+		\addplot[smooth,mark=*,blue]
+		  coordinates{
+		  (2,4669)
+		  (4,6994)
+		  (6,9594)
+		  (8,16423)
+		  (15,22621)
+		}; \label{IntPairExact Run}
+		
+		\addplot[smooth,mark=*,green]
+		  coordinates{
+		  (2,5423)
+		  (4,5143)
+		  (6,5069)
+		  (8,5862)
+		  (15,5452)
+		}; \label{IntPairApprox Run}
+		
+		\addplot[smooth,mark=*,black]
+		  coordinates{
+		  (2,33288)
+		  (4,38731)
+		  (6,41307)
+		  (8,42426)
+		  (15,44868)
+		}; \label{IntegerRun}
+	
+		\addlegendentry{IntPairExact Run}
+		\addlegendentry{IntPairApprox Run}
+		\addlegendentry{Integer Run}
+	\end{axis}
+\end{tikzpicture}
+\caption{{Steps=20, Tokens=5, Steps=7}}
+\end{figure}
+
+\begin{figure}
+\begin{tikzpicture} [scale=1.8]
+	\pgfplotsset{
+	    scale only axis,
+		legend style={at={(0,0.8)}, anchor=west},
+	    xmin=7, xmax=10
+	}
+	\begin{axis}[
+	  axis y line*=left,
+	  ymin=0, ymax=120000000,
+	  xlabel=steps,
+	  ylabel=nodes,	]
+		\addplot[smooth,mark=x,red]
+		  coordinates{
+		  (7,93227)
+		  (8,431051)
+		  (9,1992011)
+		  (10,9207489)
+		}; \label{IntPair Nodes}
+		\addplot[smooth,mark=x,purple]
+		  coordinates{
+		  (7,755629)
+		  (8,3924361)
+		  (9,20128261)
+		  (10,102243101)
+		}; \label{Integer Nodes}
+	\end{axis}
+	
+	\begin{axis}[
+	  axis y line*=right,
+	  axis x line=none,
+	  ymin=0, ymax=8000000,
+	  ylabel=runtime (ms) ] 
+		\addlegendimage{/pgfplots/refstyle=IntPair Nodes}\addlegendentry{IntPair Nodes}
+		\addlegendimage{/pgfplots/refstyle=Integer Nodes}\addlegendentry{Integer Nodes}
+		\addplot[smooth,mark=*,blue]
+		  coordinates{
+		  (7,6535)
+		  (8,32150)
+		  (9,137846)
+		  (10,696655)
+		}; \label{IntPairExact Run}
+		
+		\addplot[smooth,mark=*,green]
+		  coordinates{
+		  (7,5582)
+		  (8,24569)
+		  (9,116613)
+		  (10,540708)
+		}; \label{IntPairApprox Run}
+		
+		\addplot[smooth,mark=*,black]
+		  coordinates{
+		  (7,37169)
+		  (8,207591)
+		  (9,1204695)
+		  (10,6076224)
+		}; \label{IntegerRun}
+	
+		\addlegendentry{IntPairExact Run}
+		\addlegendentry{IntPairApprox Run}
+		\addlegendentry{Integer Run}
+	\end{axis}
+\end{tikzpicture}
+\caption{{States=20, Tokens=5, Maxcost=4}}
+\end{figure}
+
+
+In table we can see advantages for IntPair. In all tests it wins over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer nodes, while the pair variant uses two pairs and one integer. The size of a node for the integer case should roughly be proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. Note that the tuples have a higher memory usage per node and that this does not necessarily mean that the total memory usage is higher. 
 
 \section{Related Work}
 \subsection{Implementation of bit-vector variables in a CP solver}
