@@ -47,3 +47,7 @@ doc/*.toc
 external/gecodelib
 external/gecode-4.3.2/*
 
+src/performance/*
+src/multisteptest/*
+src/tripletest/*
+src/test/*
