@@ -1,6 +1,7 @@
 [General]
 Name:		IntPairApprox
 Namespace:   	MPG::IntPair
+Dispose:	true
 
 [ModEvent]
 Name:		FAILED=FAILED

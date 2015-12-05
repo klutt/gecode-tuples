@@ -69,6 +69,10 @@ public:
   }
 };
 
+
+int main(int argc, char** argv) {
+  Gecode::VarImpDisposer<IntPairApproxVarImp> disposer;
+
 #include "_main.cpp"
 /*
 int main(int argc, char* argv[]) {

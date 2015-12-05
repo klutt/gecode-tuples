@@ -1,17 +1,17 @@
 #!/bin/bash
 
-PARAMS=(
-    "10 3 3 3 3"
-    
-    "15 5 2 7 7"
-    "15 7 2 7 7"
-    "15 9 2 7 7"
-    "15 11 2 7 7"
+cp run.sh ../performancesrc/
 
-    "20 5 2 7 7"
-    "30 5 2 7 7"
-    "40 5 2 7 7"
-    "50 5 2 7 7"
+PARAMS=(
+    "15 5 3 12 6"
+    "15 6 3 12 6"
+    "15 7 3 12 6"
+    "15 8 3 12 6"
+
+    "20 5 3 12 6"
+    "30 5 3 12 6"
+    "40 5 3 12 6"
+    "50 5 3 12 6"
 
     "20 5 2 7 7"
     "20 5 4 21 7"
@@ -20,17 +20,15 @@ PARAMS=(
     "20 5 15 119 7"
 
     "20 5 4 21 7"
-    "20 5 4 30 10"
-    "20 5 4 36 12"
-    "20 5 4 42 14"
-    "20 5 4 60 20"
+    "20 5 4 30 8"
+    "20 5 4 36 9"
+    "20 5 4 42 10"
 )
 
 EXECS=(
-    int
-    intopt
     exact
     approx
+    intopt
 )
 
 for DATA in "${PARAMS[@]}"
@@ -46,12 +44,12 @@ do
     for EXEC in "${EXECS[@]}"
     do
 	OUTPUT=$(/usr/bin/time -v ./$EXEC d d 1 $DATA 2>&1)
-	RUNTIME=$(echo $OUTPUT | cut -f7 -d ' ')
+	RUNTIME=$(echo $OUTPUT | cut -f8 -d ' ' | sed 's/(//g')
 	SOLUTIONS[$SOL]=$(echo $OUTPUT | cut -f11 -d ' ')
 	let SOL=SOL+1
 	NODES=$(echo $OUTPUT | cut -f15 -d ' ')
-	MEM=$(echo $OUTPUT | cut -f87 -d ' ')
-	echo $EXEC \& $RUNTIME \& $NODES \& $MEM \\\\
+#	MEM=$(echo $OUTPUT | cut -f87 -d ' ')
+	echo $EXEC $RUNTIME $NODES
     done
 
     echo

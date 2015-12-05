@@ -113,6 +113,12 @@ public:
         IntPairVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
     }
 
+
+  size_t dispose(Gecode::Space& home) {
+    domain.~vector();
+    return sizeof(*this);
+  }
+  
     void cancel(Space& home, Propagator& prop, PropCond pc) {
         IntPairVarImpBase::cancel(home, prop, pc, assigned());
     }

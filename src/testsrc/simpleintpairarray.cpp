@@ -46,6 +46,7 @@ public:
 int main(int argc, char* argv[]) {
     SizeOptions opt("Queens");
     opt.solutions(0); // Calculate all solutions
+    Gecode::VarImpDisposer<IntPairVarImp> disposer;
     noSolutions=0;
     
     const int expected_no_solutions = 4;

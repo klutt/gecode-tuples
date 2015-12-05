@@ -74,6 +74,8 @@ public:
   }
 };
 
+int main(int argc, char ** argv) {
+
 #include "_main.cpp"
 
 /*

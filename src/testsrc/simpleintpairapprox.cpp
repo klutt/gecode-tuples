@@ -52,6 +52,7 @@ public:
 
 int main(int argc, char* argv[]) {
     SizeOptions opt("Queens");
+    Gecode::VarImpDisposer<IntPairApproxVarImp> disposer;
     opt.solutions(0); // Calculate all solutions
     noSolutions=0;
     //    opt.mode(Gecode::SM_GIST);    

@@ -73,6 +73,12 @@ public:
 };
 
 
+
+
+int main(int argc, char **argv) {
+  Gecode::VarImpDisposer<IntPairVarImp> disposer;
+
+
 #include "_main.cpp"
 /*
 int main(int argc, char* argv[]) {

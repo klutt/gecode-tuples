@@ -147,6 +147,12 @@ public:
         IntPairApproxVarImpBase::subscribe(home, prop, pc, assigned(), schedule);
     }
 
+  size_t dispose(Gecode::Space& home) {
+    domain.~vector();
+    return sizeof(*this);
+  }
+  
+  
     void cancel(Gecode::Space& home, Gecode::Propagator& prop, Gecode::PropCond pc) {
         IntPairApproxVarImpBase::cancel(home, prop, pc, assigned());
     }
