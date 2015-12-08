@@ -5,10 +5,12 @@
 \usepackage{rotating}
 \usepackage{tikz} \usetikzlibrary{trees}
 \usepackage{pbox}
-\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{courier}
+
 
 
 \usepackage{siunitx}
@@ -184,6 +186,99 @@ The exact version does not approximate the domain, that is, the implementation i
 
 \subsection{Implementation of Approximate IntPair}
 This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. The benefit is less use of memory and possibly faster calculations for some problems, but the drawback is that it can't be pruned as efficient as the exact version because it can only achieve bounds consistency. The domain is stored as \texttt{std::vector<struct\{int x, int y\_low, int y\_high\}>}
+
+\subsection{Implementation of DFA Propagator}
+This propagator is implemented in three different ways. Two are for IntPair and one is for integer variables as reference. The algorithms are described in pseudo code:
+\begin{algorithm}
+\caption{DFA propagator IntPairExact}
+\begin{algorithmic}[1]
+\Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Token, Statefunction S, Constfunction C}
+\State Pairdomain newPost := $\emptyset$
+\State Pairdomain newPre := $\emptyset$
+\State Intdomain newToken := $\emptyset$
+\ForAll {token in Token}
+	\ForAll {pre in Pre}
+		\State Pair p := (S(pre.state, token), pre.cost+C(pre.cost, token))
+		\If {Post.contain(p)}
+			\State newPost := newPost $\cup$ p
+			\State newPre := newPre $\cup$ pre
+			\State newToken := newToken $\cup$ token 
+		\EndIf
+	\EndFor
+\EndFor
+\State Post := Post $\cap$ newPost
+\State Pre := Pre $\cap$ newPre
+\State Token := Token $\cap$ newToken
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{DFA propagator IntPairApprox}
+\begin{algorithmic}[1]
+\Procedure{Merge}{Pairdomain dom, Pair p}
+\ForAll {d in dom : d.state = p.state} \# There will be max one
+	\State d.high := max(d.high, p.high)
+	\State d.low := min(d.low, p.low)
+\EndFor
+\EndProcedure
+\Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Token, Statefunction S, Constfunction C}
+\State Pairdomain newPost := $\emptyset$
+\State Pairdomain newPre := $\emptyset$
+\State Intdomain newToken := $\emptyset$
+\ForAll {token in Token}
+	\ForAll {pre in Pre}
+		\State Pair p := (S(pre.state, token), pre.low+C(pre.low, token), pre.high+C(pre.high, token))
+		\If {p.state $\neq$ garbage}
+			\State Merge(newPost, p)
+			\State Merge(newPre, pre)
+			\State newToken := newToken $\cup$ token 
+		\EndIf
+	\EndFor
+\EndFor
+\State Post := Post $\cap$ newPost
+\State Pre := Pre $\cap$ newPre
+\State Token := Token $\cap$ newToken
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+\caption{DFA propagator IntVar}
+\begin{algorithmic}[1]
+\Procedure{DFAprop}{IntVar PostState, IntVar PostCost, IntVar PreState, IntVar PreCost, IntVar Token, Statefunction S, Constfunction C}
+\State Intdomain newPostState := $\emptyset$
+\State Intdomain newPreState := $\emptyset$
+\State Intdomain newPostCost := $\emptyset$
+\State Intdomain newPreCost := $\emptyset$
+\State Intdomain newToken := $\emptyset$
+\ForAll {token in Token}
+	\ForAll {preState in PreState}
+		\State int state := S(pre.state, token)
+		\If {PostState.contain(state)}
+			\State newPostState := newPostState $\cup$ state
+			\State newPreState := newPreState $\cup$ pre
+			\State newToken := newToken $\cup$ token 
+			\ForAll {cost in PreCost}
+				\State int postCost := cost + C(preState, token)
+				\If {PostCost.contains(postCost)}
+					\State newPreCost := newPreCost $\cup$ cost
+					\State newPostCost := newPostCost $\cup$ postCost
+				\EndIf
+			\EndFor
+		\EndIf
+	\EndFor
+\EndFor
+\State PostState := PostState $\cap$ newPostState
+\State PreState := PreState $\cap$ newPreState
+\State PostCost := PostCost $\cap$ newPostCost
+\State PreCost := PreCost $\cap$ newPreCost
+\State Token := Token $\cap$ newToken
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
 
 \subsection{Correctness verification}
 The correctness is verified in several steps. For all problems an \texttt{assert} is used to ensure that the solution printed actually is a solution before the solution is printed. This ensures that no false solutions occur. There are a number of trivial tests in \texttt{testsrc/} with pre-calculated number of solutions. If the number of solutions are correct and all solutions fullfill the requirements the algorithms works correctly.
@@ -492,7 +587,7 @@ In table we can see advantages for IntPair. In all tests it wins over the regula
 The tests shows that tuples show potential. Both of them perform better than the integer variant in both number of nodes and total execution time. The only flaw with this experiment is that the integer solution may not be optimized enough. There is still some room for further improvement, like implementing back propagation, but the integer variant only has one unoptimized part, which is the propagator. The IntPair variants have two. Both the propagator and the variable implementation is far from optimized. 
 
 \subsection{Rewrite the implementation in such a way that it may be accepted in a new Gecode release}
-All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays.
+All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays. The brancher has a bug, which manifested itself by making the program producing the same solution several times which should not be possible. This does not matter in this thesis since it is not used.
 
 \subsection{Test different implementations with different domain representations}
 In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain.
