@@ -67,7 +67,7 @@ Constraint programming is a programing paradigm focusing on high performance com
 \end{abstract}
 
 \setcounter{tocdepth}{2}
-\tableofcontents
+%\tableofcontents
 
 \section*{Acknowledgements}
 Thanks to Jean-No\"{e}l Monette and Pierre Flener for being helpful supervisors. \\
@@ -131,7 +131,7 @@ There are three different sections in the file. The specification file must star
 
 The [General] section is trivial. This is where the name and namespace of the variable are specified. Both name and namespace are arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
 
-The [ModEvent] section specifies the modification events. The modification events describes how the variables changes. When a propagator wants to prune the domain for a variable it tells the variable to do that, using the class methods that the variable implementation provides. If no values are pruned, the variable returns the modification event NONE, and if all values are pruned it returns FAILED. When the domain of a variable gets pruned to one ASSIGNED is returned. For all variables, modification events for NONE, FAILED and ASSIGNED are required. More modification events may be added to avoid unnecessary executions of propagators. For example, the modification event BND can be used when only the boundaries of a domain has changed.
+The [ModEvent] section specifies the modification events. The modification events describes how the variables changes. When a propagator wants to prune the domain for a variable it tells the variable to do that, using the class methods that the variable implementation provides. If no values are pruned, the variable returns the modification event NONE, and if all values are pruned it returns FAILED. When the domain of a variable gets pruned to one ASSIGNED is returned. For all variables, modification events for NONE, FAILED and ASSIGNED are required. More modification events may be added to avoid unnecessary executions of propagators. For example, the modification event BND can be used when only the boundaries of a domain has changed. Note that other names than the required ones are arbitrary.
 
 The [PropCond] section describes how the propagators are scheduled, depending on how the variables have changed. For all variables, propagator conditions for NONE and ASSIGNED are required.
 
@@ -178,14 +178,25 @@ A brancher must implement the following methods:
 \item{ngl}
 \end{itemize}
 
-\section{Body}
-To keep things simple only two-dimensional integer tuples are considered, so called Pairs. The specification file is kept almost as minimal as described in the introduction. None of the propagators utilizes the boundaries anyway, and there is only one propagator working for each execution. The only thing added to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, and the domains are stored as vectors from the standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called dispose. This method should explicitly call \texttt{vector::$\sim$vector()}.
+\section{The IntPair Variables}
+To keep things simple only two-dimensional integer tuples are considered, so called Pairs. The specification file is kept almost as minimal as described in the introduction. None of the propagators utilizes the boundaries anyway, and there is only one propagator working for each execution in the performance test. A production ready implementation wouldThe only thing added to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, and the domains are stored as vectors from the standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called dispose. This method should explicitly call \texttt{vector::$\sim$vector()}.
 
-\subsection{Implementation of Exact IntPair}
+\subsection{Implementation of IntPairExact}
 The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain. The domain is stored as \texttt{std::vector<struct \{int x, int y\}>}. 
 
-\subsection{Implementation of Approximate IntPair}
+\paragraph{Modification Events}
+\begin{itemize}
+\item {\textbf{nq(Pair p) - }} Remove p from domain. $\mathcal{O}(n)$ where n is number of elements in domain.
+\end{itemize}
+\subsection{Implementation of IntPairApprox}
 This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. The benefit is less use of memory and possibly faster calculations for some problems, but the drawback is that it can't be pruned as efficient as the exact version because it can only achieve bounds consistency. The domain is stored as \texttt{std::vector<struct\{int x, int y\_low, int y\_high\}>}
+
+\paragraph{Modification Events}
+\begin{itemize}
+\item {\textbf{nq(Pair p) - }} Remove p from domain. $\mathcal{O}(x)$ where x is the number of different x-values in domain.
+\item{\textbf{xeq(Pair p) - }} Remove all values from domain whose y-value is not in the interval $[p.y\_low; p.y\_high]$ iff that values x-value is equal to p.x. $\mathcal{O}(x)$ where x is the number of different x-values in domain.
+\item{\textbf{xeq(vector\textless Pair\textgreater v) - }} Remove all values from domain whose x-value does not exist in v. $\mathcal{O}(xm)$ where x is number of x-values in domain and m is number of elements in v.
+\end{itemize}
 
 \subsection{Implementation of DFA Propagator}
 This propagator is implemented in three different ways. Two are for IntPair and one is for integer variables as reference. The algorithms are described in pseudo code:
@@ -594,9 +605,6 @@ In this thesis there is one exact and one approximate version. The approximation
 
 \subsection{Extend the tuples to arbitrary dimensions and not just pairs}
 This would require a complete rewrite of the variable implementation.
-
-\section{Git repository}
-\url{http://github.com/klutt/gecode-tuples}
 
 \begin{thebibliography}{99}
 \bibitem{Calculus}
