@@ -64,7 +64,7 @@
 \maketitle
 
 \begin{abstract}
-In constraint programming it is vital with efficient pruning to avoid unnecessary searching. This thesis shows that tuple variables can be used to significantly reduce the size of the search tree, which reduces the execution time. The tuple is implemented in c++ for the Gecode library. The problem used to measure performance is finding a path through a deterministic finite automaton with costs for each transition.
+In constraint programming it is vital with efficient pruning to avoid unnecessary searching. This thesis shows that tuple variables can be used to significantly reduce the size of the search tree, which reduces the execution time. The tuple is implemented in C++ for the Gecode library. The problem used to measure performance is finding paths through a deterministic finite automaton with different costs for each transition.
 \end{abstract}
 
 \setcounter{tocdepth}{2}
@@ -76,12 +76,17 @@ Thanks to Joseph Scott for helping me configuring Gecode. \\
 Thanks to Johan Gustafsson for general help with C++. \\
 
 \section{Introduction}
-Intro...
+Almost all constraint programming (CP) problems could be pruned more efficiently if it was possible to remove a combination of values from the domains, rather than removing the values individually. For many of these problems a more efficient pruning would mean faster execution. In this thesis it is shown that a tuple variable can do that, and that it is possible to reach better performance with it.
+To demonstrate this I have implemented two different variants of a tuple. Both of them are restricted to two dimensions. One of them keeps an exact representation of the domain, while the other approximates the second dimension by just storing the boundaries. I wrote propagators for these tuple implementations and a reference propagator to compare performance. Because the main purpose of this thesis is to show that tuples can improve performence I have intentionally avoided to optimise the code that handles the tuples. Even obvious and simple optimisations have been avoided. For the same reason I have optimised the reference propagator as far as I can, and I also asked more experienced CP-programmers for help with that.
+To compare performance I used the tuples to find all valid paths through a deterministic finite automaton (DFA) with costs for each transition. It means that the DFA does not only tell if a string is accepted or not, but also that the total cost is valid. The performance is measured by studying how the execution time and size of the search tree depends on four different parameters: number of states, size of alphabet, maximum cost per transition and number of steps. Number of steps can be interpreted as the size of the string.
+The results confirm that tuples can be used for increasing performance. The tuple which has an approximated domain performs slightly better than the exact version. The parameter that gives the greatest advantage to tuples over regular variables is the number of steps.
+
+
 
 \section{Background}
 \subsection{Constraint Programming}
 
-Constraint programming (CP) is a method to solve problems by modeling the problem with variables and constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. 
+Constraint programming is a method to solve problems by modeling the problem with variables and constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. 
 
 A very typical problem suitable for constraint programming is a sudoku. The most intuitive model is a $9\times9$ matrix of integer variables. The constraints that all variables have a domain of $\{1..9\}$, and that all variables in a row, column and box must be different. For a specific sudoku constraints are added to require specific variables to have predetermined values.
 
@@ -147,12 +152,12 @@ The variable implementation class implements methods for modification of the var
 \subsubsection{Propagators}
 A propagator implements constraints and prunes variables. They interact with the views and have four possible return values.
 \begin{itemize}
-\item{ES\_FAILED} - There are no values in the domains that satisfies the constraint. 
-\item{ES\_FIX} - The propagator is at a fixpoint. It is impossible for the propagator to prune more values before the domain has changed for any of the variables the propagator depends on, by either a brancher or another propagator.
+\item{ES\_FAILED} - There is no combination of values in the domains that satisfies the constraint. 
+\item{ES\_FIX} - The propagator is at a fixpoint. It is impossible for the propagator to prune more values before a domain has changed for any of the variables the propagator depends on, by either a brancher or another propagator.
 \item{ES\_NOFIX} - The propagator may be at a fixpoint, but it is not guaranteed. Running it once more may or may not prune some values. 
 \item{ES\_SUBSUMED} - The propagator is done. Regardless of any changes made to the variables this particular propagator will not be able to do anything more.
 \end{itemize}
-The propagator must implement ES\_FAILED and at least one of the others. ES\_NOFIX is safe to return in the sense that it does not promise anything. Furthermore, the propagator needs the following methods:
+The propagator must implement ES\_FAILED and at least one of the others. ES\_NOFIX is safe to return in the sense that it does not promise anything. If it can't be guaranteed that the propagator has reached a fixpoint, this should be returned. Furthermore, the propagator needs the following methods:
 \begin{itemize}
 \item{post} - The method for posting a constraint, which basically is saying that a certain constraint should be used.
 \item{dispose} - This works as a destructor. The only reason to not have a regular destructor is that destructors in C++ can't take arguments.
@@ -598,11 +603,11 @@ In all examples, the maximum total cost is set to max total cost per transition 
 
 In the graphs we can see advantages for IntPair. In all tests they win over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer variables, while the pair variant uses two pairs and one integer. The size of a node for the integer case should be roughly proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. For two-dimensional tuples with "normal" domain sizes this should not be of any concern. However, higher dimensions could cause trouble. The DFA problem could be modeled with a five-dimensional tuple. For the case in figure 2 with 50 states, 5 tokens, 6 steps and max total cost 18 the size per node would be around 100MB. Note though that the tuples have a higher memory usage per node and that this does not necessarily mean that the total memory usage is higher because the number of nodes shrinks.
 
-For all situations the number of nodes are exactly equal for both IntPairExact and IntPairApprox. This may be a bit surprising. It would be reasonable that the number of nodes were, if ever so slightly, higher for IntPairApprox, since the domain is approximated. The reason is that if a the starting state $s_0$ and the starting cumalative cost $c_0$ is assigned, then everything else follows automatically if we branch on the tokens first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. If we removed some values from the domains of $t_1$, $s_1$ and $c_1$ and above things would have been different. This is also confirmed by the fact that there were no failures during the execution.
+For all situations the number of nodes are exactly equal for both IntPairExact and IntPairApprox. This may be a bit surprising. It would be reasonable that the number of nodes were, if ever so slightly, higher for IntPairApprox, since the domain is approximated. The reason is that if the starting state $s_0$ and the starting cumalative cost $c_0$ is assigned (which they are for a DFA), then everything else follows automatically if we branch on the tokens first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. This is also confirmed by the fact that there were no failures during the execution. If we removed some values from the domains of $t_1$, $s_1$ and $c_1$ and above things would have been different. 
 
 In figure 3 IntPairApprox seems to be almost constant in time. Even though this may seem very good it is not something that shows that tuples work, since the same result probably would be achievable by using an approximate version of integer variables for the cost.
 
-All in all the graphs indicates that tuples can give significantly better performance for certain problems. The only major source of error with this experiment is that the reference propagator may not be optimized enough, but I find that highly unlikely.
+All in all the graphs indicates that tuples can give significantly better performance for certain problems. The only possible source of error with this experiment is that the reference propagator may not be optimized enough, but I find that highly unlikely. After all, the implementation of IntVar has to be assumed to be very optimized, and the reference propagator is much more optimized than the ones for pairs.
 
 \section{Related Work}
 The paper Propagating Regular Counting Constraints (Beldiceanu, Flener, Pearson, Van Hentenryck) describes constraints for a counter-DFA (cDFA). It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The DFA in this thesis is almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting we talk about cost, but it makes no difference in practise. I wanted to do a performance comparasion with that implementaion, but it would be complicated to do that in a fair way, because the constraints are implemented in Prolog, while everything in this thesis is in C++.
@@ -617,16 +622,5 @@ The tests shows that tuples have potential. Both of them perform better than the
 All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays. The brancher has a bug, which manifested itself by making the program producing the same solution several times which should not be possible. This does not matter in this thesis since it is not used.
 
 In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain. Another relevant change that could be made is to extend the pairs to arbitrary dimensions.
-
-
-\begin{thebibliography}{99}
-\bibitem{Calculus}
-	Calculus, 
-	Adams
-	
-\bibitem{os}
-	Operating systems and its concepts,
-	Galvin
-\end{thebibliography}
 
 \end{document}
