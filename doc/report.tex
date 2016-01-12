@@ -18,7 +18,7 @@
 \sisetup{per=slash, load=abbr}
 
 \usepackage{tikz}
-\usetikzlibrary{calc,angles,positioning,intersections}
+% \usetikzlibrary{calc,angles,positioning,intersections}
 \usepackage{pgfplots}
 \pgfplotsset{width=7cm, height=10cm, compat=1.4, every axis/.append style={thick}}
 
@@ -64,7 +64,7 @@
 \maketitle
 
 \begin{abstract}
-Constraint programming is a programing paradigm focusing on high performance computing. There exists several different frameworks for constraint programming. Gecode is one of them, and is the one chosen for this project. In the present version of Gecode the available variable types are booleans, integers, floats and integer sets. In this thesis a new variable type - tuples - is implemented and analyzed. It is shown that for some problems, this variable type can improve performance significantly.
+In constraint programming it is vital with efficient pruning to avoid unnecessary searching. This thesis shows that tuple variables can be used to significantly reduce the size of the search tree, which reduces the execution time. The tuple is implemented in c++ for the Gecode library. The problem used to measure performance is finding a path through a deterministic finite automaton with costs for each transition.
 \end{abstract}
 
 \setcounter{tocdepth}{2}
@@ -91,23 +91,21 @@ In principal the CP-solver loops propagating and branching until the problem is 
 
 When no propagator can prune any values a brancher takes over. The brancher typically splits the variable it is connected to into two parts, one with an assigned value and one with the rest of the domain, thus creating a search tree. After this branching the propagators are called again. The branchers determines the structure of the tree, and the search engine determines how the tree will be traversed. 
 
-\subsection{Gecode}
-Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used.
-
-For more information, have a look at the homepage. \url{http://www.gecode.org}
-
 \subsection{Motivation for Tuple Variables}
 When using a CP solver, it is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends on the model and the propagators. With good models and propagators the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$ in one step, and this is the solution to the problem. If we instead have the same variables and domains but instead use the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. 
 
 In this example the problem was modeled wit h two integer variables. An tuple is an ordered list of elements with fixed length. If the problem would be modeled with one tuple variable instead of two integers pruning would be possible. Then we would have a tuple variable $t$ with domain $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,2\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,3\rangle,\langle3,4\rangle\}$ and pruning with the same constraint would yield $dom(t)=\{\langle1,2\rangle,\langle1,3\rangle,\langle1,4\rangle,\langle2,3\rangle,\langle2,4\rangle,\langle3,2\rangle,\langle3,4\rangle\}$. This shrinks the size of the search tree from 9 to 7. 
 
-If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constraint $x=y+1$ the benefits are more obvious. Using integer variables only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $DFA(state_1, cost_1, state_0, cost_0, token, statefun, costfun)$. It is a constraint for a DFA with cost and a solution has to satisfy $state_1= statefun(state_0, token), cost_1=cost_0+costfun(state+0, token)$. This is the constraint used in this thesis. Furthermore, the constraint is linked in several steps: $DFA(state_n, cost_n, state_{n-1}, cost_{n-1}, token_{n-1}, statefun, costfun)$
+If we instead look at the case where $dom(x),dom(y)=\{1..1000\}$ and the constraint $x=y+1$ the benefits are more obvious. Using integer variables only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $DFA(state_1, cost_1, state_0, cost_0, token, statefun, costfun)$. It is a constraint for a DFA with cost and a solution has to satisfy $state_1= statefun(state_0, token), cost_1=cost_0+costfun(state_0, token)$. This is the constraint used in this thesis. Furthermore, the constraint is linked in several steps: $DFA(state_n, cost_n, state_{n-1}, cost_{n-1}, token_{n-1}, statefun, costfun)$. A solution to this problem would be three vectors, one for states, one for costs and one for tokens.
 
-The main benefit of a tuple is the possibility to link variables together. The most obvious case is when dealing with coordinates since a coordinate by definition is a tuple, but it can be generalized to any case where it is interesting to see if a combination of two values is a part of a solution. 
+The main benefit of a tuple is the possibility to link variables together. The most intuitive case is when dealing with coordinates since a coordinate by definition is a tuple, but it can be generalized to any case where it is interesting to see if a combination of two values is a part of a solution. 
 
-\newpage
+\subsection{Gecode}
+Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used.
 
-\subsection{Creating a New Variable in Gecode}
+For more information, have a look at the homepage. \url{http://www.gecode.org}
+
+When implementing a new variable in Gecode there are several things that should be written. Among them is specification file, various classes and propagators.
 \subsubsection{Specification File}
 Creating the specification file is the first thing that needs to be done when designing a new variable.  A simple specification file could look like this:
 
@@ -162,7 +160,7 @@ The propagator must implement ES\_FAILED and at least one of the others. ES\_NOF
 \item{cost} - Estimates the cost to run the propagator. This does not affect the correctness, but may improve efficiency by making it easier for the Gecode engine to schedule cheap propagators before expensive ones.
 \item{propagate} - The method which does the actual work. It prunes domains and determines the status to return.
 \end{itemize}
-A propagator must also subscribe to views, that is, telling Gecode when the propagator should be awaken. For instance, a propagator for the constraint $x\le y$ should subscribe to the maximum value of x and minimum value of y.
+A propagator must also subscribe to views, that is, telling Gecode when the propagator should be awaken. For instance, a propagator for the constraint $x\le y$ should subscribe to the maximum value of x and minimum value of y, because if none of these changes there is nothing the propagator can do.
 
 \paragraph{Consistency}
 A propagator can work with different consistencies. Bound consistency means that the propagator ensures that the bounds (min and max value for an integer variable) satisfies the constraint. If if $dom(x)={1,5,7,8}$ and $dom(y)={1,3,7}$ and the constraint $x=y$ is applied, the propagator would yield $dom(x)={1,5,7}$ and $dom(y)={1,3,7}$ with bounds consistency, since there are solutions to $x=1$, $x=7$, $y=1$ and $y=7$. $x=5$ and $y=3$ is not considered. Pruning the whole domain does in general cost more execution time.
@@ -182,7 +180,7 @@ A brancher must implement the following methods:
 \section{The IntPair Variables}
 To keep things simple only two-dimensional integer tuples are considered, so called Pairs. The specification file is kept almost as minimal as described in the introduction. None of the propagators utilizes the boundaries anyway, and there is only one propagator working for each execution in the performance test. The only thing added to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, and the domains are stored as vectors from the standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called dispose. This method should explicitly call \texttt{vector::$\sim$vector()}.
 
-The main purpose of this thesis is to show that tuples have benefits over regular integers for certain problems. For that reason the code for Pairs has purposely been kept unoptimised. The modification events do not use the fact that the domains are sorted. Just fixing this would decrease their time complexity from linear to logarithmic.
+The main purpose of this thesis is to show that tuples have benefits over regular integers for certain problems. For that reason the code for Pairs has purposely been kept unoptimised. The modification events do not use the fact that the domains are sorted. Just fixing this would decrease the time complexity from linear to logarithmic for operations like removing values from the domains.
 
 The complete source can be found at \url{http://www.github.com/klutt/gecode-tuples}
 
@@ -305,7 +303,7 @@ At a first glance it may seem that the Pair propagators have better time complex
 \subsection{Correctness verification}
 The correctness is verified in several steps. For all problems an \texttt{assert} is used to ensure that the solution printed actually is a solution before the solution is printed. This ensures that no false solutions occur. There are a number of trivial tests in \texttt{testsrc/} with pre-calculated number of solutions. If the number of solutions are correct and all solutions fullfill the requirements the algorithms works correctly.
 
-For bigger problems it is very hard to pre-calculate the number of solutions. Instead the tests relies on probability. The two IntPairs and one integer implementation are compared to ensure that they put out the same number of solutions, and the same solutions. It is very unlikely that they all are wrong in the exactly same way. These tests are found in \texttt{tripletestsrc/} and \texttt{multisteptestsrc/}
+For bigger problems it is very hard to pre-calculate the number of solutions. Instead the tests relies on probability. The two IntPairs and one integer implementation are compared to ensure that they put out the same number of solutions, and that the solutions are the same. It is very unlikely that they would be wrong in the exactly same way. These tests are found in \texttt{tripletestsrc/} and \texttt{multisteptestsrc/}
 
 \subsection{Performance Test}
 To test the performance the same problem is solved in three different ways. Two of them is IntPairExact and IntPairApprox. The last one is solved with the integer variable that comes with Gecode, and is just for reference. The purpose of this thesis is to show that tuples can be very useful. For that reason the reference propagator have been optimized, while the Pairs have been left with a very naive implementation. The problem is a DFA with costs. The executables accepts six arguments: 
@@ -600,27 +598,26 @@ In all examples, the maximum total cost is set to max total cost per transition 
 
 In the graphs we can see advantages for IntPair. In all tests they win over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer variables, while the pair variant uses two pairs and one integer. The size of a node for the integer case should be roughly proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. For two-dimensional tuples with "normal" domain sizes this should not be of any concern. However, higher dimensions could cause trouble. The DFA problem could be modeled with a five-dimensional tuple. For the case in figure 2 with 50 states, 5 tokens, 6 steps and max total cost 18 the size per node would be around 100MB. Note though that the tuples have a higher memory usage per node and that this does not necessarily mean that the total memory usage is higher because the number of nodes shrinks.
 
-For all situations the number of nodes are exactly equal for both IntPairExact and IntPairApprox. This is a bit surprising. It would be reasonable that the number of nodes were, if ever so slightly, higher for IntPairApprox, since the domain is approximated.
+For all situations the number of nodes are exactly equal for both IntPairExact and IntPairApprox. This may be a bit surprising. It would be reasonable that the number of nodes were, if ever so slightly, higher for IntPairApprox, since the domain is approximated. The reason is that if a the starting state $s_0$ and the starting cumalative cost $c_0$ is assigned, then everything else follows automatically if we branch on the tokens first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. If we removed some values from the domains of $t_1$, $s_1$ and $c_1$ and above things would have been different. This is also confirmed by the fact that there were no failures during the execution.
 
-In figure 3 IntPairApprox seems to be constant in time. Even though this may seem very good it is not something that shows that tuples work, since the same result probably would be achievable by using an approximate version of integer variables for the cost.
+In figure 3 IntPairApprox seems to be almost constant in time. Even though this may seem very good it is not something that shows that tuples work, since the same result probably would be achievable by using an approximate version of integer variables for the cost.
+
+All in all the graphs indicates that tuples can give significantly better performance for certain problems. The only major source of error with this experiment is that the reference propagator may not be optimized enough, but I find that highly unlikely.
 
 \section{Related Work}
-\begin{itemize}
-\item{\textbf{Implementation of bit-vector variables in a CP solver}}
-\item{\textbf{A propagator design framework for constraints over sequences}}
-\end{itemize}
+The paper Propagating Regular Counting Constraints (Beldiceanu, Flener, Pearson, Van Hentenryck) describes constraints for a counter-DFA (cDFA). It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The DFA in this thesis is almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting we talk about cost, but it makes no difference in practise. I wanted to do a performance comparasion with that implementaion, but it would be complicated to do that in a fair way, because the constraints are implemented in Prolog, while everything in this thesis is in C++.
+
+In Implementation of bit-vector variables in a CP solver (Dye) Gecode is used, and a new variable is implemented. That paper was useful for getting more understanding of how to implement a new variable in Gecode.
+
+The paper A propagator design framework for constraints over sequences (Monette, Flener, Pearson) shows that tuples can be used to make pruning much more efficient. This thesis is basically a practical demonstration that this indeed is true, and that it translates directly into better performance.
 
 \section{Conclusions and future work}
-The tests shows that tuples show potential. Both of them perform better than the integer variant in both number of nodes and total execution time. The only flaw with this experiment is that the integer solution may not be optimized enough. There is still some room for further improvement, like implementing back propagation, but the integer variant only has one unoptimized part, which is the propagator. The IntPair variants have two. Both the propagator and the variable implementation is far from optimized. 
+The tests shows that tuples have potential. Both of them perform better than the integer variant in both number of nodes and total execution time, and there is still much room for further improvement. Especially the vector operations are very inefficient and can easily be improved.
 
-\subsection{Rewrite the implementation in such a way that it may be accepted in a new Gecode release}
 All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairs in such a way that it satisfies Gecodes standards. For instance, vector from std is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis, that is, proving that tuples actually is a good idea. One example of this is that it exists methods to get the minimum and maximum x-value for the domain, but no methods for y-value. Also, the propagators and the brancher currently only accepts arrays. The brancher has a bug, which manifested itself by making the program producing the same solution several times which should not be possible. This does not matter in this thesis since it is not used.
 
-\subsection{Test different implementations with different domain representations}
-In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain.
+In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain. Another relevant change that could be made is to extend the pairs to arbitrary dimensions.
 
-\subsection{Extend the tuples to arbitrary dimensions and not just pairs}
-This would require a complete rewrite of the variable implementation.
 
 \begin{thebibliography}{99}
 \bibitem{Calculus}
