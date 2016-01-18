@@ -174,16 +174,7 @@ A propagator must also subscribe to views, that is, telling Gecode when the prop
 A propagator can work with different consistencies. Bound consistency means that the propagator ensures that the bounds (min and max value for an integer variable) satisfies the constraint. If if $dom(x)={1,5,7,8}$ and $dom(y)={1,3,7}$ and the constraint $x=y$ is applied, the propagator would yield $dom(x)={1,5,7}$ and $dom(y)={1,3,7}$ with bounds consistency, since there are solutions to $x=1$, $x=7$, $y=1$ and $y=7$. $x=5$ and $y=3$ is not considered. Pruning the whole domain does in general cost more execution time.
 
 \subsubsection{Branchers}
-When there are no propagators able to prune any variables the CP solver must start searching. The branchers determines how this is done. The simplest brancher just puts the first value in the first branch and the rest of the values in a second branch. Another way is to pick a random value in the domain, but more sophisticated ways exist. For the IntPair variable only a simple brancher is implemented. The domain of IntPair is just a long sorted list, and the brancher picks the first value.
-
-A brancher must implement the following methods:
-\begin{itemize}
-\item{status}
-\item{choice}
-\item{commit}
-\item{print}
-\item{ngl}
-\end{itemize}
+When there are no propagators able to prune any variables the CP solver must start searching. The branchers determines how this is done. The simplest brancher just puts the first value in the first branch and the rest of the values in a second branch. Another way is to pick a random value in the domain, but more sophisticated ways exist. For the IntPair variable only a simple brancher is implemented. The domain of IntPair is just a long sorted list, and the brancher picks the first value. A brancher is not strictly needed to implement a variable, but if there is no brancher the propagators must be able to prune the variable until it is assigned. 
 
 \section{The IntPair Variables}
 To keep things simple only two-dimensional integer tuples are considered, so called Pairs. The specification file is kept almost as minimal as described in the introduction. None of the propagators utilizes the boundaries anyway, and there is only one propagator working for each execution in the performance test. The only thing added to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, and the domains are stored as vectors from the standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called dispose. This method should explicitly call \texttt{vector::$\sim$vector()}.
@@ -302,7 +293,7 @@ This propagator is implemented in three different ways. Two are for IntPair and 
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-All three implementations work in a similar manner. PreCost and PreState is current state in the DFA. PostCost and PostState is the result of reading the token in Token. Since the Pairs makes it possible to bundle Cost and State to a single variable they are just called Pre and Post. The basic principle is, for all tokens and all states in Pre, calculate the possible Post. Remove everything from Post that is not reachable. If nothing is reachable from a certain Pre, also remove that. This is done by creating lists of everything that should remain and then removing everything that is not in those lists.
+All three implementations work in a similar manner. $PreState$ and $PreCost$ is current state and accumulated cost so far in the DFA. $PostState$ and $PostCost$ is the result of reading the token in $Token$. Since the Pairs makes it possible to bundle Cost and State to a single variable they are just called Pre and Post. The basic principle is, for all tokens and all states in Pre, calculate the possible Post. Remove everything from Post that is not reachable. If nothing is reachable from a certain Pre, also remove that. This is done by creating lists of everything that should remain and then removing everything that is not in those lists.
 
 The differences are just adjustments to make the algorithms work with different variable types. For the IntVarApprox we can not freely remove any value we want. That is why it has the function Merge, which checks if there is an element d in dom such that d.x=p.x. If so d.y\_low and d.y\_high get expanded to fit the interval p.y\_low to p.y\_high.
 
@@ -324,46 +315,50 @@ To test the performance the same problem is solved in three different ways. Two 
 \item{steps} - Number of steps in the DFA.
 \end{itemize}
 In all examples, the maximum total cost is set to max total cost per transition times number of steps.
-
 \begin{figure}[H]
-\begin{tikzpicture} [scale=1.8]
+\centering
+
 	\pgfplotsset{
 	    scale only axis,
 		legend style={at={(0,0.8)}, anchor=west, font=\tiny},
 	    xmin=5, xmax=8
 	}
+\begin{tikzpicture} [scale=0.9] 
 	\begin{axis}[
-	  axis y line*=left,
+	%  axis y line*=left,
 	  ymin=0, ymax=3000000,
 	  xlabel=tokens,
 	  ylabel=nodes,
 	  xtick=data]
-		\addplot[smooth,mark=square*, mark options={solid},red, dashdotted]
+		\addplot[smooth,mark=square*, mark options={solid},red, dotted]
 		  coordinates{
 		    (5,20879)
 		    (6,68523)
 		    (7,169435)
 		    (8,396625)
-		}; \label{pnt_plot} \addlegendentry{IntPair Nodes}
-		\addplot[smooth,mark=square*,mark options={solid},violet, dashdotdotted]
+		}; \label{pnt_plot} \addlegendentry{IntPair}
+		\addplot[smooth,mark=*,mark options={solid},violet, dashed]
 		  coordinates{
 		    (5,146895)
 		    (6,482543)
 		    (7,1193363)
 		    (8,2791621)
-		}; \label{int_plot} \addlegendentry{Integer Nodes}
+		}; \label{int_plot} \addlegendentry{Integer}
 	\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture} [scale=0.9]
 	
 	\begin{axis}[
-	  axis y line*=right,
-	  axis x line=none,
+	%  boarders=all,
+%	  axis y line*=right,
+	%  axis x line=none,
+	 xlabel=tokens,
 	  ymin=0, ymax=120000,
+	  xtick=data,
 	  ylabel=runtime (ms) ] 
-	  				\addlegendimage{/pgfplots/refstyle=pnt_plot}\addlegendentry{IntPair Nodes}
-	  				\addlegendimage{/pgfplots/refstyle=int_plot}\addlegendentry{Integer Nodes}
 	  
 	  
-		\addplot[smooth,mark=*,mark options={solid},blue, dashed]
+		\addplot[smooth,mark=square*,mark options={solid},blue, dashed]
 		  coordinates{
 		    (5,992)
 		    (6,3491)
@@ -371,7 +366,7 @@ In all examples, the maximum total cost is set to max total cost per transition 
 		    (8,23866)
 		}; \label{IntPairExact Run}
 		
-		\addplot[smooth,mark=*,mark options={solid},green]
+		\addplot[smooth,mark=square*,mark options={solid},green]
 		  coordinates{
 		    (5,827)
 		    (6,2767)
@@ -387,13 +382,83 @@ In all examples, the maximum total cost is set to max total cost per transition 
 		    (8,116126)
 		}; \label{IntegerRun}
 	
-		\addlegendentry{IntPairExact Run}
-		\addlegendentry{IntPairApprox Run}
-		\addlegendentry{Integer Run}
+		\addlegendentry{IntPairExact}
+		\addlegendentry{IntPairApprox}
+		\addlegendentry{Integer}
 	\end{axis}
 \end{tikzpicture}
+
 \caption{{States=15, Maxcost=3, Steps=6}}
 \end{figure}
+%\begin{figure}[H]
+%\begin{tikzpicture} [scale=1.8]
+%	\pgfplotsset{
+%	    scale only axis,
+%		legend style={at={(0,0.8)}, anchor=west, font=\tiny},
+%	    xmin=5, xmax=8
+%	}
+%	\begin{axis}[
+%	  axis y line*=left,
+%	  ymin=0, ymax=3000000,
+%	  xlabel=tokens,
+%	  ylabel=nodes,
+%	  xtick=data]
+%		\addplot[smooth,mark=square*, mark options={solid},red, dashdotted]
+%		  coordinates{
+%		    (5,20879)
+%		    (6,68523)
+%		    (7,169435)
+%		    (8,396625)
+%		}; \label{pnt_plot} \addlegendentry{IntPair Nodes}
+%		\addplot[smooth,mark=square*,mark options={solid},violet, dashdotdotted]
+%		  coordinates{
+%		    (5,146895)
+%		    (6,482543)
+%		    (7,1193363)
+%		    (8,2791621)
+%		}; \label{int_plot} \addlegendentry{Integer Nodes}
+%	\end{axis}
+%	
+%	\begin{axis}[
+%	  axis y line*=right,
+%	  axis x line=none,
+%	  ymin=0, ymax=120000,
+%	  ylabel=runtime (ms) ] 
+%	  				\addlegendimage{/pgfplots/refstyle=pnt_plot}\addlegendentry{IntPair Nodes}
+%	  				\addlegendimage{/pgfplots/refstyle=int_plot}\addlegendentry{Integer Nodes}
+%	  
+%	  
+%		\addplot[smooth,mark=*,mark options={solid},blue, dashed]
+%		  coordinates{
+%		    (5,992)
+%		    (6,3491)
+%		    (7,9352)
+%		    (8,23866)
+%		}; \label{IntPairExact Run}
+%		
+%		\addplot[smooth,mark=*,mark options={solid},green]
+%		  coordinates{
+%		    (5,827)
+%		    (6,2767)
+%		    (7,8186)
+%		    (8,20679)
+%		}; \label{IntPairApprox Run}
+%		
+%		\addplot[smooth,mark=*,mark options={solid},black, dotted]
+%		  coordinates{
+%		    (5,4770)
+%		    (6,17716)
+%		    (7,40416)
+%		    (8,116126)
+%		}; \label{IntegerRun}
+%	
+%		\addlegendentry{IntPairExact Run}
+%		\addlegendentry{IntPairApprox Run}
+%		\addlegendentry{Integer Run}
+%	\end{axis}
+%\end{tikzpicture}
+%\caption{{States=15, Maxcost=3, Steps=6}}
+%\end{figure}
 
 \begin{figure}[H]
 \begin{tikzpicture} [scale=1.8]
