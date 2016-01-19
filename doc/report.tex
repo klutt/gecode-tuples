@@ -318,11 +318,13 @@ In all examples, the maximum total cost is set to max total cost per transition 
 
 \input{graphs.tex}
 
-In the graphs we can see advantages for IntPair. In all tests they win over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer variables, while the pair variant uses two pairs and one integer. The size of a node for the integer case should be roughly proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. For two-dimensional tuples with "normal" domain sizes this should not be of any concern. However, higher dimensions could cause trouble. The DFA problem could be modeled with a five-dimensional tuple. For the case in figure 2 with 50 states, 5 tokens, 6 steps and max total cost 18 the size per node would be around 100MB. Note though that the tuples have a higher memory usage \textit{per node} and that this does not necessarily mean that the total memory usage is higher since the number of nodes shrinks. The case where this would be a problem is if the search tree became to deep, because a parent node can not be freed from memory until its children have been propagated to either a failure or a solution.
+In the graphs we can see advantages for IntPair. In all tests they win over the regular integer solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variant uses five integer variables, while the pair variant uses two pairs and one integer. The size of a node for the integer case should be roughly proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps*States*Maxtotalcost$. For two-dimensional tuples with "normal" domain sizes this should not be of any concern. However, higher dimensions could cause trouble. The DFA problem could be modeled with a five-dimensional tuple. For the case in figure~\ref{fig:states} with 50 states, 5 tokens, 6 steps and max total cost 18 the size per node would be around 100MB. Note though that the tuples have a higher memory usage \textit{per node} and that this does not necessarily mean that the total memory usage is higher since the number of nodes shrinks. The case where this would be a problem is if the search tree became to deep, because a parent node can not be freed from memory until its children have been propagated to either a failure or a solution.
 
 For all situations the number of nodes are exactly equal for both IntPairExact and IntPairApprox. This may be a bit surprising. It would be reasonable that the number of nodes were, if ever so slightly, higher for IntPairApprox, since the domain is approximated. The reason is that if the starting state $s_0$ and the starting cumalative cost $c_0$ is assigned (which they are for a DFA), then everything else follows automatically if we branch on the tokens first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. This is also confirmed by the fact that there were no failures during the execution. If we removed some values from the domains of $t_1$, $s_1$ and $c_1$ and above things would have been different. 
 
-In figure 3 IntPairApprox seems to be almost constant in time. Even though this may seem very good it is not something that shows that tuples work, since the same result probably would be achievable by using an approximate version of integer variables for the cost. In the same graph we can read in the comment that the number of nodes were constant for all three methods. This is because how the DFA:s are generated. The random generator first generates the state matrix and then the cost matrix, so the automatons looks exactly the same except for the transition costs.
+In all figures, except figure 3 the logarithmic graphs are close to straight lines. This indicates that all algorithms are logarithmic in both time and size of search tree. More importantly, this confirms that there was no complexity difference between tuples and integers when solving this problem. Tuples are faster, but not asymptotically faster.
+
+In figure~\ref{fig:cost} IntPairApprox seems to be almost constant in time. Even though this may seem very good it is not something that shows that tuples work, since the same result probably would be achievable by using an approximate version of integer variables for the cost. In the same graph we can see that the number of nodes were constant for all three methods. This is because how the DFA:s are generated. The random generator first generates the state matrix and then the cost matrix, so the automatons looks exactly the same except for the transition costs.
 
 All in all the graphs indicates that tuples can give significantly better performance for certain problems. The only possible source of error with this experiment is that the reference propagator may not be optimized enough, but I find that highly unlikely. After all, the implementation of IntVar has to be assumed to be very optimized, and the reference propagator is much more optimized than the ones for pairs.
 
@@ -340,4 +342,19 @@ All big software libraries have coding standards. There is plenty of work to rew
 
 In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain. Another relevant change that could be made is to extend the pairs to arbitrary dimensions.
 
+\begin{thebibliography}{9}
+
+\bibitem{propreg}
+  Beldiceanu, Flener, Pearson, Van Hentenryck,
+  \emph{Propagating Regular Counting Constraints},
+
+\bibitem{bitvector}
+  Dye,
+  \emph{Implementation of bit-vector variables in a CP solver},
+
+\bibitem{bitvector}
+  Monette, Flener, Pearson,
+  \emph{A propagator design framework for constraints over sequences},
+
+\end{thebibliography}
 \end{document}
