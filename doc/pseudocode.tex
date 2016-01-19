@@ -1,0 +1,95 @@
+%Int
+\begin{algorithm}[H]
+\caption{DFA propagator IntVar\newline $\mathcal{O}(\#(PostState)\#(PostCost)\#(PreState)\#(PreCost)\#(Symbol))$}
+\begin{algorithmic}[1]
+\Procedure{DFAprop}{IntVar PostState, IntVar PostCost, IntVar PreState, IntVar PreCost, IntVar Symbol, Statefunction S, Costfunction C}
+\State Intdomain newPostState := $\emptyset$
+\State Intdomain newPreState := $\emptyset$
+\State Intdomain newPostCost := $\emptyset$
+\State Intdomain newPreCost := $\emptyset$
+\State Intdomain newSymbol := $\emptyset$
+\ForAll {symbol in Symbol}
+	\ForAll {preState in PreState}
+		\State int state := S(pre.state, symbol)
+		\If {PostState.contain(state)}
+			\State newPostState := newPostState $\cup$ state
+			\State newPreState := newPreState $\cup$ pre
+			\State newSymbol := newSymbol $\cup$ symbol 
+			\ForAll {cost in PreCost}
+				\State int postCost := cost + C(preState, symbol)
+				\If {PostCost.contains(postCost)}
+					\State newPreCost := newPreCost $\cup$ cost
+					\State newPostCost := newPostCost $\cup$ postCost
+				\EndIf
+			\EndFor
+		\EndIf
+	\EndFor
+\EndFor
+\State PostState := PostState $\cap$ newPostState
+\State PreState := PreState $\cap$ newPreState
+\State PostCost := PostCost $\cap$ newPostCost
+\State PreCost := PreCost $\cap$ newPreCost
+\State Symbol := Symbol $\cap$ newSymbol
+\EndProcedure
+\end{algorithmic}
+\end{algorithm} 
+
+%Exact
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
+\State Pairdomain newPost := $\emptyset$
+\State Pairdomain newPre := $\emptyset$
+\State Intdomain newSymbol := $\emptyset$
+\ForAll {symbol in Symbol}
+	\ForAll {pre in Pre}
+		\State Pair p := (S(pre.state, symbol), pre.cost+C(pre.cost, symbol))
+		\If {Post.contain(p)}
+			\State newPost := newPost $\cup$ p
+			\State newPre := newPre $\cup$ pre
+			\State newSymbol := newSymbol $\cup$ symbol 
+		\EndIf
+	\EndFor
+\EndFor
+\State Post := Post $\cap$ newPost
+\State Pre := Pre $\cap$ newPre
+\State Symbol := Symbol $\cap$ newSymbol
+\EndProcedure
+\end{algorithmic}
+\caption{DFA propagator IntPairExact \newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
+\end{algorithm}
+
+%Approx
+\begin{algorithm}[H]
+\caption{DFA propagator IntPairApprox\newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
+\begin{algorithmic}[1]
+\Procedure{Merge}{Pairdomain dom, Pair p}
+	\State find d in dom such that d.state = p.state
+	\If{not found}
+		\State add p to dom
+	\Else	
+		\State d.high := max(d.high, p.high)
+		\State d.low := min(d.low, p.low)
+	\EndIf
+\EndProcedure
+\Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
+\State Pairdomain newPost := $\emptyset$
+\State Pairdomain newPre := $\emptyset$
+\State Intdomain newSymbol := $\emptyset$
+\ForAll {symbol in Symbol}
+	\ForAll {pre in Pre}
+		\State Pair p :=(S(pre.state,symbol),pre.low+C(pre.low,symbol),pre.high+ C(pre.high,symbol))
+		\If {p.state $\neq$ garbage state}
+			\State Merge(newPost, p)
+			\State Merge(newPre, pre)
+			\State newSymbol := newSymbol $\cup$ symbol 
+		\EndIf
+	\EndFor
+\EndFor
+\State Post := Post $\cap$ newPost
+\State Pre := Pre $\cap$ newPre
+\State Symbol := Symbol $\cap$ newSymbol
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
