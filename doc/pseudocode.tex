@@ -1,13 +1,10 @@
 %Int
+\begin{figure}[H]
 \begin{algorithm}[H]
 \caption{DFA propagator IntVar\newline $\mathcal{O}(\#(PostState)\#(PostCost)\#(PreState)\#(PreCost)\#(Symbol))$}
 \begin{algorithmic}[1]
 \Procedure{DFAprop}{IntVar PostState, IntVar PostCost, IntVar PreState, IntVar PreCost, IntVar Symbol, Statefunction S, Costfunction C}
-\State Intdomain newPostState := $\emptyset$
-\State Intdomain newPreState := $\emptyset$
-\State Intdomain newPostCost := $\emptyset$
-\State Intdomain newPreCost := $\emptyset$
-\State Intdomain newSymbol := $\emptyset$
+\State Intdomain newPostState, newPreState, newPostCost, newPreCost, newSymbol := $\emptyset$
 \ForAll {symbol in Symbol}
 	\ForAll {preState in PreState}
 		\State int state := S(pre.state, symbol)
@@ -33,13 +30,15 @@
 \EndProcedure
 \end{algorithmic}
 \end{algorithm} 
+\caption{int}\label{fig:algint}
+\end{figure}
 
 %Exact
+\begin{figure}[H]
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
-\State Pairdomain newPost := $\emptyset$
-\State Pairdomain newPre := $\emptyset$
+\State Pairdomain newPost, newPre := $\emptyset$
 \State Intdomain newSymbol := $\emptyset$
 \ForAll {symbol in Symbol}
 	\ForAll {pre in Pre}
@@ -58,14 +57,16 @@
 \end{algorithmic}
 \caption{DFA propagator IntPairExact \newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
 \end{algorithm}
-
+\caption{exact}\label{fig:algexact}
+\end{figure}
 %Approx
+\begin{figure}[H]
 \begin{algorithm}[H]
 \caption{DFA propagator IntPairApprox\newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
 \begin{algorithmic}[1]
 \Procedure{Merge}{Pairdomain dom, Pair p}
 	\State find d in dom such that d.state = p.state
-	\If{not found}
+	\If{not found} 
 		\State add p to dom
 	\Else	
 		\State d.high := max(d.high, p.high)
@@ -73,16 +74,15 @@
 	\EndIf
 \EndProcedure
 \Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
-\State Pairdomain newPost := $\emptyset$
-\State Pairdomain newPre := $\emptyset$
+\State Pairdomain newPost, newPre := $\emptyset$
 \State Intdomain newSymbol := $\emptyset$
-\ForAll {symbol in Symbol}
+\ForAll {s in Symbol}
 	\ForAll {pre in Pre}
-		\State Pair p :=(S(pre.state,symbol),pre.low+C(pre.low,symbol),pre.high+ C(pre.high,symbol))
+		\State Pair p :=(S(pre.state,s),pre.low+C(pre.low,s),pre.high+ C(pre.high,s))
 		\If {p.state $\neq$ garbage state}
 			\State Merge(newPost, p)
 			\State Merge(newPre, pre)
-			\State newSymbol := newSymbol $\cup$ symbol 
+			\State newSymbol := newSymbol $\cup$ s
 		\EndIf
 	\EndFor
 \EndFor
@@ -92,4 +92,5 @@
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-
+\caption{approx}\label{fig:algapprox}
+\end{figure}

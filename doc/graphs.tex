@@ -43,7 +43,7 @@
 	\end{axis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8] 
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	  ylabel=nodes,
 	  xtick=data,
   	  ymin=0, ymax=3000000,
@@ -54,10 +54,10 @@
 		\addplot[smooth,mark=*,mark options={solid},black, dashed]
 		  coordinates{ (5,146895) (6,482543) (7,1193363) (8,2791621)
 		}; \label{int_plot} \addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8]
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	yticklabel pos=right,
 	  xtick=data,
 	  ylabel=runtime (ms),
@@ -75,7 +75,7 @@
 		\addlegendentry{IntPairExact}
 		\addlegendentry{IntPairApprox}
 		\addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \caption{{States=15, Maxcost=3, Steps=6}}\label{fig:tokens}
 \end{figure}
@@ -125,7 +125,7 @@
 	\end{axis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8] 
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	  ylabel=nodes,
 	  xtick=data,
 	  ymin=0, ymax=200000,
@@ -136,10 +136,10 @@
 		\addplot[smooth,mark=*,mark options={solid},black, dashed]
 		  coordinates{ (20,143413) (30,167251) (40,172417) (50,189809)
 		}; \label{int_plot} \addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8]
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	yticklabel pos=right,
 	  xtick=data,
 	  ylabel=runtime (ms),
@@ -157,7 +157,7 @@
 		\addlegendentry{IntPairExact}
 		\addlegendentry{IntPairApprox}
 		\addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \caption{{Token=5, Maxcost=3, Steps=6}}\label{fig:states}
 \end{figure}
@@ -207,7 +207,7 @@
 	\end{axis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8] 
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	  ylabel=nodes,
 	  xtick=data,
   	  ymin=2, ymax=1000000,
@@ -218,10 +218,10 @@
 		\addplot[smooth,mark=*,mark options={solid},black, dashed]
 		  coordinates{ (2,755629) (4,755629) (6,755629) (8,755629) (15,755629)
 		}; \label{int_plot} \addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8]
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	yticklabel pos=right,
 	  xtick=data,
 	  ylabel=runtime (ms),
@@ -239,7 +239,7 @@
 		\addlegendentry{IntPairExact}
 		\addlegendentry{IntPairApprox}
 		\addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \caption{{Steps=20, Tokens=5, Steps=7. }}\label{fig:cost}
 \end{figure}
@@ -288,7 +288,7 @@
 	\end{axis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8] 
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	  ylabel=nodes,
 	  xtick=data,
   	  ymin=2, ymax=120000000,
@@ -299,10 +299,10 @@
 		\addplot[smooth,mark=*,mark options={solid},black, dashed]
 		  coordinates{ (7,755629)(8,3924361)(9,20128261) (10,102243101)
 		}; \label{int_plot} \addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \begin{tikzpicture} [scale=0.8]
-	\begin{loglogaxis}[
+	\begin{semilogyaxis}[
 	yticklabel pos=right,
 	  xtick=data,
 	  ylabel=runtime (ms),
@@ -320,7 +320,7 @@
 		\addlegendentry{IntPairExact}
 		\addlegendentry{IntPairApprox}
 		\addlegendentry{Integer}
-	\end{loglogaxis}
+	\end{semilogyaxis}
 \end{tikzpicture}
 \caption{{States=20, Tokens=5, Maxcost=4}}\label{fig:steps}
 \end{figure}
