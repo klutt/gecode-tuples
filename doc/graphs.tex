@@ -1,7 +1,9 @@
-% tokens
+% symbols
 \begin{figure}[H]
-
 \centering
+\textbf{Varying number of symbols}
+\newline
+\newline
 	\pgfplotsset{
 	    scale only axis,
 		legend style={at={(0,0.8)}, anchor=west, font=\tiny},
@@ -12,7 +14,7 @@
 	  ylabel=nodes,
 	  xtick=data,
   	  ymin=0, ymax=3000000,
-  	  xlabel=tokens ]
+  	  xlabel=symbols ]
 		\addplot[smooth,mark=square*, mark options={solid},red, dotted]
 		  coordinates{ (5,20879) (6,68523) (7,169435) (8,396625)
 		}; \label{pnt_plot} \addlegendentry{IntPair}
@@ -26,7 +28,7 @@
 	yticklabel pos=right,
 	  xtick=data,
 	  ylabel=runtime (ms),
-  	 xlabel=tokens,
+  	 xlabel=symbols,
 	  ymin=0, ymax=120000 ] 
 		\addplot[smooth,mark=square*,mark options={solid},red, dashed]
 		  coordinates{ (5,992) (6,3491) (7,9352) (8,23866)
@@ -47,7 +49,7 @@
 	  ylabel=nodes,
 	  xtick=data,
   	  ymin=0, ymax=3000000,
-  	  xlabel=tokens ]
+  	  xlabel=symbols ]
 		\addplot[smooth,mark=square*, mark options={solid},red, dotted]
 		  coordinates{ (5,20879) (6,68523) (7,169435) (8,396625)
 		}; \label{pnt_plot} \addlegendentry{IntPair}
@@ -61,7 +63,7 @@
 	yticklabel pos=right,
 	  xtick=data,
 	  ylabel=runtime (ms),
-  	 xlabel=tokens,
+  	 xlabel=symbols,
 	  ymin=0, ymax=120000 ] 
 		\addplot[smooth,mark=square*,mark options={solid},red, dashed]
 		  coordinates{ (5,992) (6,3491) (7,9352) (8,23866)
@@ -77,13 +79,16 @@
 		\addlegendentry{Integer}
 	\end{semilogyaxis}
 \end{tikzpicture}
-\caption{{States=15, Maxcost=3, Steps=6}}\label{fig:tokens}
+\caption{{States=15, Maxcost=3, Steps=6}}\label{fig:symbols}
 \end{figure}
 
 
 %states
 \begin{figure}[H]
 \centering
+\textbf{Varying number of states}
+\newline
+\newline
 	\pgfplotsset{
 	    scale only axis,
 		legend style={at={(0,0.4)}, anchor=west, font=\tiny},
@@ -164,8 +169,10 @@
 
 %max cost
 \begin{figure}[H]
-
 \centering
+\textbf{Varying maximum cost per transision}
+\newline
+\newline
 	\pgfplotsset{
 	    scale only axis,
 		legend style={at={(0,0.4)}, anchor=west, font=\tiny},
@@ -247,6 +254,10 @@
 %steps
 \begin{figure}[H]
 \centering
+\textbf{Varying number of steps}
+\newline
+\newline
+
 	\pgfplotsset{
 	    scale only axis,
 		legend style={at={(0,0.4)}, anchor=west, font=\tiny},
