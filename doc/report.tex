@@ -200,15 +200,18 @@ This version of IntPair approximates the domain by just storing one dimension ex
 
 \paragraph{Modification Events}
 \begin{itemize}
-\item {\textbf{nq(Pair p) - }} Remove p from domain. $\mathcal{O}(x)$ where x is the number of different x-values in domain.
-\item{\textbf{xeq(ApproxPair p) - }} Remove all values from domain whose y-value is not in the interval $[p.y\_low; p.y\_high]$ iff that values x-value is equal to p.x. $\mathcal{O}(x)$ where x is the number of different x-values in domain. The name is very badly chosen. The definition of this modification event was altered during development, but the name was never changed.
-\item{\textbf{xeq(vector\textless Pair\textgreater v) - }} Remove all values from domain whose x-value does not exist in v. $\mathcal{O}(xm)$ where x is number of x-values in domain and m is number of elements in v.
+\item {\textbf{nq(Pair p) - }} Remove p from domain. $\mathcal{O}(n)$ where $n$ is the number of different x-values in domain.
+
+\item{\textbf{xeq(PairInterval p) - }} Remove all values from domain whose y-value is not in the interval $[p.ylow; p.yhigh]$ iff those values x-values is equal to $x$. $\mathcal{O}(n)$ where $n$ is the number of different x-values in domain. The name xeq is very badly chosen. The definition of this modification event was altered during development, but the name was never changed.
+
+\item{\textbf{xeq(vector\textless Pair\textgreater v) - }} Remove all values from domain whose x-value does not exist in $v$. $\mathcal{O}(nm)$ where $n$ is number of x-values in domain and $m$ is number of elements in $v$.
+
 \end{itemize}
 
 \subsection{Implementation of DFA Propagators}
-The DFA \textit{propagators} are the actual implementations of the DFA \textit{constraints}. These propagators are implemented in three different ways. Two are for IntPair and one is for integer variables as reference. The algorithms are described below in pseudo code.
+The DFA \textit{propagators} are the actual implementations of the DFA \textit{constraints}. These propagators are implemented in three different ways. Two are for IntPair and one is for integer variables. The latter one is just for reference when comparing performance. The algorithms are described below in pseudo code.
 
-All three implementations work in a similar manner. $PreState$ and $PreCost$ is current state and accumulated cost so far in the DFA. $PostState$ and $PostCost$ is the result of reading the symbol in $Symbol$. Since the Pairs makes it possible to bundle Cost and State to a single variable they are just called Pre and Post. The basic principle is, for all symbols and all states in Pre, calculate the possible Post. Remove everything from Post that is not reachable. If nothing is reachable from a certain Pre, also remove that. This is done by creating lists of everything that should remain and then removing everything that is not in those lists.
+All three implementations work in a similar manner. $PreState$ and $PreCost$ is current state and accumulated cost so far in the DFA. $PostState$ and $PostCost$ is the result of reading the symbol in $Symbol$. Since the Pairs makes it possible to bundle cost and state to a single variable they are just called $Pre$ and $Post$. The basic principle is: for all symbols and all states in $Pre$, calculate the possible values for $Post$. Remove everything from $Post$ that is not reachable. If nothing is reachable from a certain $Pre$, also remove that. This is done by creating lists of everything that should remain and then removing everything that is not in those lists.
 
 \input{pseudocode.tex}
 
@@ -239,7 +242,7 @@ In the graphs we can see advantages for IntPair. In all tests they win over the 
 
 For all situations the number of nodes are exactly equal for both IntPairExact and IntPairApprox. This may be a bit surprising. It would be reasonable that the number of nodes were, if ever so slightly, higher for IntPairApprox, since the domain is approximated. The reason is that if the starting state $s_0$ and the starting cumalative cost $c_0$ is assigned (which they are for a DFA), then everything else follows automatically if we branch on the symbols first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. This is also confirmed by the fact that there were no failures during the execution. If we removed some values from the domains of $t_1$, $s_1$ and $c_1$ and above things would have been different. 
 
-In all figures, except figure~\ref{fig:cost} the logarithmic graphs are close to straight lines. This indicates that all algorithms are logarithmic in both time and size of search tree. More importantly, this confirms that there was no complexity difference between tuple variables and integer variables when solving this problem. Tuple variables are faster, but not asymptotically faster.
+In all figures, except figure~\ref{fig:cost} the logarithmic graphs are close to parallel straight lines. This indicates that all algorithms are exponential in both time and size of search tree. More importantly, this confirms that there was no complexity difference between tuple variables and integer variables when solving this problem. Tuple variables are faster, but not asymptotically faster.
 
 In figure~\ref{fig:cost} IntPairApprox seems to be almost constant in time. Even though this may seem very good it is not something that shows that tuple variables work, since the same result probably would be achievable by using an approximate version of integer variables for the cost. In the same graph we can see that the number of nodes were constant for all three methods. This is because how the DFA:s are generated. The random generator first generates the state matrix and then the cost matrix, so the automatons looks exactly the same except for the transition costs.
 
