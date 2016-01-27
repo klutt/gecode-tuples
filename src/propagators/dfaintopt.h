@@ -52,10 +52,10 @@ public:
 	std::sort(newvar.begin(), newvar.end());
         while(iter()) {
             int v = iter.val();
-            if(v == var.max() || var.assigned())
-                break;
             if(! std::binary_search (newvar.begin(), newvar.end(), v, [](int a, int b){return a<b;}))
                 remove.push_back(v);
+            if(v == var.max() || var.assigned())
+                break;
             ++iter;
         }
 
@@ -83,14 +83,18 @@ public:
             while(iqx()) {
                 int state = D->S(iqx.val(), iz.val());
                 if(state>0 && Px.in(state)) {
-                    newqx.push_back(iqx.val());
-                    newpx.push_back(state);
-                    newz.push_back(iz.val());
+		  int c = D->C(iqx.val(), iz.val());
+		  Gecode::Int::ViewRanges<Gecode::Int::IntView> r(Qy);
+		  Gecode::Iter::Ranges::Offset<Gecode::Int::ViewRanges<Gecode::Int::IntView> > r2(r,c);
+		  u|=r2;
+
+		  if(Qy.size()==0)
+		    return Gecode::ES_FAILED;
+
+		  newqx.push_back(iqx.val());
+		  newpx.push_back(state);
+		  newz.push_back(iz.val());
 		    
-		    int c = D->C(iqx.val(), iz.val());
-		    Gecode::Int::ViewRanges<Gecode::Int::IntView> r(Qy);
-		    Gecode::Iter::Ranges::Offset<Gecode::Int::ViewRanges<Gecode::Int::IntView> > r2(r,c);
-		    u|=r2; 
                 }
                 if(iqx.val() == Qx.max()) // TODO Ugly hack
                     break;
