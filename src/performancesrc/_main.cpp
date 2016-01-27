@@ -22,8 +22,10 @@
     return -1;
   }
 
+maxcosttotal=((maxcost-1)*nosteps)/5;
+
   df = new Dfa(seed, nostates, notokens, maxcost);
-  //    df->print();
+//      df->print();
   opt.mode(Gecode::SM_STAT);
   opt.parse(argc,argv);
   ScriptOutput::run<Test,DFS,SizeOptions>(opt);

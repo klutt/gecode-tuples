@@ -24,13 +24,14 @@ public:
   IntVarArray z;
   IntPairApproxVar init;
   
-  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal),
+  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal-1),
 				 z(*this, nosteps,1,notokens),
 				 init(*this, 1,1,0,0)
   {
     eq(*this, p[0], init);
     for(int i=0; i<nosteps; i++)
       mydfa(*this, p[i+1],p[i],z[i],df);
+
     branch(*this, z, INT_VAR_NONE(), INT_VAL_MIN());
     //    nonenone(*this, p);
   }
@@ -61,10 +62,10 @@ public:
     //    for(int i=0; i<nosteps; i++)
     //    assert(solutionOk(df, p[i+1].val().x, p[i+1].val().y, p[i].val().x, p[i].val().y, z[i].val()));
 
-    //    for(int i=0; i<nosteps; i++)
-    //      cout << z[i].val() << " " << p[i].val().x << " " << p[i].val().y << " ";
-    //    cout << p[nosteps].val().x << " " << p[nosteps].val().y << endl;
-    //  cout << a[1] << " "  << a[0] << " " << z << endl;
+        for(int i=0; i<nosteps; i++)
+          cout << z[i].val() << " " << p[i].val().x << " " << p[i].val().y << " ";
+        cout << p[nosteps].val().x << " " << p[nosteps].val().y << endl;
+      cout << p[1] << " "  << p[0] << " " << z << endl;
     noSolutions++;
   }
 };

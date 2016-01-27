@@ -11,9 +11,9 @@ class Dfa : public MPG::IntPair::DFA_I {
  private:
   matrix state, cost;
   unsigned int seed;
-  unsigned int rnd(unsigned int r) { seed = (1103515245 * seed + 12345) % 4294967296; return seed % r; };
   
  public:
+  unsigned int rnd(unsigned int r) { seed = (1103515245 * seed + 12345) % 4294967296; return seed % r; };
   int S(int s, int t) { return state[s-1][t-1]; };
   int C(int s, int t) { return cost[s-1][t-1]; };
 

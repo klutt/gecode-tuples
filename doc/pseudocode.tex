@@ -42,7 +42,7 @@
 \State Intdomain newSymbol := $\emptyset$
 \ForAll {symbol in Symbol}
 	\ForAll {pre in Pre}
-		\State Pair p := (S(pre.state, symbol), pre.cost+C(pre.cost, symbol))
+		\State Pair p := (S(pre.state, symbol), pre.cost+C(pre.state, symbol))
 		\If {Post.contain(p)}
 			\State newPost := newPost $\cup$ p
 			\State newPre := newPre $\cup$ pre
@@ -78,7 +78,7 @@
 \State Intdomain newSymbol := $\emptyset$
 \ForAll {s in Symbol}
 	\ForAll {pre in Pre}
-		\State Pair p :=(S(pre.state,s),pre.low+C(pre.low,s),pre.high+ C(pre.high,s))
+		\State Pair p :=(S(pre.state,s),pre.low+C(pre.state,s),pre.high+ C(pre.state,s))
 		\If {p.state $\neq$ garbage state}
 			\State Merge(newPost, p)
 			\State Merge(newPre, pre)

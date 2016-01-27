@@ -27,7 +27,7 @@ public:
 
   
   Test(const SizeOptions& opt) : sv(*this, nosteps+1,1,nostates),
-				 cv(*this ,nosteps+1,0, maxcosttotal),
+				 cv(*this ,nosteps+1,0, maxcosttotal-1),
 				 zv(*this, nosteps,1,notokens)
   {
     rel(*this, sv[0], IRT_EQ, 1); // Starting state

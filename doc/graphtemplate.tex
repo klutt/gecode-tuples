@@ -1,0 +1,100 @@
+\begin{figure}[H]
+  \centering
+  \textbf{Varying XVAR }
+  \newline
+  \newline
+  \pgfplotsset{
+    scale only axis,
+    legend style={at={(0,0.8)}, anchor=west, font=\tiny},
+    xmin=XMIN,
+  }
+  \begin{tikzpicture} [scale=0.8]
+    \begin{axis}[
+        title=No nodes linear scale,
+        ylabel=nodes,
+        xtick=data,
+        ymin=0, 
+        xlabel=XVAR ]
+      \addplot[smooth,mark=square*, mark options={solid},red, dashed]
+      coordinates{ DATAEN
+      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      \addplot[smooth,mark=square*, mark options={solid},blue]
+      coordinates{ DATAAN
+      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+      coordinates{ DATAN
+      }; \label{int_plot} \addlegendentry{Integer}
+    \end{axis}
+  \end{tikzpicture}
+  \begin{tikzpicture} [scale=0.8]
+    \begin{axis}[
+        yticklabel pos=right,
+        xtick=data,
+        title=Runtime linear scale,
+        ylabel=runtime (ms),
+        xlabel=XVAR,
+        ymin=0, ]
+      \addplot[smooth,mark=square*,mark options={solid},red, dashed]
+      coordinates{ DATAER
+      }; \label{IntPairExact Run}
+      \addplot[smooth,mark=square*,mark options={solid},blue]
+      coordinates{ DATAAR
+      }; \label{IntPairApprox Run}
+      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+      coordinates{ DATAR
+      }; \label{IntegerRun}
+      \addlegendentry{IntPairExact}
+      \addlegendentry{IntPairApprox}
+      \addlegendentry{Integer}
+    \end{axis}
+  \end{tikzpicture}
+
+  \begin{tikzpicture}[scale=1.4]
+    \draw[very thick] (-4,0) -- (4,0);
+    \draw[draw=white] (-5,-0.2) -- (5,-0.2);
+  \end{tikzpicture}
+
+
+  \begin{tikzpicture} [scale=0.8]
+    \begin{semilogyaxis}[
+        title=No nodes logarithmic scale,
+        ylabel=nodes,
+        xtick=data,
+        ymin=0, 
+        xlabel=XVAR ]
+     \addplot[smooth,mark=square*, mark options={solid},red, dashed]
+      coordinates{ DATAEN
+      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      \addplot[smooth,mark=square*, mark options={solid},blue]
+      coordinates{ DATAAN
+      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+      coordinates{ DATAN
+      }; \label{int_plot} \addlegendentry{Integer}
+
+    \end{semilogyaxis}
+  \end{tikzpicture}
+  \begin{tikzpicture} [scale=0.8]
+    \begin{semilogyaxis}[
+        title=Runtime logaritmhic scale,
+        yticklabel pos=right,
+        xtick=data,
+        ylabel=runtime (ms),
+        xlabel=XVAR,
+        ymin=0,  ]
+      \addplot[smooth,mark=square*,mark options={solid},red, dashed]
+      coordinates{ DATAER
+      }; \label{IntPairExact Run}
+      \addplot[smooth,mark=square*,mark options={solid},blue]
+      coordinates{ DATAAR
+      }; \label{IntPairApprox Run}
+      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+      coordinates{ DATAR
+      }; \label{IntegerRun}
+      \addlegendentry{IntPairExact}
+      \addlegendentry{IntPairApprox}
+      \addlegendentry{Integer}
+    \end{semilogyaxis}
+  \end{tikzpicture}
+  \caption{{Caption}}\label{fig:}
+\end{figure}

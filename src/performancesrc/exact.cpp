@@ -26,7 +26,7 @@ public:
   IntVarArray z;
   IntPairVar init;
   
-  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal),
+  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal-1),
 				 z(*this, nosteps,1,notokens),
 				 init(*this, 1,1,0,0)
   {
