@@ -1,6 +1,6 @@
 \begin{figure}[H]
   \centering
-  \textbf{Varying  }
+  \textbf{Varying steps }
   \newline
   \newline
   \pgfplotsset{
@@ -14,15 +14,15 @@
         ylabel=nodes,
         xtick=data,
         ymin=0, 
-        xlabel= ]
+        xlabel=steps ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7, 3612) (8, 14817) (9, 65810) (10, 319263)
+      coordinates{ (7, 3936) (8, 14841) (9, 65068) (10, 295937) (11, 1039687)
       }; \label{ie_plot} \addlegendentry{IntPairExact}
       \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7, 6374) (8, 33149) (9, 108671) (10, 477582)
+      coordinates{ (7, 5646) (8, 23764) (9, 106988) (10, 471656) (11, 1675490)
       }; \label{ia_plot} \addlegendentry{IntPairApprox}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 6999) (8, 29162) (9, 119996) (10, 526972)
+      coordinates{ (7, 7312) (8, 26952) (9, 119632) (10, 516456) (11, 1867028)
       }; \label{int_plot} \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
@@ -32,16 +32,16 @@
         xtick=data,
         title=Runtime linear scale,
         ylabel=runtime (ms),
-        xlabel=,
+        xlabel=steps,
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824)
+      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
       }; \label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138)
+      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
       }; \label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862)
+      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
       }; \label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
@@ -61,15 +61,15 @@
         ylabel=nodes,
         xtick=data,
         ymin=0, 
-        xlabel= ]
+        xlabel=steps ]
      \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7, 3612) (8, 14817) (9, 65810) (10, 319263)
+      coordinates{ (7, 3936) (8, 14841) (9, 65068) (10, 295937) (11, 1039687)
       }; \label{ie_plot} \addlegendentry{IntPairExact}
       \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7, 6374) (8, 33149) (9, 108671) (10, 477582)
+      coordinates{ (7, 5646) (8, 23764) (9, 106988) (10, 471656) (11, 1675490)
       }; \label{ia_plot} \addlegendentry{IntPairApprox}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 6999) (8, 29162) (9, 119996) (10, 526972)
+      coordinates{ (7, 7312) (8, 26952) (9, 119632) (10, 516456) (11, 1867028)
       }; \label{int_plot} \addlegendentry{Integer}
 
     \end{semilogyaxis}
@@ -80,16 +80,16 @@
         yticklabel pos=right,
         xtick=data,
         ylabel=runtime (ms),
-        xlabel=,
+        xlabel=steps,
         ymin=0,  ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824)
+      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
       }; \label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138)
+      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
       }; \label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862)
+      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
       }; \label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}

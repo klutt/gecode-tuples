@@ -11,8 +11,8 @@
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{courier}
-
-
+\usepackage{graphicx}
+\usepackage{epsfig}
 
 \usepackage{siunitx}
 \sisetup{per=slash, load=abbr}
@@ -98,6 +98,33 @@ In constraint programming, different variable types may be used. Gecode comes wi
 In principal the CP-solver loops propagating and branching until the problem is solved. The propagators has two main tasks. The most important task is to determine if a solution has been found or not. A solution is a state where all variables are assigned, which means their domain has been pruned (shrinked) to exactly one, and all propagators reports that the values assigned to the variables satisfies the constraints. The second task is not mandatory, but crucial for performance. A propagator can prune values from a variable's domain. For example, if a variable $x$ has a domain of $\{1..9\}$ and the constraint $x\le 4$ is used, a propagator could instantaneously remove the values $\{5..9\}$ from the domain.
 
 When no propagator can prune any values a brancher takes over. The brancher typically splits the variable it is connected to into two parts, one with an assigned value and one with the rest of the domain, thus creating a search tree. After this branching the propagators are called again. The branchers determines the structure of the tree, and the search engine determines how the tree will be traversed. 
+\subsection{Tuple}
+In a mathematical context a tuple is a finite length sequence (ordered list) of elements. The elements can be of any type, and does not need to be of the same type. The most common type of tuples in mathematics and physics are vectors. Velocity and force is two examples. In this thesis a tuple is denoted by angle brackets. The tuples considered in this thesis are integer 2-tuples. 
+
+\subsection{Deterministic Finite Automaton}
+A deterministic finite automaton (DFA) is a 5-tuple, $\langle Q,\Sigma,\delta,q_0, F\rangle$. $Q$ is a finite set of states. $\Sigma$ is called the alphabet and is a finite set of symbols. $\delta$ is a transition function which maps a state from $Q$ and a symbol from $\Sigma$ to a state in $Q$. $q_0$ is called the starting state and is an element in $Q$. $F$ is a subset of $Q$, and these states are called accepting states. Any state from which there is no path to an accepting state is commonly called a \textit{garbage state}. Furthermore, the set of garbage states are commonly viewed at as one state, called \textit{the} garbage state. Usually the garbage state is left out in graphical representations.
+
+\begin{figure}[H]
+\centering
+\includegraphics{dfa.eps}
+\caption{A DFA for the swedish drinking protocol, as it is showed in the Gecode documentation. State $1$ is the starting state and the only accepting state. State $2$ is not an accepting state. The symbols $d$ and $s$ denotes drinking and singing. The DFA means that you may drink whenever you want, but if a song has been sung you have to drink before you leave. The regular expression for this DFA is $(d|sd)*$}
+\label{fig:dfasdp}
+\end{figure}
+
+A finite automaton where $q_0$ is a set of states and $\Sigma$ may include $\epsilon$, which is an empty string, is called a nondeterministic finite automaton (NFA). Every NFA can be converted to a DFA.
+
+DFA:s are closely related to regular expressions (regex). Every regex corresponds to a DFA and vice versa. Note that this is not true for the extended regex one can find in many languages. A pure regex can be written with the operators $($,$)$,$|$ and $*$. One example is $ab(a|b)c*$ which is a regex for the language of all strings starting with $ab$, continuing with an a or a b and ends with zero or more c.
+
+In this thesis an altered version of a DFA is used. The difference is that the state function not only maps a state and a symbol to a state, but to a tuple of both a state and a cost. Another way to look at it is to define the DFA as a 6-tuple with an added cost function. Mathematically the two approaches are equivalent, and for implementation related reasons it is considered as a 6-tuple in the code. It is not a DFA strictly speaking. 
+
+I considered naming it \textit{cDFA} for cost DFA, but this acronym is used in the paper Propagating Regular Counting Constraints for a counting DFA, which is defined in a similar but different manner. Whenever the term DFA occurs in this thesis the meaning is a DFA with individual costs for each transition.
+
+\begin{figure}[H]
+\centering
+\includegraphics{cdfa.eps}
+\caption{A DFA with costs for the swedish drinking protocol. It is an altered variant of the DFA shown in figure~\ref{fig:dfasdp}. The symbols $d$ and $s$ still means drinking and singing, but the symbol $l$ is introduced for leaving. Also, costs are introduced for each transition, so you can leave without drinking after singing, but with a punishment.}
+\label{fig:cdfasdp}
+\end{figure}
 
 \subsection{Motivation for Tuple Variables}
 When using a CP solver, it is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends on the model and the propagators. With good models and propagators the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$ in one step, and this is the solution to the problem. If we instead have the same variables and domains but instead use the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. 
@@ -145,7 +172,7 @@ The [ModEvent] section specifies the modification events. The modification event
 The [PropCond] section describes how the propagators are scheduled, depending on how the variables have changed. For all variables, propagator conditions for NONE and ASSIGNED are required.
 
 \subsubsection{Variable Implementation}
-The variable implementation class would with the specification file in the previous section be called IntTupleVarImp and inherit from the class IntTupleVarBase generated from the specification file. It has to implement a function called assigned that returns true if the variable is assigned. The implementation class is the class that does all the work. This is where the modification events are defined, and the modification events are the only methods that directly changes the domain. The implementation class implements both the getters and setters that are used by the variable class and view class.
+The variable implementation class would with the specification file in the previous section be called IntTupleVarImp and inherit from the class IntTupleVarBase generated from the specification file. It has to implement a function called \texttt{assigned} that returns true iff the variable is assigned. The implementation class is the class that does all the work. This is where the modification events are defined, and the modification events are the only methods that directly changes the domain. The implementation class implements both the getters and setters that are used by the variable class and view classes.
 
 \subsubsection{Variable Class}
 The variable class is the class that is used when modeling the actual problem and inherits from the variable implementation. It is a read-only user interface, and a programmer that does not program any custom branchers or propagators will not use anything else than this. This class would be called IntTupleVar.
