@@ -8,8 +8,8 @@
 \ForAll {symbol in Symbol}
 	\ForAll {preState in PreState}
 		\State int state := S(pre.state, symbol)
-		\If {PostState.contain(state)}
-			\State newPostState := newPostState $\cup$ state
+		\If {PostState.contain(state) and p.state $\neq$ garbage state}
+					\State newPostState := newPostState $\cup$ state
 			\State newPreState := newPreState $\cup$ pre
 			\State newSymbol := newSymbol $\cup$ symbol 
 			\ForAll {cost in PreCost}
@@ -30,7 +30,7 @@
 \EndProcedure
 \end{algorithmic}
 \end{algorithm} 
-\caption{int}\label{fig:algint}
+\caption{Propagator for DFA constraint for IntVar variables}\label{fig:algint}
 \end{figure}
 
 %Exact
@@ -43,7 +43,7 @@
 \ForAll {symbol in Symbol}
 	\ForAll {pre in Pre}
 		\State Pair p := (S(pre.state, symbol), pre.cost+C(pre.state, symbol))
-		\If {Post.contain(p)}
+		\If {Post.contain(p) and p.state $\neq$ garbage state}
 			\State newPost := newPost $\cup$ p
 			\State newPre := newPre $\cup$ pre
 			\State newSymbol := newSymbol $\cup$ symbol 
@@ -57,7 +57,7 @@
 \end{algorithmic}
 \caption{DFA propagator IntPairExact \newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
 \end{algorithm}
-\caption{exact}\label{fig:algexact}
+\caption{Propagator for DFA constraint for IntPairExactVar variables}\label{fig:algexact}
 \end{figure}
 %Approx
 \begin{figure}[H]
@@ -92,5 +92,5 @@
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-\caption{approx}\label{fig:algapprox}
+\caption{Propagator for DFA constraint for IntPairApprox variables}\label{fig:algapprox}
 \end{figure}

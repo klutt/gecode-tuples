@@ -16,14 +16,17 @@
         ymin=0, 
         xlabel=steps ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7, 3936) (8, 14841) (9, 65068) (10, 295937) (11, 1039687)
-      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
+      }; %\label{ie_plot}
+      \addlegendentry{IntPairExact}
       \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7, 5646) (8, 23764) (9, 106988) (10, 471656) (11, 1675490)
-      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
+      }; %\label{ia_plot}
+      \addlegendentry{IntPairApprox}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 7312) (8, 26952) (9, 119632) (10, 516456) (11, 1867028)
-      }; \label{int_plot} \addlegendentry{Integer}
+      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
+      }; %\label{int_plot}
+      \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
   \begin{tikzpicture} [scale=0.8]
@@ -35,66 +38,69 @@
         xlabel=steps,
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
-      }; \label{IntPairExact Run}
+      coordinates{ (7, 2256) (8, 11920) (9, 56407) (10, 252762) (11, 894726)
+      };% \label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
-      }; \label{IntPairApprox Run}
+      coordinates{ (7, 4721) (8, 19793) (9, 92335) (10, 400819) (11, 1424025)
+      }; %\label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
-      }; \label{IntegerRun}
+      coordinates{ (7, 5248) (8, 23749) (9, 100874) (10, 438791) (11, 1558550)
+      }; %\label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
       \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
 
-  \begin{tikzpicture}[scale=1.4]
-    \draw[very thick] (-4,0) -- (4,0);
-    \draw[draw=white] (-5,-0.2) -- (5,-0.2);
-  \end{tikzpicture}
+%  \begin{tikzpicture}[scale=1.4]
+%    \draw[very thick] (-4,0) -- (4,0);
+%    \draw[draw=white] (-5,-0.2) -- (5,-0.2);
+%  \end{tikzpicture}
 
 
-  \begin{tikzpicture} [scale=0.8]
-    \begin{semilogyaxis}[
-        title=No nodes logarithmic scale,
-        ylabel=nodes,
-        xtick=data,
-        ymin=0, 
-        xlabel=steps ]
-     \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7, 3936) (8, 14841) (9, 65068) (10, 295937) (11, 1039687)
-      }; \label{ie_plot} \addlegendentry{IntPairExact}
-      \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7, 5646) (8, 23764) (9, 106988) (10, 471656) (11, 1675490)
-      }; \label{ia_plot} \addlegendentry{IntPairApprox}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 7312) (8, 26952) (9, 119632) (10, 516456) (11, 1867028)
-      }; \label{int_plot} \addlegendentry{Integer}
+%  \begin{tikzpicture} [scale=0.8]
+%    \begin{semilogyaxis}[
+%        title=No nodes logarithmic scale,
+%        ylabel=nodes,
+%        xtick=data,
+%        ymin=0, 
+%        xlabel=steps ]
+%     \addplot[smooth,mark=square*, mark options={solid},red, dashed]
+%      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
+%      }; %\label{ie_plot}
+%      \addlegendentry{IntPairExact}
+%      \addplot[smooth,mark=square*, mark options={solid},blue]
+%      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
+%      }; %\label{ia_plot}
+%      \addlegendentry{IntPairApprox}
+%      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+%      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
+%      }; %\label{int_plot}
+%      \addlegendentry{Integer}
 
-    \end{semilogyaxis}
-  \end{tikzpicture}
-  \begin{tikzpicture} [scale=0.8]
-    \begin{semilogyaxis}[
-        title=Runtime logaritmhic scale,
-        yticklabel pos=right,
-        xtick=data,
-        ylabel=runtime (ms),
-        xlabel=steps,
-        ymin=0,  ]
-      \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
-      }; \label{IntPairExact Run}
-      \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
-      }; \label{IntPairApprox Run}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
-      }; \label{IntegerRun}
-      \addlegendentry{IntPairExact}
-      \addlegendentry{IntPairApprox}
-      \addlegendentry{Integer}
-    \end{semilogyaxis}
-  \end{tikzpicture}
-  \caption{{Caption}}\label{fig:}
+%    \end{semilogyaxis}
+%  \end{tikzpicture}
+%  \begin{tikzpicture} [scale=0.8]
+%    \begin{semilogyaxis}[
+%        title=Runtime logaritmhic scale,
+%        yticklabel pos=right,
+%        xtick=data,
+%        ylabel=runtime (ms),
+%        xlabel=steps,
+%        ymin=0,  ]
+%      \addplot[smooth,mark=square*,mark options={solid},red, dashed]
+%      coordinates{ (7, 2256) (8, 11920) (9, 56407) (10, 252762) (11, 894726)
+%      }; %\label{IntPairExact Run}
+%      \addplot[smooth,mark=square*,mark options={solid},blue]
+%      coordinates{ (7, 4721) (8, 19793) (9, 92335) (10, 400819) (11, 1424025)
+%     }; %\label{IntPairApprox Run}
+%      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+%      coordinates{ (7, 5248) (8, 23749) (9, 100874) (10, 438791) (11, 1558550)
+%      }; %\label{IntegerRun}
+%      \addlegendentry{IntPairExact}
+%      \addlegendentry{IntPairApprox}
+%      \addlegendentry{Integer}
+%    \end{semilogyaxis}
+%  \end{tikzpicture}
+%  \caption{{Caption}}\label{fig:}
 \end{figure}

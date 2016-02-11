@@ -16,14 +16,17 @@
         ymin=0, 
         xlabel=states ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7, 2062) (9, 1136) (11, 3521) (13, 2452) (15, 2784) (17, 4053) (19, 2365) (21, 5039)
-      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      coordinates{ (7,427514) (9,454874) (11,356896) (13,385169) (15,329868) (17,338722) (19,339050) (21,440084) (23,437965) (25,356520) (27,415702)
+      }; %\label{ie_plot}
+      \addlegendentry{IntPairExact}
       \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7, 3553) (9, 2592) (11, 6505) (13, 4568) (15, 5156) (17, 7433) (19, 4444) (21, 8725)
-      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      coordinates{ (7,1195984) (9,1264044) (11,1094910) (13,1210487) (15,1127178) (17,1166840) (19,1207856) (21,1464930) (23,1496955) (25,1296590) (27,1470000)
+      }; %\label{ia_plot}
+      \addlegendentry{IntPairApprox}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 4552) (9, 3918) (11, 7834) (13, 6439) (15, 7096) (17, 9639) (19, 6742) (21, 12021)
-      }; \label{int_plot} \addlegendentry{Integer}
+      coordinates{ (7,1283617) (9,1382304) (11,1219058) (13,1358874) (15,1261790) (17,1313042) (19,1367570) (21,1636624) (23,1661830) (25,1464554) (27,1653812)
+      }; %\label{int_plot}
+      \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
   \begin{tikzpicture} [scale=0.8]
@@ -35,66 +38,69 @@
         xlabel=states,
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7,33465) (9,15686) (11,47674) (13,27424) (15,25602) (17,37602) (19,16206) (21,35578)
-      }; \label{IntPairExact Run}
+      coordinates{ (7, 24091) (9, 30492) (11, 31026) (13, 38125) (15, 39380) (17, 45187) (19, 48943) (21, 67630) (23, 72791) (25, 67855) (27, 81536)
+      };% \label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7,97813) (9,55060) (11,138726) (13,79518) (15,87294) (17,116620) (19,63208) (21,120264)
-      }; \label{IntPairApprox Run}
+      coordinates{ (7, 47133) (9, 55287) (11, 55408) (13, 65274) (15, 67460) (17, 73920) (19, 81508) (21, 101759) (23, 109442) (25, 101353) (27, 119748)
+      }; %\label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (9,66098) (11,149430) (13,91884) (15,98370) (17,131234) (19,73028) (21,137458)
-      }; \label{IntegerRun}
+      coordinates{ (7, 52426) (9, 64242) (11, 68331) (13, 84028) (15, 88250) (17, 98554) (19, 111021) (21, 131160) (23, 141472) (25, 137661) (27, 159120)
+      }; %\label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
       \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
 
-  \begin{tikzpicture}[scale=1.4]
-    \draw[very thick] (-4,0) -- (4,0);
-    \draw[draw=white] (-5,-0.2) -- (5,-0.2);
-  \end{tikzpicture}
+%  \begin{tikzpicture}[scale=1.4]
+%    \draw[very thick] (-4,0) -- (4,0);
+%    \draw[draw=white] (-5,-0.2) -- (5,-0.2);
+%  \end{tikzpicture}
 
 
-  \begin{tikzpicture} [scale=0.8]
-    \begin{semilogyaxis}[
-        title=No nodes logarithmic scale,
-        ylabel=nodes,
-        xtick=data,
-        ymin=0, 
-        xlabel=states ]
-     \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7, 2062) (9, 1136) (11, 3521) (13, 2452) (15, 2784) (17, 4053) (19, 2365) (21, 5039)
-      }; \label{ie_plot} \addlegendentry{IntPairExact}
-      \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7, 3553) (9, 2592) (11, 6505) (13, 4568) (15, 5156) (17, 7433) (19, 4444) (21, 8725)
-      }; \label{ia_plot} \addlegendentry{IntPairApprox}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 4552) (9, 3918) (11, 7834) (13, 6439) (15, 7096) (17, 9639) (19, 6742) (21, 12021)
-      }; \label{int_plot} \addlegendentry{Integer}
+%  \begin{tikzpicture} [scale=0.8]
+%    \begin{semilogyaxis}[
+%        title=No nodes logarithmic scale,
+%        ylabel=nodes,
+%        xtick=data,
+%        ymin=0, 
+%        xlabel=states ]
+%     \addplot[smooth,mark=square*, mark options={solid},red, dashed]
+%      coordinates{ (7,427514) (9,454874) (11,356896) (13,385169) (15,329868) (17,338722) (19,339050) (21,440084) (23,437965) (25,356520) (27,415702)
+%      }; %\label{ie_plot}
+%      \addlegendentry{IntPairExact}
+%      \addplot[smooth,mark=square*, mark options={solid},blue]
+%      coordinates{ (7,1195984) (9,1264044) (11,1094910) (13,1210487) (15,1127178) (17,1166840) (19,1207856) (21,1464930) (23,1496955) (25,1296590) (27,1470000)
+%      }; %\label{ia_plot}
+%      \addlegendentry{IntPairApprox}
+%      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+%      coordinates{ (7,1283617) (9,1382304) (11,1219058) (13,1358874) (15,1261790) (17,1313042) (19,1367570) (21,1636624) (23,1661830) (25,1464554) (27,1653812)
+%      }; %\label{int_plot}
+%      \addlegendentry{Integer}
 
-    \end{semilogyaxis}
-  \end{tikzpicture}
-  \begin{tikzpicture} [scale=0.8]
-    \begin{semilogyaxis}[
-        title=Runtime logaritmhic scale,
-        yticklabel pos=right,
-        xtick=data,
-        ylabel=runtime (ms),
-        xlabel=states,
-        ymin=0,  ]
-      \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7,33465) (9,15686) (11,47674) (13,27424) (15,25602) (17,37602) (19,16206) (21,35578)
-      }; \label{IntPairExact Run}
-      \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7,97813) (9,55060) (11,138726) (13,79518) (15,87294) (17,116620) (19,63208) (21,120264)
-      }; \label{IntPairApprox Run}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (9,66098) (11,149430) (13,91884) (15,98370) (17,131234) (19,73028) (21,137458)
-      }; \label{IntegerRun}
-      \addlegendentry{IntPairExact}
-      \addlegendentry{IntPairApprox}
-      \addlegendentry{Integer}
-    \end{semilogyaxis}
-  \end{tikzpicture}
-  \caption{{Caption}}\label{fig:}
+%    \end{semilogyaxis}
+%  \end{tikzpicture}
+%  \begin{tikzpicture} [scale=0.8]
+%    \begin{semilogyaxis}[
+%        title=Runtime logaritmhic scale,
+%        yticklabel pos=right,
+%        xtick=data,
+%        ylabel=runtime (ms),
+%        xlabel=states,
+%        ymin=0,  ]
+%      \addplot[smooth,mark=square*,mark options={solid},red, dashed]
+%      coordinates{ (7, 24091) (9, 30492) (11, 31026) (13, 38125) (15, 39380) (17, 45187) (19, 48943) (21, 67630) (23, 72791) (25, 67855) (27, 81536)
+%      }; %\label{IntPairExact Run}
+%      \addplot[smooth,mark=square*,mark options={solid},blue]
+%      coordinates{ (7, 47133) (9, 55287) (11, 55408) (13, 65274) (15, 67460) (17, 73920) (19, 81508) (21, 101759) (23, 109442) (25, 101353) (27, 119748)
+%     }; %\label{IntPairApprox Run}
+%      \addplot[smooth,mark=*,mark options={solid},black, dotted]
+%      coordinates{ (7, 52426) (9, 64242) (11, 68331) (13, 84028) (15, 88250) (17, 98554) (19, 111021) (21, 131160) (23, 141472) (25, 137661) (27, 159120)
+%      }; %\label{IntegerRun}
+%      \addlegendentry{IntPairExact}
+%      \addlegendentry{IntPairApprox}
+%      \addlegendentry{Integer}
+%    \end{semilogyaxis}
+%  \end{tikzpicture}
+%  \caption{{Caption}}\label{fig:}
 \end{figure}

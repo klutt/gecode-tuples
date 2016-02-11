@@ -17,13 +17,16 @@
         xlabel=XVAR ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
       coordinates{ DATAEN
-      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      }; %\label{ie_plot}
+      \addlegendentry{IntPairExact}
       \addplot[smooth,mark=square*, mark options={solid},blue]
       coordinates{ DATAAN
-      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      }; %\label{ia_plot}
+      \addlegendentry{IntPairApprox}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
       coordinates{ DATAN
-      }; \label{int_plot} \addlegendentry{Integer}
+      }; %\label{int_plot}
+      \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
   \begin{tikzpicture} [scale=0.8]
@@ -36,13 +39,13 @@
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
       coordinates{ DATAER
-      }; \label{IntPairExact Run}
+      };% \label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
       coordinates{ DATAAR
-      }; \label{IntPairApprox Run}
+      }; %\label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
       coordinates{ DATAR
-      }; \label{IntegerRun}
+      }; %\label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
       \addlegendentry{Integer}
@@ -64,13 +67,16 @@
         xlabel=XVAR ]
      \addplot[smooth,mark=square*, mark options={solid},red, dashed]
       coordinates{ DATAEN
-      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      }; %\label{ie_plot}
+      \addlegendentry{IntPairExact}
       \addplot[smooth,mark=square*, mark options={solid},blue]
       coordinates{ DATAAN
-      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      }; %\label{ia_plot}
+      \addlegendentry{IntPairApprox}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
       coordinates{ DATAN
-      }; \label{int_plot} \addlegendentry{Integer}
+      }; %\label{int_plot}
+      \addlegendentry{Integer}
 
     \end{semilogyaxis}
   \end{tikzpicture}
@@ -84,13 +90,13 @@
         ymin=0,  ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
       coordinates{ DATAER
-      }; \label{IntPairExact Run}
+      }; %\label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
       coordinates{ DATAAR
-      }; \label{IntPairApprox Run}
+      }; %\label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
       coordinates{ DATAR
-      }; \label{IntegerRun}
+      }; %\label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
       \addlegendentry{Integer}
