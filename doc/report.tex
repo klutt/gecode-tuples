@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 %\usepackage{bibtopic}
-\usepackage{natbib}
+%\usepackage{natbib}
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -97,23 +97,23 @@ The results confirm that tuple variables can be used to increase performance. Th
 \section{Background}
 \subsection{Constraint Programming}
 
-Constraint programming (CP) is a method to solve problems by modeling the problem with variables and constraints that the variables must fulfill. The variables have an initial domain of possible values. The CP solver then uses the constraints to remove impossible values. CP is a \textit{declarative} type of programming, which basically means that the programmer states what is true. This is very much like mathematics. The \textit{constraints} work like equations.
+Constraint programming (CP) is a method to solve problems by modeling the problem with variables and constraints that the variables must fulfill. The variables have an initial domain of possible values. Then \textit{propagators} are used to remove impossible values. Propagators are explained in detail in Section~\ref{sec:propagators}. CP is a \textit{declarative} type of programming, which basically means that the programmer states what is true. This is very much like mathematics. The \textit{constraints} work like equations.
 
-A very typical problem suitable for CP is a Sudoku. The most intuitive model is a $9\times9$ matrix of integer variables. The constraints are that all variables have a domain of $\{1,\ldots,9\}$, and that all variables in a row, column and box must be different. For a specific sudoku constraints are added to require specific variables to have predetermined values.
+A problem suitable for CP is a Sudoku. The most intuitive model is a $9\times9$ matrix of integer variables. The constraints are that all variables have a domain of $\{1,\ldots,9\}$, and that all variables in a row, column and box must be different. For a specific Sudoku constraints are added to require certain variables to have predetermined values.
 
-In CP, different variable types may be used. Gecode comes with boolean, integer, integer set and float variables. The available variable types limits the options to model a specific problem. With more variable types a specific problem can be modeled in different ways. There is a problem called Eight queens\footnote{\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}}. The problem is to place eight queens on a chess board in such a way that no queen threatens another. If only boolean variables are available, the problem would have to modeled with 64 boolean variables. With integer variables it would be sufficient with only 8 variables. In the boolean case each variable $b[i][j]$ would tell whether a tile has a queen or not, while in the integer variable case each variable $x[i]$ would tell on which row the queen in column $i$ should be placed on. By analyzing the Eight queen problem it is easy to realize that a solution must have one queen per column.
+When using CP, different variable types may be used. Gecode comes with boolean, integer, integer set and float variables. The available variable types limits the options to model a specific problem. With more variable types a specific problem can be modeled in different ways. There is a problem called Eight queens\footnote{\url{https://en.wikipedia.org/wiki/Eight_queens_puzzle}}. The problem is to place eight queens on a chess board in such a way that no queen threatens another queen. If only boolean variables are available, the problem have to modeled with 64 boolean variables. With integer variables, it is sufficient with only 8 variables. In the boolean case each variable $b[i][j]$ would tell whether a tile has a queen or not, while in the integer variable case each variable $x[i]$ would tell on which row the queen in column $i$ should be placed on. By analyzing the Eight queen problem it is easy to realize that a solution must have one queen per column.
 
 In principal, solving a CP-problem means alternating propagating and branching until the problem is solved. The propagators have two main tasks. The most important task is to determine whether a \textit{solution} has been found or not. A \textit{solution} is a state where all variables are \textit{assigned}, which means their domain has been \textit{pruned} to the size of exactly one, and all propagators reports that the values assigned to the variables satisfies the constraints. \textit{Pruning} is when a propagator removes values from domains. The second task is not mandatory, but crucial for performance. A propagator can prune values from a variable's domain. For example, if a variable $x$ has a domain of $\{1..9\}$ and the constraint $x\le 4$ is used, a propagator could instantaneously remove the values $\{5..9\}$ from the domain.
 
-When no propagator can prune any values a brancher takes over. The brancher typically splits the variable it is connected to into two parts, one with an assigned value and one with the rest of the domain, thus creating a search tree. After this branching, the propagators are called again. The branchers determine the structure of the tree, and the search engine determines how the tree will be traversed. 
+When no propagator can prune any values, a brancher takes over. The brancher typically splits the variable it is connected to into two parts, one with an assigned value and one with the rest of the domain, thus creating a search tree. After this branching, the propagators are called again for both branches. The branchers determine the structure of the search tree.
 
 Note that the domain of a variable never grows, and no values changes. The only thing that happens to the domains after initialisation is that values are removed by either a propagator or a brancher.
 
 \subsection{Tuple}
-In a mathematical context a tuple is a finite length sequence (ordered list) of elements. The elements can be of any type, such as numbers, sets and functions. The elements do not need to be of the same type. The most common type of tuples in mathematics and physics are vectors. Velocity and force are two examples. An $n$-dimensional tuple is called an $n$-tuple. In this thesis a tuple is denoted by angle brackets. $\langle 3, 2, 1, 4, 2 \rangle$ is an example of a 5-tuple.
+In a mathematical context, a tuple is a finite length sequence (ordered list) of elements. The elements can be of any type, such as numbers, sets, and functions. The elements do not need to be of the same type. The most common type of tuples in mathematics and physics are vectors. Velocity and force are two examples. An $n$-dimensional tuple is called an $n$-tuple. In this thesis, a tuple is denoted by angle brackets. $\langle 3, 2, 1, 4, 2 \rangle$ is an example of a 5-tuple.
 
 \subsection{Deterministic Finite Automaton}
-A deterministic finite automaton (DFA) is a 5-tuple, $\langle Q,\Sigma,\delta,q_0, F\rangle$. $Q$ is a finite set of states. $\Sigma$ is called the alphabet and is a finite set of symbols. $\delta : Q \times \Sigma \mapsto Q$  is a transition function which maps a state and a symbol to a state. $q_0$ is called the starting state and is an element in $Q$. $F$ is a subset of $Q$, and these states are called accepting states. Any state from which there is no path to an accepting state is commonly called a \textit{garbage state}. Furthermore, the set of garbage states are commonly viewed at as one state, called \textit{the} garbage state. Usually the garbage state is left out in both graphical and algebraic representations. 
+A deterministic finite automaton (DFA) is a 5-tuple: $\langle Q,\Sigma,\delta,q_0, F\rangle$. $Q$ is a finite set of states. $\Sigma$ is called the alphabet and is a finite set of symbols. $\delta : Q \times \Sigma \mapsto Q$  is a transition function, and maps a state and a symbol to a state. $q_0$ is called the starting state and is an element in $Q$. $F$ is a subset of $Q$, and these states are called accepting states. Any state from which there is no path (via one or more transisions) to an accepting state is commonly called a \textit{garbage state}. Furthermore, the set of garbage states are commonly viewed at as one state, called \textit{the} garbage state. Usually the garbage state is left out in both graphical and algebraic representations. 
 
 A DFA \textit{consumes} symbols from a string from the beginning to the end. If the DFA is in an accepting state when all symbols in the string have been consumed the DFA \textit{accepts} the string. Figure~\ref{fig:dfasdp} shows a 2-state DFA with omitted garbage state.
 
@@ -128,9 +128,9 @@ A finite automaton where $\Sigma$ maps a state and a symbol to a set of states i
 
 DFA:s (and therefore also NFA:s) are closely related to regular expressions (regex). Every regex corresponds to a DFA and vice versa. Note that this is not true for the extended regexes one can find in many languages, such as Perl and Python. A pure regex can be written with the operators $($,$)$,$|$ and $^{*}$. One example that uses all of them is $ab(a|b)c^{*}$ which is a regex for the language of all strings starting with $ab$, continuing with either an $a$ or a $b$, and ends with zero or more $c$. A corresponding DFA for this regex is $Q=\{1,2,3,4\}, \Sigma=\{a,b,c\}, q_0=1, F=\{4\}, \delta(1,a)=2, \delta(2,b)=3, \delta(3,a)=4, \delta(3,b)=4, \delta(4,c)=4$. Any other parameters for $\delta$ returns the garbage state.
 
-In this thesis an extended version of a DFA, a counting DFA (cDFA), is used. The difference is that the state function not only maps a state and a symbol to a state, but to a tuple of both a state and a cost. Another possible approach is to define the DFA as a 6-tuple with an added cost function. Mathematically the two approaches are equivalent. When displayed graphically the first approach is more suitable, but for implementation related reasons the latter one is used in the actual code. Figure~\ref{fig:cdfasdp} shows an example of an extended DFA.
+In this thesis an extended version of a DFA, a counting DFA (cDFA), is used. The difference is that the state function not only maps a state and a symbol to a state, but to a tuple of both a state and a cost. Another possible approach is to define the DFA as a 6-tuple with an added cost function. Mathematically the two approaches are equivalent. When displayed graphically the first approach is more suitable, but for implementation related reasons the latter one is used in the actual code. Figure~\ref{fig:cdfasdp} shows an example of an cDFA.
 
-In the paper Propagating Regular Counting Constraints cDFA means \textit{counting DFA} It is defined in a similar manner, and counting can be interpreted as cost. Whenever a DFA is mentioned in this thesis, it is a cDFA.
+In the paper Propagating Regular Counting Constraints cDFA means \textit{counting DFA}. It is defined in a similar manner, and counting can be interpreted as cost. Whenever a DFA is mentioned in this thesis, it is a cDFA.
 
 \begin{figure}[H]
 \centering
@@ -140,9 +140,9 @@ In the paper Propagating Regular Counting Constraints cDFA means \textit{countin
 \end{figure}
 
 \subsection{Motivation for Tuple Variables}
-When solving a problem with CP, it is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends on the model and the propagators. With good models and propagators the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$ in one step, and this is the solution to the problem. If we instead have the same variables and domains but instead use the constraint $x\neq y$ nothing would be pruned, since for all values in both domains there exists solutions. 
+When solving a problem with CP, it is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends on the model and the propagators. With good models and propagators the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied, then the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$ in one step, and this is the solution to the problem. If we instead have the same variables and domains but instead use the constraint $x\neq y$ nothing can be pruned, since for all values in both domains there exists solutions. 
 
-In this example the problem was modeled with two integer variables. If the problem would be modeled with one tuple variable instead of two integer variables pruning would be possible. Then we would have a tuple variable $t$ with domain 
+In this example the problem was modeled with two integer variables. If the problem would be modeled with one tuple variable instead of two integer variables, pruning would be possible. Then we would have a tuple variable $t$ with domain 
 $dom(t)=\{
 \langle1,2\rangle,\allowbreak 
 \langle1,3\rangle,\allowbreak 
@@ -152,7 +152,8 @@ $dom(t)=\{
 \langle2,4\rangle,\allowbreak
 \langle3,2\rangle,\allowbreak
 \langle3,3\rangle,\allowbreak
-\langle3,4\rangle\}$ and pruning with the same constraint would yield 
+\langle3,4\rangle\}$ 
+and pruning with the same constraint would yield 
 $dom(t)=\{
 \langle1,2\rangle,\allowbreak
 \langle1,3\rangle,\allowbreak
@@ -160,21 +161,23 @@ $dom(t)=\{
 \langle2,3\rangle,\allowbreak
 \langle2,4\rangle,\allowbreak
 \langle3,2\rangle,\allowbreak
-\langle3,4\rangle\}$. This shrinks the size of the search tree from 9 to 7. 
+\langle3,4\rangle\}$. 
+This shrinks the size of the search tree from 9 to 7. 
 
-If we instead look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constraint $x=y+1$ the benefits are more obvious. Using integer variables only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $DFA(state_1, cost_1, state_0, cost_0, symbol, statefun, costfun)$. It is a constraint for a DFA with cost and a solution has to satisfy $state_1= statefun(state_0, symbol)$ and $cost_1=cost_0+costfun(state_0, symbol)$. This is the constraint used in this thesis. Furthermore, the constraint is linked in several steps: $DFA(state_n, cost_n, state_{n-1}, cost_{n-1}, symbol_{n-1}, statefun, costfun)$. A solution to this problem would be three vectors, one for states, one for costs and one for symbols. With tuple variables, this could be done more efficiently by combining states and costs into one variable: $DFA(P, Q, symbol, statefun, costfun)$ where $P=\langle state_1, cost_1\rangle$ and $Q=\langle state_0, cost_0\rangle$.
+If we instead look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constraint $x=y+1$ the benefits are more obvious. Using integer variables only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $DFA(state_1, cost_1, state_0, cost_0, symbol, statefun, costfun)$. It is a constraint for a DFA with costs and a solution has to satisfy $state_1= statefun(state_0, symbol)$ and $cost_1=cost_0+costfun(state_0, symbol)$. This is the constraint used in this thesis. Furthermore, the constraint is linked in several steps: $DFA(state_n, cost_n, state_{n-1}, cost_{n-1}, symbol_{n-1}, statefun, costfun)$. A solution to this problem would be three vectors: one for states, one for costs, and one for symbols. With tuple variables, this could be done more efficiently by combining states and costs into one variable: $DFA(P, Q, symbol, statefun, costfun)$ where $P=\langle state_1, cost_1\rangle$ and $Q=\langle state_0, cost_0\rangle$.
 
 The main benefit of a tuple variable is the possibility to link variables together. The most intuitive case is when dealing with coordinates, since a coordinate is a tuple by definition, but it can be generalized to any case where it is interesting to see if a combination of two or more values is a part of a solution. 
 
 \subsection{Creating a Custom Variable in Gecode}
-Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used. It is no longer available. However, version 4.3.3 should work. For more information, visit the homepage. \url{http://www.gecode.org}
+Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used. This version is no longer available. However, version 4.3.3 should work. For more information, visit the homepage. \url{http://www.gecode.org}
 
 Everything that follows in this chapter is basically a summary of chapter P, B and V in MPG (Modeling and Programming with Gecode)\cite{mpg}. 
 
-When implementing a new variable in Gecode there are several things that should be written. Among them is specification file, various classes and propagators.
+When implementing a new variable in Gecode, there are several things that should be written. Among them is specification file, various classes and propagators.
 \subsubsection{Specification File}\label{sec:specfile}
 Creating the specification file is the first thing that needs to be done when designing a new variable.  A simple specification file could look like this:
 
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[frame=single]
 [General]
 Name:        IntTuple
@@ -192,6 +195,7 @@ Name:        VAL=ASSIGNED
 ScheduledBy: VAL
 [End]
 \end{lstlisting}
+\end{minipage}
 There are three different sections in the file. The specification file must start with the [General] section and end with [End]. There are also sections for modification events and propagation conditions. The specification file is used by a configuration script to generate base class, from which the variable implementation class will inherit.
 
 The [General] section is trivial. This is where the name and namespace of the variable are specified. Both name and namespace are arbitrary. In Gecode the standard variables have namespace Gecode::VarName and in the examples in the documentation they instead have the namespace MPG::VarName.
@@ -213,6 +217,7 @@ Deltas are used for passing information about changes to improve efficiency. In 
 The variable implementation class implements methods for modification of the variable, but the variable class does not give access to these. Instead these are called from a view, which is a read and write interface to the implementation class.
 
 \subsubsection{Propagators}
+\label{sec:propagators}
 A propagator implements constraints and prunes variables. It interacts with the views. A propagator class must have the following methods:
 \begin{itemize}
 \item{post} - The method for posting a constraint, which basically is saying that a certain constraint should be used.
@@ -337,7 +342,7 @@ All in all the graphs indicates that tuple variables can give better performance
 \section{Related Work}
 The paper Propagating Regular Counting Constraints (Beldiceanu, Flener, Pearson, Van Hentenryck) \cite{Beldiceanu675954} describes constraints for a counter-DFA (cDFA). It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The DFA in this thesis is almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting we talk about cost, but it makes no difference in practise. I wanted to do a performance comparasion with that implementaion, but it would be complicated to do that in a fair way, because the constraints are implemented in Prolog, while everything in this thesis is in C++.
 
-In Implementation of bit-vector variables in a CP solver (Dye)\cite{Dye761927} Gecode is used, and a new variable is implemented. That paper was useful for getting more understanding of how to implement a new variable in Gecode.
+In Implementation of bit-vector variables in a CP solver (Dye) \cite{Dye761927} Gecode is used, and a new variable is implemented. That paper was useful for getting more understanding of how to implement a new variable in Gecode.
 
 The paper A propagator design framework for constraints over sequences (Monette, Flener, Pearson)\cite{Monette771427} shows that tuple variables can be used to make pruning much more efficient. This thesis is basically a practical demonstration that this indeed is true, and that it translates directly into better performance.
 
