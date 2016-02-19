@@ -1,6 +1,7 @@
 \documentclass[a4paper,11pt]{article}
 %\usepackage{bibtopic}
 %\usepackage{natbib}
+\usepackage{pgfplotstable}
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -71,6 +72,7 @@ In constraint programming it is vital with efficient pruning to avoid unnecessar
 
 \setcounter{tocdepth}{2}
 \tableofcontents
+\pagestyle{plain}
 
 \section*{Acknowledgements}
 Thanks to Jean-No\"{e}l Monette and Pierre Flener for being helpful supervisors. \\
@@ -78,11 +80,11 @@ Thanks to Joseph Scott for helping me configuring Gecode. \\
 Thanks to Johan Gustafsson for general help with C++. \\
 
 \section{Introduction}
-Constraint programming (CP) is a declarative style programming, and is very similar to solve equations in mathematics. A problem is modeled with variables, which must satisfy certain conditions. These conditions are called \textit{constraints}. The variables are initialised with a set of possible values. Such a set is called a \textit{domain}. The goal is to remove values from the domain until only one is left, and a state where all variables have a domain with only one unique value each is called a \textit{solution}.
+Constraint programming (CP) is a declarative style programming, and is very similar to solve equations in mathematics. A problem is modeled with variables, which must satisfy certain conditions. These conditions are called \textit{constraints}. The variables are initialised with a set of possible values. Such a set is called a \textit{domain}. The goal is to remove values from the domain until only one is left, and a state where all variables have a domain with only one value each is called a \textit{solution}.
 
-For many CP problems it is a problem that it is impossible to remove impossible combinations of values from the domains. Consider a problem where we have the variables $x$ and $y$. We initialise the domains $dom(x)={1,2,3,4}$ and $dom(y)={3,4,5,6}$. We also use the constraint $x=y$. In this case we can instantly remove 1 and 2 from $x$, and 5 and 6 from $y$. This leaves us with $dom(x)={3,4}$ and $dom(y)={3,4}$. Now consider the same initial domains, but with the constraint $x\neq y$. We know that no solution have $x=y$, but we can not remove any value at all from any of the domains. 
+When using CP it is often a problem that it is impossible to remove invalid combinations of values from the domains. Consider a problem where we have the variables $x$ and $y$. We initialise the domains $dom(x)=\{1,2,3,4\}$ and $dom(y)=\{3,4,5,6\}$. We also use the constraint $x=y$. In this case we can instantly remove 1 and 2 from $x$, and 5 and 6 from $y$. This leaves us with $dom(x)=\{3,4\}$ and $dom(y)=\{3,4\}$. Now consider the same initial domains, but with the constraint $x\neq y$. We know that no solution have $x=y$, but we can not remove any value at all from any of the domains. 
 
-Many CP problems could be solved more efficiently if it was possible to remove a combination of values from the variables, rather than removing the values individually. In the paper A propagator design framework for constraints over sequences (Monette, Flener, Pearson)\cite{Monette771427} a conclusion is that a tuple variable can be used to link variables together. In this thesis a tuple variable is used to do that, and it is shown that it is possible to achieve better performance with tuple variables. 
+Many CP problems could be solved more efficiently if it was possible to remove a combination of values from the variables, rather than removing the values individually. Recently, it was shown in a paper\cite{Monette771427} that a tuple variable can be used to link variables together. In this thesis a tuple variable is used to do that, and it is shown that it is possible to achieve better performance with tuple variables. 
 
 A \textit{tuple} is a mathematical object. It is an ordered list of elements. In this thesis a \textit{tuple variable} is a \textit{tuple} in Gecode, which in turn is a library for CP. Currently Gecode supports boolean, integer, integer set and float variables. The tuple variable described here is an extension to the Gecode library.
 
@@ -119,7 +121,7 @@ A DFA \textit{consumes} symbols from a string from the beginning to the end. If 
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.8]{dfa.eps}
+\includegraphics[scale=0.6]{dfa.eps}
 \caption{A DFA for the swedish drinking protocol, as it is showed in the Gecode documentation\cite{mpg}. State $1$ is the starting state and the only accepting state. State $2$ is a non-accepting state. The symbols $d$ and $s$ denotes drinking and singing. The DFA means that you may drink whenever you want, but if a song has been sung you have to drink before you leave. The regular expression for this DFA is $(d|sd)^{*}$}
 \label{fig:dfasdp}
 \end{figure}
@@ -134,7 +136,7 @@ In the paper Propagating Regular Counting Constraints cDFA means \textit{countin
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.8]{cdfa.eps}
+\includegraphics[scale=0.6]{cdfa.eps}
 \caption{A cDFA for the swedish drinking protocol. It is an altered variant of the DFA shown in Figure~\ref{fig:dfasdp}. The symbols $d$ and $s$ still means drinking and singing, but the symbol $l$ is introduced for leaving. Also, costs are introduced for each transition, so you can leave without drinking after singing, but with some kind of cost.}
 \label{fig:cdfasdp}
 \end{figure}
@@ -171,7 +173,7 @@ The main benefit of a tuple variable is the possibility to link variables togeth
 \subsection{Creating a Custom Variable in Gecode}
 Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used. This version is no longer available. However, version 4.3.3 should work. For more information, visit the homepage. \url{http://www.gecode.org}
 
-Everything that follows in this chapter is basically a summary of chapter P, B and V in MPG (Modeling and Programming with Gecode)\cite{mpg}. 
+Everything that follows in this section is a summary of Chapter P, B and V in Modeling and Programming with Gecode\cite{mpg}. 
 
 When implementing a new variable in Gecode, there are several things that should be written. Among them is specification file, various classes and propagators.
 \subsubsection{Specification File}\label{sec:specfile}
@@ -250,7 +252,16 @@ When there are no propagators able to prune any variables, searching is performe
 For the IntPair variables only a simple brancher is implemented. The domain of IntPair is a long sorted list, and the brancher picks the first value. However, it is not used. See Section~\ref{sec:performancetest} for details. A brancher is not strictly needed to implement a variable, but if there is no brancher the propagators must be able to prune the variable until it is assigned, then it is required. 
 
 \section{The IntPair Variables}
-To keep things simple only two-dimensional integer tuples (Pairs) are considered. The specification files are kept almost as minimal as described in the introduction. None of the propagators utilizes the boundaries anyway. Both implementations uses identical specification files except for the name of the variable. 
+To keep things simple only two-dimensional integer tuples (Pairs) are considered. The specification files are kept almost as minimal as described in Section~\ref{sec:specfile}. Both implementations use identical specification files except for the name of the variable. 
+
+Two variants are implemented. One stores an exact representation of the domain, while the other stores an overapproximation. This means that the domain is bigger than it should be. The domain still fulfills the condition that it contains all values that should, but also some values that should not. An approximation saves some memory, but the biggest benefit is that some operations can be done in constant time. The approximate version only stores the boundaries for the second dimension. It stores separate boundaries for each value in the first dimension, as shown in Section~\ref{sec:impapprox}. Now, consider the case with a tuple $t$ and the constraint $t.x\neq5$. The exact version has to remove an arbitrary amount of elements. The approximate version only needs to remove one element. The biggest drawback with the approximation is that it can not be pruned as efficiently as an exact representation. This is demonstrated below in Figure~\ref{fig:pair}.
+
+\input{pair.tex}
+
+
+The same benefit also holds for the following example. First we define a constraint $YLTIXEQ$ (y less then if x equal) such that $YLTIXEQ(p, y, x)$ means that $p.x=x\implies p.y<y$. With the exact variant there are possibly several values that needs to be removed. The approximate version only needs to change the value of the higher bound for the element with x-value $x$.
+
+There are only two things added to the specification file described in Section~\ref{sec:specfile}. The first is the DOM modification event and propagator condition. These are used to schedule the propagators. As soon as the domain of any variable is changed, all propagators that have subscribed to that variable will be scheduled to run again. The second change to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, the domains are stored as vectors from the C++ standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called \texttt{dispose}. This method explicitly calls \texttt{vector::$\sim$vector()}.
 
 \begin{figure}[H]
 \begin{minipage}{\linewidth}
@@ -282,18 +293,12 @@ ScheduledBy:    VAL, DOM
 \caption{The specification file for IntPairApprox. The specification file for IntPairExact is equal, except for name and namespace.}
 \end{figure}
 
-There are only two things added to the specification file described in Section~\ref{sec:specfile}. The first is the DOM modification event and propagator condition. These are used to schedule the propagators. As soon the domain of any variable is changed, all propagators that have subscribed to that variable be scheduled. The second change to the specification file is the line \texttt{Dispose: true}. This is needed when using external memory resources outside Gecode, and the domains are stored as vectors from the standard library. The way Gecode is designed, the destructors for variables are never called. If a variable needs a destructor it needs to be replaced by a method called dispose. This method explicitly calls \texttt{vector::$\sim$vector()}.
-
-Two variants are implemented. One stores an exact representation of the domain, while the other stores an overapproximation. This means that the domain size is bigger than it should be. The domain still fulfills that it contains all values that should in the domain, but also some values that should not. An approximation saves some memory, but the biggest benefit is that some operations can be done in constant time. Recall that the approximate version only stores the boundaries for the second dimension, and that it stores unique boundaries for each value in the first dimension, as shown in Section~\ref{sec:impapprox}. Now, consider the case with a tuple $t$ and the constraint $t.x=5$. The exact version has to remove all values that do not satisfy this. The approximate version only needs to remove one element. 
-
-The same benefit also goes for the following example. First we define a constraint $YLTIXEQ$ (y less then if x equal) such that $YLTIXEQ(p, y, x)$ means that $p.x=x\implies p.y<y$. With the exact variant there are possibly several values that needs to be removed. The approximate version only needs to change the value of the higher bound.
-
 The main purpose of this thesis is to show that tuple variables have benefits over regular integer variables for certain problems. For that reason the code for Pairs has purposely been kept unoptimised. The modification events implemented in the variable implementation do not use the fact that the domains are sorted. Just fixing this would decrease the time complexity from linear to logarithmic for operations like removing a value from a domain. This would be especially efficient when removing ranges of values. Currently, they are removed one by one.
 
 The complete source can be found at \url{http://www.github.com/klutt/gecode-tuples}
 
 \subsection{Implementation of IntPairExact}
-The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that's currently in the domain. The domain is stored as \texttt{std::vector<struct \{int x, int y\}>}. 
+The exact version does not approximate the domain, that is, the implementation is a long list of all integer pairs that are currently in the domain. The domain is stored as \texttt{std::vector<struct \{int x, int y\}>}. 
 
 \paragraph{Modification Events}
 \begin{itemize}
@@ -307,13 +312,13 @@ The exact version does not approximate the domain, that is, the implementation i
 
 \subsection{Implementation of IntPairApprox}
 \label{sec:impapprox}
-This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. Unique boundaries are stored for each value in the first dimension. The benefit is less use of memory and faster calculations for some operations, but the drawback is that the domain can not be pruned as efficient as the exact version, because it can only achieve bounds consistency. The domain is stored as \texttt{std::vector<struct\{int x, int y\_low, int y\_high\}>}
+This version of IntPair approximates the domain by just storing one dimension exactly. For the other dimension, only the boundaries are stored. Unique boundaries are stored for each value in the first dimension. The benefit is less use of memory and faster calculations for some operations, but the drawback is that the domain can not be pruned as efficient as the exact version, because no values whose y-value is between the bounds can be pruned. The domain is stored as \texttt{std::vector<struct\{int x, int y\_low, int y\_high\}>}
 
 \paragraph{Modification Events}
 \begin{itemize}
 \item {\textbf{nq(Pair p) - }} Remove p from domain. $\mathcal{O}(n)$ where $n$ is the number of different x-values in domain.
 
-\item{\textbf{xeq(PairInterval p) - }} Remove all values from domain whose y-value is not in the interval $[p.ylow; p.yhigh]$ iff those values x-values is equal to $x$. $\mathcal{O}(n)$ where $n$ is the number of different x-values in domain. The name xeq is very badly chosen. The definition of this modification event was altered during development, but the name was never changed.
+\item{\textbf{yeqforspecificx(PairInterval p) - }} Remove all values from domain whose y-value is not in the interval $[p.ylow; p.yhigh]$ iff those values x-values is equal to $x$. $\mathcal{O}(n)$ where $n$ is the number of different x-values in domain. In the actual source code the name xeq is used, which is a bad name. The definition of this modification event was altered during development, but the name was never changed.
 
 \item{\textbf{xeq(vector\textless Pair\textgreater v) - }} Remove all values from domain whose x-value does not exist in $v$. $\mathcal{O}(nm)$ where $n$ is number of x-values in domain and $m$ is number of elements in $v$.
 \end{itemize}
@@ -332,9 +337,9 @@ All three implementations work in a similar manner. $PreState$ and $PreCost$ is 
 
 The differences are just adjustments to make the algorithms work with different variable types. For IntPairApprox we can not freely remove any value we want. That is why it has the function $Merge$, which checks if there is an element $d$ in the domain $dom$ such that $d.x=p.x$. If so $d.y\_low$ and $d.y\_high$ get expanded to fit the interval $p.y\_low$ to $p.y\_high$. 
 
-The contain functions' time complexity is $\mathcal{O}(n)$ where $n$ is the size of the domain for the Pair variables. It might be faster for the integer variable. The time complexity for the intersection operation is at most quadratic, but it does not matter since they are performed outside the loop. The union operation inside the loop is constant in time.
+The \texttt{contain} functions' time complexity is $\mathcal{O}(n)$ where $n$ is the size of the domain for the Pair variables. It is fairly safe to assume that this is faster for the integer variable for the avarage case. The time complexity for the intersection operations is at most quadratic, but it does not matter since they are performed outside the loop. The union operation inside the loop is constant in time.
 
-At a first glance it may seem that the Pair propagators have better time complexities. This is an illusion, because the size of $\#(Pre)$ and $\#(Post)$ is equal to $\#(PreState)\#(PreCost)$ and $\#(PostState)\#(PostCost)$ respectively.
+At a first glance it may seem that the IntPairExact propagator has better time complexity. This is an illusion, because the size of $\#(Pre)$ and $\#(Post)$ is equal to $\#(PreState)\#(PreCost)$ and $\#(PostState)\#(PostCost)$ respectively. However, this is not the case for the IntPairApprox propagator. Here $\#(Pre)=\#(PreState)$ and $\#(Post)=\#(PostState)$. 
 
 The propagators for IntPairExact and IntVar both achieves domain consistency. The propagator for IntPairApprox does not, but this would be impossible because the domain is only approximated.
 
@@ -374,11 +379,11 @@ Figure~\ref{fig:states} and Figure~\ref{fig:cost} fluctuates very much. The diff
 All in all, the graphs indicate that tuple variables can give better performance for certain problems. The only possible source of error with this experiment that I can think of is that the reference propagator may not be optimized enough, but I find that highly unlikely. After all, the implementation of IntVar has to be assumed to be very optimised, and the reference propagator is much more optimised than the ones for pairs.
 
 \section{Related Work}
-The paper Propagating Regular Counting Constraints (Beldiceanu, Flener, Pearson, Van Hentenryck) \cite{Beldiceanu675954} describes constraints for a counter-DFA (cDFA). It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The DFA in this thesis is almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting we talk about cost, but it makes no difference in practise. I wanted to do a performance comparasion with that implementaion, but it would be complicated to do that in a fair way, because the constraints are implemented in Prolog, while everything in this thesis is in C++.
+Beldiceanu et al. \cite{Beldiceanu675954} describes constraints for a counter-DFA (cDFA). It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The DFA in this thesis is almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting we talk about cost, but it makes no difference in practise. I wanted to do a performance comparasion with that implementaion, but it would be complicated to do that in a fair way, because the constraints are implemented in Prolog, while everything in this thesis is in C++.
 
-In Implementation of bit-vector variables in a CP solver (Dye) \cite{Dye761927} Gecode is used, and a new variable is implemented. That paper was useful for getting more understanding of how to implement a new variable in Gecode.
+Kellen Dye has implemented a bitvector for Gecode for her master thesis.\cite{Dye761927} That paper was useful for getting more understanding of how to implement a new variable in Gecode.
 
-The paper A propagator design framework for constraints over sequences (Monette, Flener, Pearson)\cite{Monette771427} shows that tuple variables can be used to make pruning much more efficient. This thesis is basically a practical demonstration that this indeed is true, and that it translates into better performance.
+Monette et al.\cite{Monette771427} shows that tuple variables can be used to make pruning much more efficient. This thesis is basically a practical demonstration that this indeed is true, and that it translates into better performance.
 
 \section{Conclusions and future work}
 The tests shows that tuple variables have potential. Both of them perform better than the integer variable variant in both number of nodes and total execution time, and there is still much room for further improvement. Especially the vector operations are very inefficient and can easily be improved.

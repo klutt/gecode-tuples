@@ -1,7 +1,9 @@
 %Int
-\begin{figure}[H]
+%\begin{figure}[H]
 \begin{algorithm}[H]
-\caption{DFA propagator IntVar\newline $\mathcal{O}(\#(PostState)\#(PostCost)\#(PreState)\#(PreCost)\#(Symbol))$}
+\label{fig:algint}
+\caption{DFA propagator IntVar\newline
+ $\mathcal{O}(\#(PostState)\#(PostCost)\#(PreState)\#(PreCost)\#(Symbol))$}
 \begin{algorithmic}[1]
 \Procedure{DFAprop}{IntVar PostState, IntVar PostCost, IntVar PreState, IntVar PreCost, IntVar Symbol, Statefunction S, Costfunction C}
 \State Intdomain newPostState, newPreState, newPostCost, newPreCost, newSymbol := $\emptyset$
@@ -30,11 +32,11 @@
 \EndProcedure
 \end{algorithmic}
 \end{algorithm} 
-\caption{Propagator for DFA constraint for IntVar variables}\label{fig:algint}
-\end{figure}
+%\caption{Propagator for DFA constraint for IntVar variables}\label{fig:algint}
+%\end{figure}
 
 %Exact
-\begin{figure}[H]
+%\begin{figure}[H]
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
@@ -55,13 +57,16 @@
 \State Symbol := Symbol $\cap$ newSymbol
 \EndProcedure
 \end{algorithmic}
-\caption{DFA propagator IntPairExact \newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
+\caption{DFA propagator IntPairExact \newline
+ $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
+\label{fig:algexact}
 \end{algorithm}
-\caption{Propagator for DFA constraint for IntPairExactVar variables}\label{fig:algexact}
-\end{figure}
+%\caption{Propagator for DFA constraint for IntPairExactVar variables}\label{fig:algexact}
+%\end{figure}
 %Approx
-\begin{figure}[H]
+%\begin{figure}[H]
 \begin{algorithm}[H]
+\label{fig:algapprox}
 \caption{DFA propagator IntPairApprox\newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
 \begin{algorithmic}[1]
 \Procedure{Merge}{Pairdomain dom, Pair p}
@@ -92,5 +97,5 @@
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-\caption{Propagator for DFA constraint for IntPairApprox variables}\label{fig:algapprox}
-\end{figure}
+%\caption{Propagator for DFA constraint for IntPairApprox variables}\label{fig:algapprox}
+%\end{figure}
