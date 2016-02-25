@@ -6,7 +6,7 @@
   }
   \begin{tikzpicture} [scale=0.7]
     \begin{axis}[
-        title=IntPairExact,
+        title=Exact representation,
         xtick=data,
         ymin=0,
       ]
@@ -26,7 +26,7 @@
     \begin{axis}[
         yticklabel pos=right,
         xtick=data,
-        title=IntPairApprox,
+        title=Approximate representation,
         ytick=data
         ]
       \addplot[black, mark=*, only marks]
@@ -54,5 +54,5 @@
     \end{axis}
   \end{tikzpicture}
 
- \caption{Comparasion between IntPairExact and IntPairApprox representing the same domain. The red dots are values that should not be there, but IntPairApprox only stores the boundaries for the second dimension.}\label{fig:pair}
+ \caption{Comparasion between an exact and an approxiamate representation of the same domain. The red dots are values that should not be there, but the approximate representation only stores the boundaries for the second dimension.}\label{fig:pair}
 \end{figure}
