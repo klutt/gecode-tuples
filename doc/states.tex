@@ -1,20 +1,25 @@
 \begin{figure}[H]
   \centering
-  \textbf{Varying states }
-  \newline
-  \newline
   \pgfplotsset{
+	    scaled y ticks=false,
     scale only axis,
-    legend style={at={(0,0.8)}, anchor=west, font=\tiny},
+    legend style={at={(0,0.8)}, anchor=west , font=\tiny
+    },
     xmin=7,
   }
-  \begin{tikzpicture} [scale=0.7]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
-        title=No nodes linear scale,
-        ylabel=nodes,
+        title=Size of search tree,
+        ylabel=Number of nodes,
         xtick=data,
         ymin=0, 
-        xlabel=states ]
+%        yticklabel style={/pgf/number format/sci},
+%        yticklabel={ 
+%        \pgfmathfloatparsenumber{\tick} 
+%        \pgfmathfloatexp{\pgfmathresult} 
+%        \pgfmathprintnumber{\pgfmathresult} 
+%        },
+        xlabel=Number of states ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
       coordinates{ (7,427514) (9,454874) (11,356896) (13,385169) (15,329868) (17,338722) (19,339050) (21,440084) (23,437965) (25,356520) (27,415702)
       }; %\label{ie_plot}
@@ -29,22 +34,22 @@
       \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
-  \begin{tikzpicture} [scale=0.7]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
         yticklabel pos=right,
         xtick=data,
-        title=Runtime linear scale,
-        ylabel=runtime (ms),
-        xlabel=states,
+        title=Runtime,
+        ylabel=Seconds,
+        xlabel=Number of states,
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7, 24091) (9, 30492) (11, 31026) (13, 38125) (15, 39380) (17, 45187) (19, 48943) (21, 67630) (23, 72791) (25, 67855) (27, 81536)
+      coordinates{ (7, 24.091) (9, 30.492) (11, 31.026) (13, 38.125) (15, 39.380) (17, 45.187) (19, 48.943) (21, 67.630) (23, 72.791) (25, 67.855) (27, 81.536)
       };% \label{IntPairExact Run}
       \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7, 47133) (9, 55287) (11, 55408) (13, 65274) (15, 67460) (17, 73920) (19, 81508) (21, 101759) (23, 109442) (25, 101353) (27, 119748)
+      coordinates{ (7, 47.133) (9, 55.287) (11, 55.408) (13, 65.274) (15, 67.460) (17, 73.920) (19, 81.508) (21, 101.759) (23, 109.442) (25, 101.353) (27, 119.748)
       }; %\label{IntPairApprox Run}
       \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 52426) (9, 64242) (11, 68331) (13, 84028) (15, 88250) (17, 98554) (19, 111021) (21, 131160) (23, 141472) (25, 137661) (27, 159120)
+      coordinates{ (7, 52.426) (9, 64.242) (11, 68.331) (13, 84.028) (15, 88.250) (17, 98.554) (19, 111.021) (21, 131.160) (23, 141.472) (25, 137.661) (27, 159.120)
       }; %\label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
@@ -102,5 +107,5 @@
 %      \addlegendentry{Integer}
 %    \end{semilogyaxis}
 %  \end{tikzpicture}
- \caption{Varying the number of states. The other parameters are fixed. Size of alphabet=7, max cost per transition=15 and number of steps=7.}\label{fig:states}
+ \caption{Varying the number of states. The other parameters are fixed. Size of alphabet=7, max cost per transition=15, and number of steps=7.}\label{fig:states}
 \end{figure}

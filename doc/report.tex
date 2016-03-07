@@ -64,6 +64,7 @@
 
 \begin{document}
 \maketitle
+\interlinepenalty 10000
 
 \begin{abstract}
 
@@ -141,34 +142,9 @@ In the paper Propagating Regular Counting Constraints \cite{Beldiceanu675954} cD
 \label{fig:cdfasdp}
 \end{figure}
 
-\subsection{Motivation for Tuple Variables}
-When solving a problem with CP, it is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends in part on the model and the strengths of the propagators. With good models and propagators, the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied, then the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$ in one step, and the solution is found without searching. If we instead have the same variables and domains but instead use the constraint $x\neq y$, nothing can be pruned, since there exist solutions for all values in both domains.
-
-In this example, the problem was modeled with two integer variables. If the problem is modeled with one tuple variable instead of two integer variables, then pruning would be possible. In that case, we have a tuple variable $t$ with domain 
-$dom(t)=\{
-\langle1,2\rangle,\allowbreak 
-\langle1,3\rangle,\allowbreak 
-\langle1,4\rangle,\allowbreak
-\langle2,2\rangle,\allowbreak
-\langle2,3\rangle,\allowbreak
-\langle2,4\rangle,\allowbreak
-\langle3,2\rangle,\allowbreak
-\langle3,3\rangle,\allowbreak
-\langle3,4\rangle\}$ 
-and pruning with the same constraint would yield 
-$dom(t)=\{
-\langle1,2\rangle,\allowbreak
-\langle1,3\rangle,\allowbreak
-\langle1,4\rangle,\allowbreak
-\langle2,3\rangle,\allowbreak
-\langle2,4\rangle,\allowbreak
-\langle3,2\rangle,\allowbreak
-\langle3,4\rangle\}$. 
-This shrinks the size of the domain from 9 to 7. 
-
-If we look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constraint $x=y+1$, then the benefits are more obvious. Using integer variables, only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, then the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $DFA(state_1, cost_1, state_0, cost_0, symbol, statefun, costfun)$. It is a constraint for a DFA with costs and a solution has to satisfy $state_1= statefun(state_0, symbol)$ and $cost_1=cost_0+costfun(state_0, symbol)$. This is the constraint used in this thesis. Furthermore, the constraint is linked in several steps: $DFA(state_n, cost_n, state_{n-1}, cost_{n-1}, symbol_{n-1}, statefun, costfun)$. A solution to this problem would be three arrays: one for states, one for costs, and one for symbols. With tuple variables, this could be done more efficiently by combining states and costs into one variable: $DFA(P, Q, symbol, statefun, costfun)$ where $P=\langle state_1, cost_1\rangle$ and $Q=\langle state_0, cost_0\rangle$.
-
-The main benefit of a tuple variable is the possibility to link variables together. The most intuitive case is when dealing with coordinates, since a coordinate is a tuple by definition, but it can be generalized to any case where it is interesting to see if a combination of two or more values is a part of a solution. 
+\subsection{The cDFA Constraint}
+\label{sec:cdfaconstraint}
+A \textit{constraint} is a rule that must hold for a solution. We have already looked at simple constraints, such as $x\le y$, and such. Those constraints are easy to implement, and the propagators are easy to optimise. The constraint $cDFA$ is much more complicated. It is defined such that $cDFA(state_1, cost_1, state_0, cost_0, symbol, statefun, costfun)$ holds if $state_1= statefun(state_0, symbol)$ and $cost_1=cost_0+costfun(state_0, symbol)$. Propagators for this constraint are discussed in Section~\ref{sec:propimp}.
 
 \subsection{Creating a Custom Variable in Gecode}
 Gecode is an open source CP solver programmed in C++ and is licensed under the MIT license. It is flexible and supports customization of most parts, including variable types, branchers, and propagators. It is suitable for both education and professional use. In this thesis, Gecode 4.3.2 is used.  For more information, visit the homepage: \url{http://www.gecode.org}
@@ -252,7 +228,36 @@ If $dom(x)=\{1,5,7,8\}$ and $dom(y)=\{1,3,7\}$ and the constraint $x=y$ is appli
 \label{sec:branchers}
 When there are no propagators able to prune any variable, search is performed. The branchers determine the structure of the search tree. The simplest brancher just puts the first value in the domain - according to some order - in the first branch and the rest of the values in a second branch. Another way is to pick a random value in the domain, but more sophisticated ways exist. A brancher can create an arbitrary number of nodes, but the union of all nodes must be the original domain, and at least one node must be different from the others. Ideally, the intersection between two nodes created by a brancher is empty. A brancher is not strictly needed, but if they are not used, then the propagators need to be able to prune the domains to a solution.
 
-\section{Implementing Pair Variables}
+\subsection{Pair Variables}
+When solving a problem with CP, it is desirable to minimize the search tree to avoid brute force searching. The size of the search tree depends in part on the model and the strengths of the propagators. With good models and propagators, the variable domains can be pruned to smaller sizes, keeping the branching and searching to a minimum. For example, if two variables $x$ and $y$ have domains $dom(x)=\{1,2,3\}$ and $dom(y)=\{2,3,4\}$, and the constraint $y<x$ is applied, then the domains can be pruned to $dom(x)=\{3\}$ and $dom(y)=\{2\}$ in one step, and the solution is found without searching. If we instead have the same variables and domains but instead use the constraint $x\neq y$, nothing can be pruned, since there exist solutions for all values in both domains.
+
+In this example, the problem was modeled with two integer variables. If the problem is modeled with one tuple variable instead of two integer variables, then pruning would be possible. In that case, we have a tuple variable $t$ with domain 
+$dom(t)=\{
+\langle1,2\rangle,\allowbreak 
+\langle1,3\rangle,\allowbreak 
+\langle1,4\rangle,\allowbreak
+\langle2,2\rangle,\allowbreak
+\langle2,3\rangle,\allowbreak
+\langle2,4\rangle,\allowbreak
+\langle3,2\rangle,\allowbreak
+\langle3,3\rangle,\allowbreak
+\langle3,4\rangle\}$ 
+and pruning with the same constraint would yield 
+$dom(t)=\{
+\langle1,2\rangle,\allowbreak
+\langle1,3\rangle,\allowbreak
+\langle1,4\rangle,\allowbreak
+\langle2,3\rangle,\allowbreak
+\langle2,4\rangle,\allowbreak
+\langle3,2\rangle,\allowbreak
+\langle3,4\rangle\}$. 
+This shrinks the size of the domain from 9 to 7. 
+
+If we look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constraint $x=y+1$, then the benefits are more obvious. Using integer variables, only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, then the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $cDFA$ described in Section~\ref{sec:cdfaconstraint}. Furthermore, the constraint is linked in several steps: $cDFA(state_n, cost_n, state_{n-1}, cost_{n-1}, symbol_{n-1}, statefun, costfun)$. A solution to this problem would be three arrays: one for states, one for costs, and one for symbols. With tuple variables, this could be done more efficiently by combining states and costs into one variable: $cDFA(P, Q, symbol, statefun, costfun)$ where $P=\langle state_1, cost_1\rangle$ and $Q=\langle state_0, cost_0\rangle$.
+
+The main benefit of a tuple variable is the possibility to link variables together. The most intuitive case is when dealing with coordinates, since a coordinate is a tuple by definition, but it can be generalized to any case where it is interesting to see if a combination of two or more values is a part of a solution. 
+
+\subsection{Implementing Pair Variables}
 To keep things simple, only two-dimensional integer tuples (Pairs) are considered. For a pair $p$, we use $p.x$ to represent the value in the first dimension, and $p.y$ for the second. 
 
 Two variants are implemented. One stores an exact representation of the domain, while the other stores an overapproximation. This means that the domain is bigger than it should be. The domain still fulfills the condition that it contains all values that it should, but also some values that it should not. The approximate version only stores the boundaries for the second dimension. It stores separate boundaries for each value in the first dimension. An approximation saves memory, but the biggest benefit is that some operations can be done in constant time. A more detailed description is found in Section~\ref{sec:impapprox}. Consider the case with a tuple $t$ and the constraint $t.x\neq5$. The exact version has to remove an arbitrary amount of elements. The approximate version only needs to remove one element. 
@@ -335,6 +340,7 @@ This version of IntPairVar approximates the domain by just storing one dimension
 \end{itemize}
 
 \subsection{Implementation of Propagators for Constraint cDFA}
+\label{sec:propimp}
 The cDFA \textit{propagators} are the actual implementations of the cDFA \textit{constraint}. These propagators are implemented in three different ways. Two propagators are for pair variables and one is for integer variables. The latter one is only for reference when comparing performance. The algorithms for the propagators are described below in pseudo code.
 
 All three implementations work in a similar manner. $PreState$ and $PreCost$ are domains containing current state and accumulated cost so far in the cDFA. $PostState$ and $PostCost$ are the result of reading the symbol in $Symbol$. Since pair variables make it possible to bundle cost and state into a single variable, they are just called $Pre$ and $Post$. The basic principle is the following: For all symbols and all states in $Pre$, calculate the possible values for $Post$. Remove everything from $Post$ that is not reachable from any element in $Pre$. If nothing is reachable from a certain $Pre$, then also remove that element from $Pre$. This is done by creating lists containing all elements that should remain in the domains, and then removing everything from the domains that is not in those lists.
@@ -352,55 +358,53 @@ The propagator for IntPairExactVar achieves domain consistency. The propagator f
 \section{Results}
 Some sentence just to fullfill requirements...
 \subsection{Correctness verification}
-The correctness is verified in several steps. For all problems an \texttt{assert} is used to ensure that the solution printed actually is a valid solution before it is printed. This ensures that no false solutions occur. There are a number of trivial tests in \texttt{testsrc/} with pre-calculated number of solutions. If the number of solutions are correct and all solutions fullfill the requirements the algorithms work correctly.
+The correctness is verified in several steps. For all problems an \texttt{assert} is used to ensure that the solution printed actually is a valid solution before it is printed. This ensures that no false solutions occur. There are a number of trivial tests in \texttt{testsrc/} with pre-calculated number of solutions. If the number of solutions are correct, all solutions are unique, and all solutions fullfill the requirements the tests are as good as they can get.
 
-For bigger problems it is very hard to pre-calculate the number of solutions. Instead the tests relies on probability. The two IntPairVar and the IntVar implementation are compared to ensure that they put out the same number of solutions, and that the solutions are the same. It is very unlikely that they would be wrong in the exactly same way. These tests are found in \texttt{tripletestsrc/} and \texttt{multisteptestsrc/}
+For bigger problems, it is very hard to pre-calculate the number of solutions. Instead the tests rely on probability. The two pair variants and the integer variant are compared to ensure that they put out the same number of solutions, and that the solutions are the same. It is unlikely that they would be wrong in the exact same way. These tests are found in \texttt{tripletestsrc/} and \texttt{multisteptestsrc/}.
 
 \subsection{Performance Test}
 \label{sec:performancetest}
-To test the performance the same problem is solved in three different ways. Two of them are IntPairExactVar and IntPairApproxVar. The last one is solved with the IntVar that comes with Gecode, and is for reference. The purpose of this thesis is to show that tuple variables can be faster than regular IntVars. For that reason the reference propagator have been optimised, while the Pairs have been left with a very naive implementation. The problem is a DFA with costs. Branching is done on the symbols only, since this is enough. If the DFA is in state $s$ and has a current cost $c$ and the symbol $x$ is read, then the next state and cost can be uniquely calculated. The executables accepts six arguments: 
+To test the performance the same problem is solved in three different ways. Two of them are IntPairExactVar and IntPairApproxVar. The last one is solved with the IntVar that comes with Gecode, and is for reference. The problem is finding strings of a fixed length accepted by a cDFA. Branching is done on the symbols only, since this is enough. Indeed, if the cDFA is in a state $s$ and has a current cost $c$ and the symbol $x$ is read, then the next state and cost can be uniquely calculated. The executables accept six arguments: 
 \begin{itemize}
 \item{seed} - The seed for the random generator to generate the same DFA for all executables.
 \item{states} - Number of states.
 \item{symbols} - Size of the alphabet.
-\item{cost} - Max cost per transition in the DFA. This is decreased by one, so setting this to 1 means no cost.
-\item{max cost} - Maximum cumulative cost for the variables.
-\item{steps} - Number of steps in the DFA.
+\item{cost} - Maximum cost per transition in the cDFA. This is decreased by one, so setting this to 1 means no cost.
+\item{max cost} - Maximum cumulative cost for the string.
+\item{steps} - Length of the string.
 \end{itemize}
-The test is performed by varying one parameter of $states$, $symbols$, $cost$ and $steps$, while keeping the others fixed. For each method and combination of parameters one hundred random DFA:s are generated, except for when varying steps where it is only ten. All three methods generate the same DFA:s for a given seed. Runtime and number of nodes are the total for the random generated DFA:s. The maximum total cost is set to $(steps\cdot cost)/5$.
+The test is performed by varying one parameter of $states$, $symbols$, $cost$ and $steps$, while keeping the others fixed. For each method and combination of parameters one hundred random cDFA are generated, except for when varying steps where it is only ten. All three methods generate the same cDFA for a given seed. Runtime and number of nodes are the total for the random generated DFA. The maximum total cost is set to $(steps\cdot cost)/5$.
 
 \input{states.tex}
 \input{symbols.tex}
-\input{cost.tex}
 \input{steps.tex}
+\input{cost.tex}
 
 %\input{graphs.tex}
 
-In the graphs we can see advantages for IntPairVar variables. In all tests they win over the regular IntVar variable solution in both execution time and the size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the IntVar variable variant uses five IntVar variables, while the pair variants use two IntPair and one IntVar variable. The size of a node for the IntVar variable case should be roughly proportional to $Steps(States + Maxtotalcost)$ plus some overhead, but for the pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is $Steps\times States\times Maxtotalcost$. For two-dimensional tuples with "normal" domain sizes this should not be of any concern. However, higher dimensions could cause trouble. The DFA problem could be modeled with a five-dimensional tuple variable. For the case in Figure~\ref{fig:states} with 50 states, 5 symbols, 6 steps and a maximum total cost of 18, the size per node would be around 100MB. Note though that the tuple variables have a higher memory usage \textit{per node} and that this does not necessarily mean that the total memory usage is higher, since the number of nodes shrinks. The case where the memory would be a problem is if the search tree became to deep, because a parent node can not be freed from memory until its children have been propagated to either a failure or a solution.
+In the graphs we can see advantages for pair variables. In all tests they are more efficient than using regular integer variables in both execution time and size of the search tree. However, it does so at the cost of higher memory usage per node. A node in the integer variable variant uses five integer variables, while the pair variants use two pair variables and one integer variable. The size of a node for the IntVar variable case should be roughly proportional to $Steps\cdot (States + Maxtotalcost)$ plus some overhead, but for the exact pair case the domain sizes of the pairs is proportional to the number of states times the max total cost. This means that the size per node is proportional to $Steps\cdot States\cdot Maxtotalcost$. With approximate pairs, the size per node is proportional to $Steps\cdot States$. For two-dimensional tuples with relatively small domain sizes, this should not be of any concern. However, higher dimensions could cause troubles. The cDFA problem could be modeled with a five-dimensional tuple variable. For the case in Figure~\ref{fig:states} with 50 states, 5 symbols, 6 steps and a maximum total cost of 18, the size per node would be around 100MB. Note though that the tuple variables have a higher memory usage \textit{per node} and that this does not necessarily mean that the total memory usage is higher, since the number of nodes in the search tree shrinks. The case where the memory would be a problem is if the search tree became to deep, because a parent node can not be freed from memory until its children have been propagated to either a failure or a solution.
 
-When tests were run (this is not shown in any graph) with the maximum total cost being equal to max cost per transition times the number of steps, the number of nodes is exactly equal for both IntPairExactVar and IntPairApproxVar. The reason is that if the starting state $s_0$ and the starting cumulative cost $c_0$ are assigned (which they are for a DFA), then everything else follows automatically if we branch on the symbols first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. This is also confirmed by the fact that there were no failures during the execution. As can be seen in all graphs, this is not the case when restricting maximum total cost to a lower value.
+When tests were run (this is not shown in any graph) with the maximum total cost being equal to max cost per transition times the number of steps, the number of nodes is exactly equal for both exact pairs and approximate pairs. The reason is that if the starting state $s_0$ and the starting cumulative cost $c_0$ are assigned (which they are for a cDFA), then everything else follows automatically if we branch on the symbols first. This is easy to see because $s_1=S(s_0, t_0)$ and $c_1=c_0+C(s_0, t_0)$. This is also confirmed by the fact that there were no failures during the execution. As can be seen in all graphs, this is not the case when restricting the maximum total cost to a lower value.
 
-In Figure~\ref{fig:steps}, the logarithmic graphs are close to straight lines. This indicates that all algorithms are exponential in both time and size of the search tree. Since the lines are parallel we can also see that they have the same exponential base. More importantly, this confirms that there was no complexity difference between tuple variables and IntVar variables when solving this problem. IntPairVar variables are faster, but not necessarily asymptotically faster. 
+In Figure~\ref{fig:steps}, the logarithmic graphs are close to straight lines. This indicates that all algorithms are exponential in both time and size of the search tree with respect to the length of the string. Since the lines are parallel, we can also see that they have the same exponential base. More importantly, this confirms that there was no complexity difference between pair variables and integer variables when solving this particular problem. Pair variables are faster, but not necessarily asymptotically faster. 
 
-Figure~\ref{fig:states} and Figure~\ref{fig:cost} fluctuates very much. The difficulty of the problems does not seem to depend very much on the variable varied. When changing the number of states, the random generator generates completely different DFA:s. Changing the number of symbols also generate different DFA:s, but not in such a high degree. In the experiment there are one hundred random DFA:s for each measure point. Increasing this, would probably smoothen out the curve. The reason why the graphs for varying the cost per transition fluctuates so much is different. The maximum total cost is set to the maximum cost per transition times number of steps, so there are actually two parameters along the x-axis. One way to solve this would be to fix the maximum total cost to a fixed value. However, this is not a good solution, because a low value would make the problem easier when the cost per transition grows. On the other hand, a high value would make the problem to easy. This does not matter so much, since all the curves have the same shape, which means that if a DFA was hard to solve, it was hard for all three methods, making the comparison fair. 
+Figure~\ref{fig:states} and~\ref{fig:cost} fluctuate very much. The difficulty of the problems does not seem to depend very much on the size of the varied variable. When changing the number of states, the random generator generates completely different cDFAs. Changing the number of symbols also generate different cDFAs, but not in such a high degree. In the experiments, there are one hundred random cDFAs for each measure point. Increasing this, would probably smoothen out the curve. The reason why the graphs for varying the cost per transition fluctuates so much is different. The maximum total cost is set to the maximum cost per transition times number of steps divided by 5, so there are actually two parameters along the x-axis. One way to solve this would be to fix the maximum total cost to a fixed value. However, this is not a good solution, because a low value would make the problem easier when the cost per transition grows. On the other hand, a high value would make the problem to easy. This does not matter so much, since all the curves have the same shape, which means that if a cDFA was hard to solve, it was hard for all three methods, making the comparison fair. In Figure~\ref{fig:cost} we can also see that the runtime graphs for exact and approximate pairs crosses each other. This is expected, because the approximate version is more suitable for removing ranges of values.
 
-All in all, the graphs indicate that tuple variables can give a better performance for certain problems. The only possible source of error with this experiment that I can think of is that the reference propagator may not be optimised enough, but I find that highly unlikely. After all, the implementation of IntVar has to be assumed to be very optimised, and the reference propagator is much more optimised than the ones for pairs.
+All in all, the graphs indicate that pair variables can give a better performance for certain problems. The only possible source of error with this experiment that I can think of is that the reference propagator may not be optimised enough, but I find that highly unlikely. After all, the implementation of IntVar has to be assumed to be very optimised, and the reference propagator is much more optimised than the ones for pairs.
 
 \section{Related Work}
-Beldiceanu et al. \cite{Beldiceanu675954} describes constraints for a counter-DFA (cDFA). It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The DFA in this thesis is almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting we talk about cost, but it makes no difference in practice. I wanted to do a performance comparison with that implementation, but it would be complicated to do that in a fair way, because the constraints are implemented in Prolog, while everything in this thesis is in C++.
+Beldiceanu et al. \cite{Beldiceanu675954} describe a propagator for a counter-DFA. It is defined as a regular DFA with only accepting states and such that the transition function not only returns the next state, but the increase for a counter. The cDFA used in this thesis are almost identical. The main difference is that we also use non-accepting states. The other difference is more philosophical. Instead of counting, we talk about cost, but it makes no difference in practice. Doing a performance comparison with their implementation would be complicated to do, because their propagators are implemented in Prolog, while everything in this thesis is implemented in C++.
 
-Kellen Dye has implemented a bitvector for Gecode for her master thesis.\cite{Dye761927} That paper was useful for getting more understanding of how to implement a new variable in Gecode.
+Kellen Dye has implemented a bitvector variable for Gecode for his master thesis \cite{Dye761927}. His report was useful for getting more understanding of how to implement a new variable in Gecode.
 
-Monette et al.\cite{Monette771427} shows that tuple variables can be used to make pruning much more efficient. This thesis is basically a practical demonstration that this indeed is true, and that it translates into better performance.
+Monette et al.\cite{Monette771427} show that tuple variables can be used to make pruning much more efficient. This thesis is a practical demonstration of their results, and that it translates into better performance.
 
 \section{Conclusions and future work}
-The tests shows that tuple variables have potential. Both of them perform better than the IntVar variable variant in both number of nodes and total execution time, and there is still much room for further improvement. Especially the vector operations are very inefficient and can easily be improved.
+The experiments show that tuple variables have potential. Both versions perform better than the integer variable variant on a cDFA problem, in both number of nodes and total execution time, and there is still much room for further improvement. Especially the vector operations are very inefficient and can easily be improved.
 
-All big software libraries have coding standards. There is plenty of work to rewrite the code for IntPairVars in such a way that it satisfies Gecodes standards. For instance, vector from the standard library is not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis. One example of this is that it exists methods to get the minimum and maximum value for the first dimension, but no methods for the second. Also, the propagators and the brancher currently only accepts arrays. The brancher for IntPairApproxVar has a bug, which manifested itself by making the program producing the same solution several times which should not be possible. This does not matter in this thesis since it is not used.
+All large software libraries have coding standards. There is plenty of work to rewrite the code for pairs in such a way that it satisfies Gecode standards. For instance, vectors from the standard library are not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis. One example of this is that it exists methods to get the minimum and maximum value for the first dimension, but no methods for the second. Also, the propagators currently only accepts arrays. 
 
-In this thesis there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain. Another relevant change that could be made is to extend the pairs to arbitrary dimensions.
-
-
+In this thesis, there is one exact and one approximate version. The approximation is exact in one dimension and only stores the boundaries for the second. This is just one way of doing it and there are several other ways of approximating the domain. Another relevant change that could be made is to extend the pairs to arbitrary dimensions. A tuple of higher dimension would make it possible to shrink the search tree for a cDFA problem even further.
 
 \bibliographystyle{plain}
 \bibliography{bib}
