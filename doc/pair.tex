@@ -1,4 +1,4 @@
-\begin{figure}[H]
+\begin{figure}[t]
   \centering
   \pgfplotsset{
     scale only axis,
@@ -39,7 +39,7 @@
              (2,5)        (4,5) 
        (1,7)                               (7,7)
        }; 
-      \addplot[red, mark=*, only marks]
+      \addplot[red, mark=star, only marks]
        plot coordinates
        {  
              (2,1) 
@@ -54,5 +54,5 @@
     \end{axis}
   \end{tikzpicture}
 
- \caption{Comparasion between an exact and an approxiamate representation of the same domain. The red dots are values that should not be there, but the approximate representation only stores the boundaries for the second dimension.}\label{fig:pair}
+ \caption{Comparison between an exact and an approximate representation of the same domain. The red stars are values that should not be there, but the approximate representation only stores the boundaries for the second dimension.}\label{fig:pair}
 \end{figure}
