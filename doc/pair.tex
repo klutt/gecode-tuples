@@ -1,10 +1,10 @@
 \begin{figure}[t]
   \centering
-  \pgfplotsset{
+  \pgfplotsset{  
     scale only axis,
 %    xmin=1,
   }
-  \begin{tikzpicture} [scale=0.7]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
         title=Exact representation,
         xtick=data,
@@ -22,12 +22,11 @@
        }; 
     \end{axis}
   \end{tikzpicture}
-  \begin{tikzpicture} [scale=0.7]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
         yticklabel pos=right,
         xtick=data,
-        title=Approximate representation,
-        ytick=data
+        title=Approximate representation
         ]
       \addplot[black, mark=*, only marks]
        plot coordinates

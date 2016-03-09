@@ -92,10 +92,6 @@ To demonstrate that tuple variables can be used to increase performance, I have 
 
 To compare performance, I used the tuple variables to find all valid strings for a deterministic finite automaton (DFA) with costs for each transition (cDFA). A cDFA does not only tell whether a string is accepted or not, but also the total cost for that particular string. The performance is measured by studying how the execution time and size of the search tree depend on four parameters: the number of states, the size of the alphabet, the maximum cost per transition, and the size of the string. Both DFAs and cDFAs are described in detail in Section~\ref{sec:dfa}.
 
-The results confirm that tuple variables can be used to increase performance. The tuple variables with an exact domain perform better than the ones with an approximated domain. The latter ones perform almost identical to the integer reference. There is one case where the approximation is the best, and that is when the cost per transition is high. In most cases, the exact version is 80-\SI{100}{\percent} faster than the integer version used for reference.
-
-
-
 \section{Background}
 \subsection{Constraint Programming}
 
@@ -400,7 +396,7 @@ Kellen Dye has implemented a bitvector variable for Gecode for his master thesis
 Monette et al.\cite{Monette771427} show that tuple variables can be used to make pruning much more efficient. This thesis is a practical demonstration of their results, and that it translates into better performance.
 
 \section{Conclusions and future work}
-The experiments show that tuple variables have potential. Both versions perform better than the integer variable variant on a cDFA problem, in both number of nodes and total execution time, and there is still much room for further improvement. Especially the vector operations are very inefficient and can easily be improved.
+The experiments show that tuple variables have potential. Both versions perform better than the integer variable variant on a cDFA problem, in both number of nodes and total execution time, and there is still much room for further improvement. Especially the vector operations are very inefficient and can easily be improved. Using the exact pair variable improved the speed by 80-\SI{100}{\percent} in these experiments.
 
 All large software libraries have coding standards. There is plenty of work to rewrite the code for pairs in such a way that it satisfies Gecode standards. For instance, vectors from the standard library are not allowed. Furthermore, the code is far from ready in other aspects. It contains only the methods needed to run the tests in this thesis. One example of this is that it exists methods to get the minimum and maximum value for the first dimension, but no methods for the second. Also, the propagators currently only accepts arrays. 
 
