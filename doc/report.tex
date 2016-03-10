@@ -108,11 +108,11 @@ Solving a CP-problem means alternating propagating and branching until some goal
 Note that the domain of a variable never grows, and no value changes. The only thing that happens to a domain after its initialisation is that values are removed by either a propagator or a brancher. In the search tree, the variable domains in a certain node is always a subset of the variable domains of the parent node. 
 
 \subsection{Tuple}
-In a mathematical context, a tuple is a finite length sequence (ordered list) of elements. The elements can be of any type, such as numbers, sets, or functions. The elements do not need to be of the same type. The most common type of tuples in mathematics and physics are vectors. Velocity and force are two examples. An $n$-dimensional tuple is called an $n$-tuple. In this thesis, a tuple is denoted using angle brackets. For example, $\langle 3, 2, 1, 4, 2 \rangle$ is a 5-tuple. For a two-dimensional tuple variables $t$, the first dimension is denoted $t.x$ and the second is denoted $t.y$.
+In a mathematical context, a tuple is a finite length sequence (ordered list) of elements. The elements can be of any type, such as numbers, sets, or functions. The elements do not need to be of the same type. An $n$-dimensional tuple is called an $n$-tuple. In this thesis, a tuple is denoted using angle brackets. For example, $\langle 3, 2, 1, 4, 2 \rangle$ is a 5-tuple. 
 
 \subsection{Deterministic Finite Automaton}
 \label{sec:dfa}
-A deterministic finite automaton (DFA) is a 5-tuple: $\langle Q,\Sigma,\delta,q_0, F\rangle$, where $Q$ is a finite set of states, $\Sigma$ is called the \textit{alphabet} and is a finite set of symbols, $\delta : Q \times \Sigma \mapsto Q$  is a transition function mapping a state and a symbol to a state, $q_0\in Q$ is called the \textit{starting state}, and $F\subseteq Q$  is a set of states called \textit{accepting states}. Any state from which there is no path (via one or more transitions) to an accepting state is commonly called a \textit{garbage state}. Furthermore, the set of garbage states is commonly viewed as one state, called \textit{the} garbage state. Usually the garbage state is left out in both graphical and algebraic representations. 
+A deterministic finite automaton (DFA) is a 5-tuple: $\langle Q,\Sigma,\delta,q_0, F\rangle$, where $Q$ is a finite set of states, $\Sigma$ is called the \textit{alphabet} and is a finite set of symbols, $\delta : Q \times \Sigma \mapsto Q$  is a transition function mapping a state and a symbol to a state, $q_0\in Q$ is called the \textit{starting state}, and $F\subseteq Q$  is a set of states called \textit{accepting states}. \cite{hopcroft2001introduction} A state from which there is no path (via one or more transitions) to an accepting state is commonly called a \textit{garbage state}. Furthermore, the set of garbage states is commonly viewed as one state, called \textit{the} garbage state. Usually the garbage state is left out in both graphical and algebraic representations. 
 
 A DFA \textit{consumes} symbols from a string from the beginning to the end. If the DFA is in an accepting state when all symbols in the string have been consumed the DFA \textit{accepts} the string. Figure~\ref{fig:dfasdp} shows a 2-state DFA with omitted garbage state.
 
@@ -253,7 +253,9 @@ If we look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constrain
 
 The main benefit of a tuple variable is the possibility to link variables together. The most intuitive case is when dealing with coordinates, since a coordinate is a tuple by definition, but it can be generalized to any case where it is interesting to see if a combination of two or more values is a part of a solution. 
 
-\subsection{Implementing Pair Variables}
+For a pair variable $p$, the first dimension is denoted $p.x$ and the second is denoted $p.y$.
+
+\section{Implementing Pair Variables}
 To keep things simple, only two-dimensional integer tuples (Pairs) are considered. For a pair $p$, we use $p.x$ to represent the value in the first dimension, and $p.y$ for the second. 
 
 Two variants are implemented. One stores an exact representation of the domain, while the other stores an overapproximation. This means that the domain is bigger than it should be. The domain still fulfills the condition that it contains all values that it should, but also some values that it should not. The approximate version only stores the boundaries for the second dimension. It stores separate boundaries for each value in the first dimension. An approximation saves memory, but the biggest benefit is that some operations can be done in constant time. A more detailed description is found in Section~\ref{sec:impapprox}. Consider the case with a tuple $t$ and the constraint $t.x\neq5$. The exact version has to remove an arbitrary amount of elements. The approximate version only needs to remove one element. 
