@@ -17,7 +17,16 @@ int findPairX (std::vector<MPG::IntPair::PairApprox> v, int x) {
     return -1;
 }
 
+int findPairX (MPG::IntPair::IntPairApproxView v, int x) {
+  for(int i=0; i<v.domsize(); i++) {
+    if(v.getx(i)==x) return i;
+  }
+  return -1;
+}
+
 void mergePair(std::vector<MPG::IntPair::PairApprox> &v, const MPG::IntPair::PairApprox &p) {
+  //  if(p.l>p.h)
+  //    return;
     int i=findPairX(v, p.x);
     if(i==-1)
         v.push_back(p);
@@ -75,12 +84,21 @@ public:
         while(iter()) {
             for(int i=0; i<Q.domsize(); i++) {
                 MPG::IntPair::PairApprox q(Q.getx(i), Q.getl(i), Q.geth(i));
+		int transCost=D->C(q.x, iter.val());
                 MPG::IntPair::PairApprox p(D->S(q.x, iter.val()),
-                                           q.l + D->C(q.x, iter.val()),
-                                           q.h + D->C(q.x, iter.val()));
-                if(p.x>0) {
+                                           q.l + transCost,
+                                           q.h + transCost);
+		int j=findPairX(P,p.x);
+		MPG::IntPair::PairApprox q2(Q.getx(i),
+					    P.getl(j) - transCost,
+					    P.geth(j) - transCost);
+		MPG::IntPair::PairApprox q3(q2.x,
+					    q.l>q2.l ? q.l : q2.l,
+					    q.h<q2.h ? q.h : q2.h);
+		//		std::cout << "q   " << q <<  "    q2   " << q2 << "   q3  " << q3 << std::endl;
+                if(p.x>0 && j!=-1) {
                     mergePair(newP, p);
-                    mergePair(newQ, q);
+		    mergePair(newQ, q2);
                     newZ.push_back(iter.val());
                 }
             }

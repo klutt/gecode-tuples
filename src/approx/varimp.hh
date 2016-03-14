@@ -49,7 +49,7 @@ public:
         : IntPairApproxVarImpBase(home) {
         assert(x_min<=x_max && y_min<=y_max);
         for(int x=x_min; x<=x_max; x++)
-	  domain.push_back(PairApprox(x,y_min, y_max));
+	  domain.push_back(PairApprox(x, y_min, y_max));
     }
     // For printouts and brancher
     Pair first() const {

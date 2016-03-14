@@ -15,7 +15,7 @@ INCLUDES=-I$(INSTD)/include
 
 #FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport
 CFLAGS=-g -fdiagnostics-color=always -std=c++11 -fmax-errors=5 
-FLAGS=-lgecodedriver -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -lgecodegist -fdiagnostics-color=always
+FLAGS=-lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimodel -lgecodeint -lgecodekernel -lgecodesupport -fdiagnostics-color=always
 
 
 test/%: testsrc/%.cpp *.hh
@@ -81,9 +81,10 @@ multisteptest: \
 
 gist/%:	gistsrc/%.cpp *.hh gistsrc/_main.cpp
 	$(CXX) -c gistsrc/$*.cpp -o gist/$*.o $(INCLUDES) $(CFLAGS)
-	$(CXX) -g -o gist/$* gist/$*.o $(FLAGS) $(LIBS) -lgecodegist
+	$(CXX) -g -o gist/$* $(LIBS) gist/$*.o $(FLAGS) 
 
 gist: \
+	gist/test \
 	gist/exact \
 	gist/approx \
 
@@ -92,13 +93,12 @@ test:	testint testapprox testexact triple gist
 
 performance/%:	performancesrc/%.cpp *.hh performancesrc/_main.cpp
 	$(CXX) -c performancesrc/$*.cpp -o performance/$*.o $(INCLUDES) $(CFLAGS)
-	$(CXX) -g -o performance/$* performance/$*.o $(FLAGS) $(LIBS)
+	$(CXX) -g -o performance/$* performance/$*.o $(FLAGS) 
 	cp tripletestsrc/testrun.py tripletestsrc/comparesolutions.py tripletest
 
 performance: \
 	performance/exact \
 	performance/approx \
-	performance/int \
 	performance/intopt
 	cp performancesrc/run.sh performance/
 
