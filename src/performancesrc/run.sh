@@ -3,29 +3,6 @@
 cp run.sh ../performancesrc/
 echo using $1 and writes to $2
 source $1
-#PARAMS=(
-#    "5 7 15 20 7"
-#    "5 8 15 20 7"
-#    "5 9 15 20 7"
-#    "5 10 15 20 7"
-    
-#    "20 5 3 6 6"
-#    "30 5 3 6 6"
-#    "40 5 3 6 6"
-#    "50 5 3 6 6"
-
-#    "20 5 2 4 7"
-#    "20 5 4 11 7"
-#    "20 5 6 17 7"
-#    "20 5 8 25 7"
-#    "20 5 15 60 7"
-
-#    "20 5 4 11 7"
-#    "20 5 4 15 8"
-#    "20 5 4 18 9"
-#    "20 5 4 21 10"
-#)
-
 
 EXECS=(
     exact
@@ -35,6 +12,8 @@ EXECS=(
 
 echo > $2
 
+INDEX=0
+SOLS=(0 0 0)
 for EXEC in "${EXECS[@]}"
 do
     STRNODES=""
@@ -43,6 +22,7 @@ do
     do
     TOTRUN=0
     TOTNODES=0
+    
 	STATES=$(echo $DATA | cut -f1 -d ' ')
 	TOKENS=$(echo $DATA | cut -f2 -d ' ')
 	MCOST=$(echo $DATA | cut -f3 -d ' ')
@@ -55,24 +35,36 @@ do
 	for RNDDFA in $(seq 10)
 	do
 	    OUTPUT=$(/usr/bin/time -v ./$EXEC d d $RNDDFA $DATA 2>&1)
-	    RUNTIME=$(echo $OUTPUT | cut -f8 -d ' ' | sed 's/(//g' | cut -f1 -d '.')
+	    RUNTIME=$(echo $OUTPUT | cut -f8 -d ' ' | sed 's/(//g' | cut -f1 -d '.') 
 	    NODES=$(echo $OUTPUT | cut -f15 -d ' ')
+	    SOL=$(echo $OUTPUT | cut -f11 -d ' ')
 	    let TOTRUN=$TOTRUN+$RUNTIME
 	    let TOTNODES=$TOTNODES+$NODES
 	    printf "$RNDDFA "
+	    TOTSOL="${SOLS["$INDEX"]}"
+	    let TOTSOL=$TOTSOL+$SOL
+	    SOLS[$INDEX]=$TOTSOL
 	done
 	echo
 	echo $EXEC $TOTRUN $TOTNODES
 	STRNODES="$STRNODES ($XVAR,$TOTNODES)"
 	STRRUNTIME="$STRRUNTIME ($XVAR, $TOTRUN)"
     done
-    	echo $STRNODES
-	echo $STRRUNTIME
-	echo $EXEC >> $2
-	echo $STRNODES >> $2
-	echo $STRRUNTIME >> $2
+    let INDEX=1+$INDEX
+    echo $STRNODES
+    echo $STRRUNTIME
+    echo $EXEC >> $2
+    echo $STRRUNTIME >> $2
+    echo $STRNODES >> $2
+     
 
 done
+
+if [ "${SOLS[0]}" -ne "${SOLS[1]}" ] || [ "${SOLS[1]}" -ne "${SOLS[2]}" ]
+then
+    echo "     ERROR! Number of solutions mismatch"
+fi
+
 #echo ${DATA[0]} \& ${DATA[1]} \& ${DATA[2]}
 #echo ${DATA[*]}x		      
 

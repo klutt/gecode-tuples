@@ -15,7 +15,7 @@ using namespace MPG;
 Dfa *df;
 
 
-int seed, nostates, notokens, maxcost, maxcosttotal, nosteps;
+int seed, nostates, notokens, maxcost, maxcosttotal, nosteps, mincosttotal;
 
 
 class Test : public Script {
@@ -32,6 +32,10 @@ public:
   {
     rel(*this, sv[0], IRT_EQ, 1); // Starting state
     rel(*this, cv[0], IRT_EQ, 0); // Cost = 0 at start
+       rel(*this, sv[nosteps], IRT_EQ, 2); // End state
+    rel(*this, cv[nosteps], IRT_LQ, maxcosttotal); // Costt
+    rel(*this, cv[nosteps], IRT_GQ, mincosttotal); // fsdf
+
     for(int i=0; i<nosteps; i++) 
       optintdfa(*this, sv[i+1] ,cv[i+1], sv[i], cv[i] ,zv[i],df);
     branch(*this, zv, INT_VAR_NONE(), INT_VAL_MIN());

@@ -287,6 +287,10 @@ Gecode::ModEvent IntPairApproxVarImp::eq(Gecode::Space& home, const IntPairAppro
 	  //	  std::cout << "Changing upper bound to "<< domain[i].h  << std::endl;
 	  domain[i].h=p.domain[index].h; modified = true;
 	}
+	if(domain[i].h < domain[i].l) {
+	  domain.erase(domain.begin()+i); i--; modified=true; 
+	}
+
       } 
     }
 

@@ -1,20 +1,18 @@
 \begin{figure}[H]
   \centering
-  \textbf{Varying number of }
-  \newline
-  \newline
   \pgfplotsset{
+    scaled y ticks=false,
     scale only axis,
     legend style={at={(0,0.8)}, anchor=west, font=\tiny},
     xmin=XMIN,
   }
-  \begin{tikzpicture} [scale=0.8]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
         title=No nodes linear scale,
-        ylabel=nodes,
+        ylabel=Nodes,
         xtick=data,
         ymin=0, 
-        xlabel=symbols ]
+        xlabel=xlabel ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
       coordinates{ DATAEN
       }; \label{ie_plot} \addlegendentry{IntPairExact}
@@ -26,13 +24,13 @@
       }; \label{int_plot} \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
-  \begin{tikzpicture} [scale=0.8]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
         yticklabel pos=right,
         xtick=data,
         title=Runtime linear scale,
-        ylabel=runtime (ms),
-        xlabel=symbols,
+        ylabel=Seconds,
+        xlabel=xlabel,
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
       coordinates{ DATAER
@@ -55,13 +53,13 @@
   \end{tikzpicture}
 
 
-  \begin{tikzpicture} [scale=0.8]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{semilogyaxis}[
         title=No nodes logarithmic scale,
-        ylabel=nodes,
+        ylabel=Nodes,
         xtick=data,
         ymin=0, 
-        xlabel=symbols ]
+        xlabel=xlabel ]
      \addplot[smooth,mark=square*, mark options={solid},red, dashed]
       coordinates{ DATAEN
       }; \label{ie_plot} \addlegendentry{IntPairExact}
@@ -74,13 +72,13 @@
 
     \end{semilogyaxis}
   \end{tikzpicture}
-  \begin{tikzpicture} [scale=0.8]
+  \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{semilogyaxis}[
         title=Runtime logaritmhic scale,
         yticklabel pos=right,
         xtick=data,
-        ylabel=runtime (ms),
-        xlabel=symbols,
+        ylabel=Seconds,
+        xlabel=xlabel,
         ymin=0,  ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
       coordinates{ DATAER
@@ -96,5 +94,5 @@
       \addlegendentry{Integer}
     \end{semilogyaxis}
   \end{tikzpicture}
-  \caption{{Caption}}\label{fig:}
+  \input{}
 \end{figure}

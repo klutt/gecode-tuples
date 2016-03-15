@@ -17,19 +17,21 @@ using namespace MPG;
 
 Dfa *df;
 
-int seed, nostates, notokens, maxcost, maxcosttotal, nosteps;
+int seed, nostates, notokens, maxcost, maxcosttotal, nosteps, mincosttotal;
 
 class Test : public Script {
 public:
   /// The actual problem
   IntPairVarArray p;
   IntVarArray z;
-  IntPairVar init;
-  
-  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0,maxcosttotal),
+  IntPairVar init, final;
+
+  Test(const SizeOptions& opt) : p(*this, nosteps+1,1,nostates,0, maxcosttotal),
 				 z(*this, nosteps,1,notokens),
-				 init(*this, 1,1,0,0)
+				 init(*this, 1,1,0,0),
+				 final(*this, 2,2,mincosttotal, maxcosttotal)
   {
+    eq(*this, p[nosteps], final);
     eq(*this, p[0], init);
     for(int i=0; i<nosteps; i++)
       mydfa(*this, p[i+1],p[i],z[i],df);
@@ -50,6 +52,7 @@ public:
     GC_UPDATE(p);
     GC_UPDATE(z);
     GC_UPDATE(init);
+    GC_UPDATE(final);
   }
     
   /// Perform copying during cloning
@@ -73,5 +76,6 @@ public:
   }
 };
 
-
+int main(int argc, char** argv) {
+  Gecode::VarImpDisposer<IntPairVarImp> disposer;
 #include "_main.cpp"

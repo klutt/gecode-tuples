@@ -23,7 +23,7 @@
   }
 
 maxcosttotal=((maxcost-1)*nosteps)/5;
-
+mincosttotal=maxcosttotal-2;
   df = new Dfa(seed, nostates, notokens, maxcost);
 //      df->print();
   opt.mode(Gecode::SM_STAT);

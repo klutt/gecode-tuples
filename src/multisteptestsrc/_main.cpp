@@ -1,7 +1,5 @@
 
-
-int main(int argc, char* argv[]) {
-  SizeOptions opt("Queens");
+SizeOptions opt("Queens");
   opt.solutions(0); // Calculate all solutions
   noSolutions=0;
 
@@ -22,12 +20,18 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
+maxcosttotal=((maxcost-1)*nosteps)/2;
+//mincosttotal=maxcosttotal/2;
+mincosttotal=0;
   df = new Dfa(seed, nostates, notokens, maxcost);
   //    df->print();
   // opt.mode(Gecode::SM_GIST);
   //  opt.parse(argc,argv);
+//    opt.mode(Gecode::SM_STAT);
+//  opt.parse(argc,argv);
+
   ScriptOutput::run<Test,DFS,SizeOptions>(opt);
-  Test *T = new Test(opt);
+  // Test *T = new Test(opt);
   
   cout << "No solutions: " << noSolutions << endl;
   return 0;

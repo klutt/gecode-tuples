@@ -96,7 +96,7 @@ public:
 					    q.l>q2.l ? q.l : q2.l,
 					    q.h<q2.h ? q.h : q2.h);
 		//		std::cout << "q   " << q <<  "    q2   " << q2 << "   q3  " << q3 << std::endl;
-                if(p.x>0 && j!=-1) {
+                if(p.x>0 && j!=-1 && q3.h >= q3.l) {
                     mergePair(newP, p);
 		    mergePair(newQ, q2);
                     newZ.push_back(iter.val());

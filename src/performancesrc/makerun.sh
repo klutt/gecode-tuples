@@ -1,14 +1,13 @@
 VARS=(
-    "states"
-    "symbols"
-    "cost"
+#    "states"
+#    "symbols"
+#    "cost"
     "steps"
     )
 
 for VAR in ${VARS[@]}
 do
     ./run.sh $VAR.par $VAR.txt
-    ./makegraph.sh $VAR.txt > $VAR.tex
+    ./makegraph.sh $VAR
+#    cp $VAR.tex ../../doc/
 done
-
-cp *.tex ../../doc
