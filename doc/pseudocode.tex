@@ -44,7 +44,7 @@
 \State Intdomain newSymbol := $\emptyset$
 \ForAll {symbol in Symbol}
 	\ForAll {pre in Pre}
-		\State Pair p := (S(pre.state, symbol), pre.cost+C(pre.state, symbol))
+		\State Pairdomain p := (S(pre.state, symbol), pre.cost+C(pre.state, symbol))
 		\If {Post.contain(p) and p.state $\neq$ garbage state}
 			\State newPost := newPost $\cup$ p
 			\State newPre := newPre $\cup$ pre
@@ -83,10 +83,13 @@
 \State Intdomain newSymbol := $\emptyset$
 \ForAll {s in Symbol}
 	\ForAll {pre in Pre}
-		\State Pair p :=(S(pre.state,s),pre.low+C(pre.state,s),pre.high+ C(pre.state,s))
-		\If {p.state $\neq$ garbage state}
+		\State tc:= C(pre.state, s)
+		\State Pairdomain p :=(S(pre.state,s),pre.low+tc,pre.high+tc)
+		\State i := getIndex(Post, p.x) Returns -1 if not found
+		\State Pairdomain q :=(S(pre.state,s),max(pre.l,P[i].l), min(pre.h,P[i].h))
+		\If {p.state $\neq$ garbage state and q.l$\leq$q.h and i$\geq$0}
 			\State Merge(newPost, p)
-			\State Merge(newPre, pre)
+			\State Merge(newPre, q)
 			\State newSymbol := newSymbol $\cup$ s
 		\EndIf
 	\EndFor
