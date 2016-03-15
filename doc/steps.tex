@@ -1,50 +1,46 @@
 \begin{figure}[H]
   \centering
   \pgfplotsset{
-  	    scaled y ticks=false,
+    scaled y ticks=false,
     scale only axis,
-    legend style={at={(0,0.8)}, anchor=west  , font=\tiny
-    },
+    legend style={at={(0,0.8)}, anchor=west, font=\tiny},
     xmin=7,
   }
   \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
-        title=Size of search tree\, linear scale,
-        ylabel=Number of nodes,
+        title=Size of search tree linear scale,
+        ylabel=Nodes,
         xtick=data,
         ymin=0, 
-        xlabel=Length of string]
+        xlabel=xlabel ]
       \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
-      }; %\label{ie_plot}
-      \addlegendentry{IntPairExact}
-      \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
-      }; %\label{ia_plot}
-      \addlegendentry{IntPairApprox}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
-      }; %\label{int_plot}
-      \addlegendentry{Integer}
+      coordinates{ (7,2958) (8,12299) (9,53945) (10,233801) (11,809042) (12,3602055) (13,16361867)
+      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      \addplot[smooth,mark=square*, mark options={solid},blue, dotted]
+      coordinates{ (7,3048) (8,12623) (9,55211) (10,240131) (11,829618) (12,3696025) (13,16790307)
+      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      \addplot[smooth,mark=*,mark options={solid},black]
+      coordinates{ (7, 28628) (8, 121116) (9, 527254) (10, 5315546) (11, 8329154) (12, 37151208)
+      }; \label{int_plot} \addlegendentry{Integer}
     \end{axis}
   \end{tikzpicture}
   \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{axis}[
         yticklabel pos=right,
         xtick=data,
-        title=Runtime\, linear scale,
+        title=Runtime linear scale,
         ylabel=Seconds,
-        xlabel=Length of string,
+        xlabel=xlabel,
         ymin=0, ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7, 2.256) (8, 11.920) (9, 56.407) (10, 252.762) (11, 894.726)
-      };% \label{IntPairExact Run}
-      \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7, 4.721) (8, 19.793) (9, 92.335) (10, 400.819) (11, 1424.025)
-      }; %\label{IntPairApprox Run}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 5.248) (8, 23.749) (9, 100.874) (10, 438.791) (11, 1558.550)
-      }; %\label{IntegerRun}
+      coordinates{ (7, 339) (8, 1142) (9, 4601) (10, 19534) (11, 67852) (12, 340757) (13, 1569780)
+      }; \label{IntPairExact Run}
+      \addplot[smooth,mark=square*,mark options={solid},blue, dotted]
+      coordinates{ (7, 290) (8, 1263) (9, 5724) (10, 22607) (11, 80168) (12, 359915) (13, 1629885)
+      }; \label{IntPairApprox Run}
+      \addplot[smooth,mark=*,mark options={solid},black]
+      coordinates{ (7, 1464) (8,6312) (9, 26246) (10, 120832) (11, 437171) (12, 1940096)
+      }; \label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
       \addlegendentry{Integer}
@@ -59,47 +55,45 @@
 
   \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{semilogyaxis}[
-        title=Size of search tree\, logarithmic scale,
-        ylabel=Number of nodes,
+        title=Size of search tree logarithmic scale,
+        ylabel=Nodes,
         xtick=data,
         ymin=0, 
-        xlabel=Length of string ]
+        xlabel=xlabel ]
      \addplot[smooth,mark=square*, mark options={solid},red, dashed]
-      coordinates{ (7,33465) (8,146201) (9,658312) (10,2959824) (11,10414734)
-      }; %\label{ie_plot}
-      \addlegendentry{IntPairExact}
-      \addplot[smooth,mark=square*, mark options={solid},blue]
-      coordinates{ (7,97813) (8,414505) (9,1819264) (10,7950138) (11,28032604)
-      }; %\label{ia_plot}
-      \addlegendentry{IntPairApprox}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7,107122) (8,453696) (9,1981650) (10,8664862) (11,30614378)
-      }; %\label{int_plot}
-      \addlegendentry{Integer}
+      coordinates{ (7,2958) (8,12299) (9,53945) (10,233801) (11,809042) (12,3602055) (13,16361867)
+      }; \label{ie_plot} \addlegendentry{IntPairExact}
+      \addplot[smooth,mark=square*, mark options={solid},blue, dotted]
+      coordinates{ (7,3048) (8,12623) (9,55211) (10,240131) (11,829618) (12,3696025) (13,16790307)
+      }; \label{ia_plot} \addlegendentry{IntPairApprox}
+      \addplot[smooth,mark=*,mark options={solid},black]
+      coordinates{ (7, 28628) (8, 121116) (9, 527254) (10, 5315546) (11, 8329154) (12, 37151208)
+      }; \label{int_plot} \addlegendentry{Integer}
 
     \end{semilogyaxis}
   \end{tikzpicture}
   \begin{tikzpicture} [scale=0.7, font=\Large]
     \begin{semilogyaxis}[
-        title=Runtime\, logaritmhic scale,
+        title=Runtime logaritmhic scale,
         yticklabel pos=right,
         xtick=data,
         ylabel=Seconds,
-        xlabel=Length of string,
+        xlabel=xlabel,
         ymin=0,  ]
       \addplot[smooth,mark=square*,mark options={solid},red, dashed]
-      coordinates{ (7, 2.256) (8, 11.920) (9, 56.407) (10, 252.762) (11, 894.726)
-      };% \label{IntPairExact Run}
-      \addplot[smooth,mark=square*,mark options={solid},blue]
-      coordinates{ (7, 4.721) (8, 19.793) (9, 92.335) (10, 400.819) (11, 1424.025)
-      }; %\label{IntPairApprox Run}
-      \addplot[smooth,mark=*,mark options={solid},black, dotted]
-      coordinates{ (7, 5.248) (8, 23.749) (9, 100.874) (10, 438.791) (11, 1558.550)
-      }; %\label{IntegerRun}
+      coordinates{ (7, 339) (8, 1142) (9, 4601) (10, 19534) (11, 67852) (12, 340757) (13, 1569780)
+      }; \label{IntPairExact Run}
+      \addplot[smooth,mark=square*,mark options={solid},blue, dotted]
+      coordinates{ (7, 290) (8, 1263) (9, 5724) (10, 22607) (11, 80168) (12, 359915) (13, 1629885)
+      }; \label{IntPairApprox Run}
+      \addplot[smooth,mark=*,mark options={solid},black]
+      coordinates{ (7, 1464) (8,6312) (9, 26246) (10, 120832) (11, 437171) (12, 1940096)
+      }; \label{IntegerRun}
       \addlegendentry{IntPairExact}
       \addlegendentry{IntPairApprox}
       \addlegendentry{Integer}
     \end{semilogyaxis}
   \end{tikzpicture}
-  \caption{Varying the length of the string. The other parameters are fixed. Number of states=7, size of alphabet=7, and max cost per transition=15. Here we also show graphs in logarithmic scale.}\label{fig:steps}
-\end{figure}
+%  \input{}
+%\end{figure}
+\input{stepsc.tex} \end{figure}

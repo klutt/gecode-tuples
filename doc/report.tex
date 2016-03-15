@@ -17,7 +17,7 @@
 \usepackage{graphicx}
 \usepackage{epsfig}
 %\usepackage{cite}
-
+\usetikzlibrary{pgfplots.groupplots}
 \usepackage{siunitx}
 \sisetup{per=slash, load=abbr}
 
@@ -249,7 +249,9 @@ $dom(t)=\{
 \langle3,4\rangle\}$. 
 This shrinks the size of the domain from 9 to 7. 
 
-If we look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constraint $x=y+1$, then the benefits are more obvious. Using integer variables, only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, then the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. A more realistic example is the constraint $cDFA$ described in Section~\ref{sec:cdfaconstraint}. Furthermore, the constraint is linked in several steps: $cDFA(state_n, cost_n, state_{n-1}, cost_{n-1}, symbol_{n-1}, statefun, costfun)$. A solution to this problem would be three arrays: one for states, one for costs, and one for symbols. With tuple variables, this could be done more efficiently by combining states and costs into one variable: $cDFA(P, Q, symbol, statefun, costfun)$ where $P=\langle state_1, cost_1\rangle$ and $Q=\langle state_0, cost_0\rangle$.
+If we look at the case where $dom(x),dom(y)=\{1,\ldots,1000\}$ and the constraint $x=y+1$, then the benefits are more obvious. Using integer variables, only the values $x=1$ and $y=1000$ can be pruned. If tuple variables are used, then the size of the domain would shrink from $10^6$ to $10^3$. This indicates that tuple variables can be quite useful. Note though that these two examples are selected because they are easy to understand, and in reality the performance would probably drop if tuple variables were used for them. 
+
+A more realistic example is the constraint $cDFA$ described in Section~\ref{sec:cdfaconstraint}. Furthermore, the constraint is linked in several steps: $cDFA(state_n, cost_n, state_{n-1}, cost_{n-1}, symbol_{n-1}, statefun, costfun)$. A solution to this problem would be three arrays: one for states, one for costs, and one for symbols. With tuple variables, this could be done more efficiently by combining states and costs into one variable: $cDFA(P, Q, symbol, statefun, costfun)$ where $P=\langle state_1, cost_1\rangle$ and $Q=\langle state_0, cost_0\rangle$.
 
 The main benefit of a tuple variable is the possibility to link variables together. The most intuitive case is when dealing with coordinates, since a coordinate is a tuple by definition, but it can be generalized to any case where it is interesting to see if a combination of two or more values is a part of a solution. 
 
