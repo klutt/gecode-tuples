@@ -1,0 +1,40 @@
+\begin{thebibliography}{1}
+
+\bibitem{Beldiceanu675954}
+Nicolas Beldiceanu, Pierre Flener, Justin Pearson, and Pascal Van~Hentenryck.
+\newblock Propagating regular counting constraints.
+\newblock In {\em Proc. 28th AAAI Conference on Artificial Intelligence :
+  Volume 4}, pages 2616--2622, 2014.
+
+\bibitem{Dye761927}
+Kellen Dye.
+\newblock Implementation of bit-vector variables in a cp solver, with an
+  application to the generation of cryptographic s-boxes.
+\newblock Master's thesis, Uppsala University, Department of Information
+  Technology, 2014.
+\newblock
+  \url{http://uu.diva-portal.org/smash/get/diva2:761927/FULLTEXT01.pdf}.
+
+\bibitem{FruehwirthMS06}
+T.~Fr\"{u}hwirth, L.~Michel, and C.~Schulte.
+\newblock Constraints in procedural and concurrent languages.
+\newblock In F.~Rossi, P.~van Beek, and T.~Walsh, editors, {\em Handbook of
+  Constraint Programming}, chapter 4.3. Elsevier, 2006.
+
+\bibitem{hopcroft2001introduction}
+J.E. Hopcroft, R.~Motwani, and J.D. Ullman.
+\newblock {\em Introduction to Automata Theory, Languages, and Computation}.
+\newblock Addison-Wesley series in computer science. Addison-Wesley, 2001.
+
+\bibitem{Monette771427}
+Jean-No\"{e}l Monette, Pierre Flener, and Justin Pearson.
+\newblock A propagator design framework for constraints over sequences.
+\newblock In {\em Proc. 28th AAAI Conference on Artificial Intelligence :
+  Volume 4}, pages 2710--2716, 2014.
+
+\bibitem{mpg}
+Christian Schulte, Guido Tack, and Mikael~Z. Lagerkvist.
+\newblock Modeling and programming with {Gecode}.
+\newblock \url{http://www.gecode.org/doc/4.3.3/MPG.pdf}.
+
+\end{thebibliography}
