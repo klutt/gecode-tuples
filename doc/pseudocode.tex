@@ -3,18 +3,18 @@
 \begin{algorithm}[H]
 \label{fig:algint}
 \caption{DFA propagator IntVar\newline
- $\mathcal{O}(\#(PostState)\#(PostCost)\#(PreState)\#(PreCost)\#(Symbol))$}
+ $\mathcal{O}(\#(PostState)\#(PostCost)\#(PreState)\#(PreCost)\#(Symbol))$ in time}
 \begin{algorithmic}[1]
 \Procedure{DFAprop}{IntVar PostState, IntVar PostCost, IntVar PreState, IntVar PreCost, IntVar Symbol, Statefunction S, Costfunction C}
 \State Intdomain newPostState, newPreState, newPostCost, newPreCost, newSymbol := $\emptyset$
 \ForAll {symbol in Symbol}
-	\ForAll {preState in PreState}
-		\State int state := S(pre.state, symbol)
-		\If {PostState.contain(state) and p.state $\neq$ garbage state}
+	\ForAll {preState \textbf{in} PreState}
+		\State \textbf{int} state := S(pre.state, symbol)
+		\If {PostState.contain(state) \textbf{and} p.state $\neq$ garbage state}
 					\State newPostState := newPostState $\cup$ state
 			\State newPreState := newPreState $\cup$ pre
 			\State newSymbol := newSymbol $\cup$ symbol 
-			\ForAll {cost in PreCost}
+			\ForAll {cost \textbf{in} PreCost}
 				\State int postCost := cost + C(preState, symbol)
 				\If {PostCost.contains(postCost)}
 					\State newPreCost := newPreCost $\cup$ cost
@@ -42,10 +42,10 @@
 \Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
 \State Pairdomain newPost, newPre := $\emptyset$
 \State Intdomain newSymbol := $\emptyset$
-\ForAll {symbol in Symbol}
-	\ForAll {pre in Pre}
+\ForAll {symbol \textbf{in} Symbol}
+	\ForAll {pre \textbf{in} Pre}
 		\State Pairdomain p := (S(pre.state, symbol), pre.cost+C(pre.state, symbol))
-		\If {Post.contain(p) and p.state $\neq$ garbage state}
+		\If {Post.contain(p) \textbf{and} p.state $\neq$ garbage state}
 			\State newPost := newPost $\cup$ p
 			\State newPre := newPre $\cup$ pre
 			\State newSymbol := newSymbol $\cup$ symbol 
@@ -58,7 +58,7 @@
 \EndProcedure
 \end{algorithmic}
 \caption{DFA propagator IntPairExact \newline
- $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
+ $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$ in time}
 \label{fig:algexact}
 \end{algorithm}
 %\caption{Propagator for DFA constraint for IntPairExactVar variables}\label{fig:algexact}
@@ -67,27 +67,27 @@
 %\begin{figure}[H]
 \begin{algorithm}[H]
 \label{fig:algapprox}
-\caption{DFA propagator IntPairApprox\newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$}
+\caption{DFA propagator IntPairApprox\newline $\mathcal{O}(\#(Post)\#(Pre)\#(Symbol))$ in time}
 \begin{algorithmic}[1]
 \Procedure{Merge}{Pairdomain dom, Pair p}
 	\State find d in dom such that d.state = p.state
 	\If{not found} 
 		\State add p to dom
 	\Else	
-		\State d.high := max(d.high, p.high)
-		\State d.low := min(d.low, p.low)
+		\State d.u := max(d.u, p.u)
+		\State d.l := min(d.l, p.l)
 	\EndIf
 \EndProcedure
 \Procedure{DFAprop}{IntPairVar Post, IntPairVar Pre, IntVar Symbol, Statefunction S, Costfunction C}
 \State Pairdomain newPost, newPre := $\emptyset$
 \State Intdomain newSymbol := $\emptyset$
-\ForAll {s in Symbol}
-	\ForAll {pre in Pre}
+\ForAll {s \textbf{in} Symbol}
+	\ForAll {pre \textbf{in} Pre}
 		\State tc:= C(pre.state, s)
-		\State Pairdomain p :=(S(pre.state,s),pre.low+tc,pre.high+tc)
-		\State i := getIndex(Post, p.x) Returns -1 if not found
-		\State Pairdomain q :=(S(pre.state,s),max(pre.l,P[i].l), min(pre.h,P[i].h))
-		\If {p.state $\neq$ garbage state and q.l$\leq$q.h and i$\geq$0}
+		\State Pairdomain p :=(S(pre.state,s),pre.l+tc,pre.u+tc)
+		\State i := getIndex(Post, p.x) \textit{\# Returns -1 if not found}
+		\State Pairdomain q :=(S(pre.state,s),max(pre.l,P[i].l), min(pre.u,P[i].u))
+		\If {p.state $\neq$ garbage state \textbf{and} q.l$\leq$q.u \textbf{and} i$\geq$0}
 			\State Merge(newPost, p)
 			\State Merge(newPre, q)
 			\State newSymbol := newSymbol $\cup$ s
