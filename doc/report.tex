@@ -66,20 +66,25 @@
 \maketitle
 \interlinepenalty 10000
 
+\newpage
+
 \begin{abstract}
 
 In constraint programming, efficient pruning is vital to avoid unnecessary search. This thesis shows that tuple variables can be used to reduce the size of the search tree, which in turn may reduce the execution time. The tuple variables have been implemented in C++ for the Gecode library. The problem used to measure performance is finding paths through a deterministic finite automaton with transition costs.
 
 \end{abstract}
-
+\newpage
 \setcounter{tocdepth}{2}
 \tableofcontents
 \pagestyle{plain}
+\newpage
 
 \section*{Acknowledgements}
 Thanks to Jean-No\"{e}l Monette and Pierre Flener for being helpful supervisors. \\
 Thanks to Joseph Scott for helping me configuring Gecode and solving a memory bug. \\
 Thanks to Johan Gustafsson for helping me setting up an automatic test environment and general help with C++. \\
+
+\newpage
 
 \section{Introduction}
 Constraint programming (CP) is a declarative style of programming, and is very similar to solving equations in mathematics. A problem is modelled with variables, which must satisfy certain conditions. These conditions are called \textit{constraints}. Each variable is tied to a set of possible values. Such a set is called a \textit{domain}. The main process is to remove values not satisfying the constraints from the domains until only one value is left in each domain. A state where all variables have a domain with exactly one value each is called a \textit{solution}.
